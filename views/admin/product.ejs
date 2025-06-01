@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX - Products</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/product.css">
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-text">Chrono</span>X
+            </div>
+        </div>
+        
+        <div class="nav-items">
+            <a href="dashboard" class="nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="product" class="nav-item active">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Order List</span>
+            </a>
+            <a href="userlist" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Sales</span>
+            </a>
+            <a href="category" class="nav-item">
+                <i class="fas fa-tags"></i>
+                <span>Category</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Coupons</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-image"></i>
+                <span>Banner</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="account-btn">Account</button>
+           <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="breadcrumb">
+                <a href="dashboard">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="product">Products</a>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Deepak</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+                
+        <h1 class="page-title">Products</h1>
+
+        <form action="/admin/product" method="get">
+            <div class="search-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" value="<%= search %>" name="search" placeholder="Search product...">
+                    <a href="/admin/product"><i class="fas fa-close" style="margin-left: 90%;"></i></a>
+                </div>
+            </div>
+            </form>
+
+           <form method="get" action="/admin/product"> 
+                  <select name="category" onchange="this.form.submit()" style="padding: 6px; margin-bottom:8px; border-radius: 8px; ">
+                        <option value="all">All Categories</option>
+                        <% categories.forEach(element => { %>
+                                <option value="<%= element.name %>"><%= element.name  %></option>
+                        <% }) %>
+                    </select>
+                </form>
+
+
+
+                <form action="/admin/addproduct" method="get">
+                    <button class="add-product-btn">
+                        Add New Product
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </form>
+
+
+        <div class="products-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>List</th>
+                        <th>Action</th>
+                        <th>Offer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        <% products.forEach(element => { %>
+                            <tr>
+                            <td>
+                                <div class="product-image">
+                                    <% if (element.images && element.images.length > 0 && element.images[0].public_id) { %>
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= element.images[0].public_id %>" alt="<%= element.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <% } else { %>
+                                        <img src="/images/placeholder.jpg" alt="No image available">
+                                    <% } %>
+                                </div>
+                            </td>
+                            <td><%= element.name %></td>
+                            <td><%=  element.brand||'N/A' %></td>
+                            <td>₹<%=  element.variants[0]?.salePrice || 0 %></td>
+                            <td><%=  element.variants[0]?.quantity || 0 %></td>
+                            <td>
+                                <label class="switch">
+                                     <% if (element.isActive) { %>
+                                     <input type="checkbox" checked onclick="blockUnblock('<%=element._id %>')">
+                                     <% } else { %>
+                                      <input type="checkbox" onclick="blockUnblock('<%=element._id %>')">
+                                    <% } %>
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <button class="action-btn edit" onclick="editProduct('<%= element._id %>')">
+                                <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="openModal('<%= element._id %>')">
+                                <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <% if (element.offer) { %>
+                                <div class="offer-tag"><%= element.offer %>%Off</div>
+                                <% } else { %>
+                                <div class="offer-tag">-</div>
+                                <% } %>
+                            </td>
+                            </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+        <div class="page-info">
+            Showing <%= (currentPage - 1) * limit + 1 %> -
+            <%= Math.min(currentPage * limit, totalProducts) %> from <%= totalProducts,%>
+        </div>
+
+        <div class="page-controls">
+            
+            <% if (currentPage > 1) { %>
+            <a href="product?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <% } else { %>
+            <button class="page-btn" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <% } %>
+
+            
+            <% for (let i = 1; i <= totalPage; i++) { %>
+            <a href="product?page=<%= i %>&search=<%= search %>&category=<%= selectedCategory %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                <%= i %>
+            </a>
+            <% } %>
+
+            <!-- Next Button -->
+            <% if (currentPage < totalPage) { %>
+            <a href="product?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            <% } else { %>
+            <button class="page-btn" disabled>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <% } %>
+        </div>
+        </div>
+    </div>
+     <div id="deleteModal" class="modal">
+        <div class="modal-content">
+                    <h3>Confirm Deletion</h3>
+                    <p>Are you sure you want to delete this product?</p>
+                    <button class="confirm-btn" onclick="deleteProduct()">Yes, Delete</button>
+                    <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+            </div>
+     </div>
+
+        
+    <script>
+        // Menu Toggle for Mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+        
+        // List/Unlist Toggle
+        const listStatuses = document.querySelectorAll('.list-status');
+        listStatuses.forEach(status => {
+            status.addEventListener('click', function() {
+                if (this.classList.contains('listed')) {
+                    this.classList.remove('listed');
+                    this.classList.add('unlisted');
+                    this.textContent = 'Unlist';
+                } else {
+                    this.classList.remove('unlisted');
+                    this.classList.add('listed');
+                    this.textContent = 'List';
+                }
+            });
+        });
+        
+        // Sort Options
+        const sortOptions = document.querySelectorAll('.sort-option');
+        sortOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                sortOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Pagination
+        const pageButtons = document.querySelectorAll('.page-btn:not(.dots)');
+        pageButtons.forEach(btn => {
+            if (!btn.querySelector('i')) {
+                btn.addEventListener('click', function() {
+                    pageButtons.forEach(b => {
+                        if (!b.querySelector('i')) {
+                            b.classList.remove('active');
+                        }
+                    });
+                    this.classList.add('active');
+                });
+            }
+        });
+        
+        // Hover effects for nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Add Offer Button
+        const addOfferButtons = document.querySelectorAll('.add-offer-btn');
+        addOfferButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const offerType = prompt('Enter offer type (e.g., "20%Off" or "200rs Off"):');
+                if (offerType) {
+                    const offerTag = document.createElement('div');
+                    offerTag.className = 'offer-tag';
+                    offerTag.textContent = offerType;
+                    this.parentNode.replaceChild(offerTag, this);
+                }
+            });
+        });
+
+        function editProduct(id){
+            window.location.href=`/admin/editproduct/edit/${id}`
+
+        }  
+        let currentProductId = null;
+    
+
+            function openModal(productId) {
+                currentProductId = productId;
+                console.log(currentProductId,"this is cuure")
+                document.getElementById('deleteModal').style.display = 'block';
+            }
+
+            function closeModal() {
+                document.getElementById('deleteModal').style.display = 'none';
+                currentProductId = null;
+            }
+
+            async function deleteProduct() {
+                if (!currentProductId) return;
+
+                try {
+                    const response = await fetch(`/admin/product/${currentProductId}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        showToast(result.message);
+                        setTimeout(() => {
+                            window.location.href = '/admin/product';
+                        }, 3000);
+                    } else {
+                        showToast('Error: ' + (result.message || 'Failed to delete product'), 'error');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    showToast('Error deleting product', 'error');
+                } finally {
+                    closeModal();
+                }
+            }
+
+            function showToast(message = 'Product deleted successfully!', type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.style.backgroundColor = type === 'error' ? '#dc3545' : '#4CAF50';
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('deleteModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            }
+
+            function blockUnblock(productId) {
+                fetch(`/admin/product/block/${productId}`, {
+                    method: 'put',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message||'','success');
+                    } else {
+                        showToast(data.message || "something went wrong", 'success');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Something went wrong');
+                });
+            }
+    </script>
+</body>
+</html>

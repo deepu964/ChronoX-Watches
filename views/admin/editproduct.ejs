@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX - Edit Product</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/editproduct.css">
+    <style>
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+            color: white;
+            background-color: #4CAF50;
+        }
+        .error-message { color: red; font-size: 12px; }
+        .preview-container { max-width: 100px; margin: 10px 0; position: relative; }
+        .remove-btn { position: absolute; top: 0; right: 0; background: red; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-text">ChronoX</span>
+            </div>
+        </div>
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin/product" class="nav-item active">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Order List</span>
+            </a>
+            <a href="/admin/userlist" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Sales</span>
+            </a>
+            <a href="/admin/category" class="nav-item">
+                <i class="fas fa-tags"></i>
+                <span>Category</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Coupons</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-qrcode"></i>
+                <span>Scanner</span>
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <button class="account-btn">Account</button>
+            <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="page-title">Edit Product</div>
+            <a href="/admin/product"><button class="action-btn">Back to Products</button></a>
+        </div>
+
+        <form id="editProductForm" method="put" action="/admin/product/edit/<%= product._id %>"  enctype="multipart/form-data">
+            <input type="hidden" name="productId" value="<%= product._id %>">
+            <div class="card">
+                <h3 class="card-title">Product Details</h3>
+                <div class="form-group">
+                    <label class="form-label" for="productName">Product Name</label>
+                    <input type="text" class="form-control" id="productName" placeholder="Enter product name" name="name" value="<%= product.name %>">
+                    <div class="error-message" id="productNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" id="description" placeholder="Enter product description" name="description"><%= product.description %></textarea>
+                    <div class="error-message" id="descriptionError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="brand">Brand</label>
+                    <input type="text" class="form-control" id="brand" placeholder="Enter brand name" name="brand" value="<%= product.brand %>">
+                    <div class="error-message" id="brandError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="offer">Offer</label>
+                    <input type="text" class="form-control" id="offer" placeholder="Enter offer details" name="offer" value="<%= product.offer || '' %>">
+                    <div class="error-message" id="offerError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="model">Model</label>
+                    <input type="text" class="form-control" id="model" placeholder="Enter model" name="model" value="<%= product.model %>">
+                    <div class="error-message" id="modelError"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="regularPrice">Price</label>
+                        <input type="number" class="form-control" id="regularPrice" placeholder="0.00" name="regularPrice" value="<%= product.variants[0].regularPrice %>">
+                        <div class="error-message" id="regularPriceError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="salePrice">Sale Price</label>
+                        <input type="number" class="form-control" id="salePrice" placeholder="0.00" name="salePrice" value="<%= product.variants[0].salePrice %>">
+                        <div class="error-message" id="salePriceError"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="stock">Stock</label>
+                    <input type="text" class="form-control" id="stock" placeholder="Enter stock quantity" name="stock" value="<%= product.variants[0].quantity %>">
+                    <div class="error-message" id="stockError"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Product Images</h3>
+                <div class="image-upload-container">
+                    <div class="main-image-upload">
+                        <label class="form-label">Main Product Image</label>
+                        <div class="upload-box main-upload" id="mainImageBox">
+                            <% if (product.images) { %>
+                                <div class="preview-container">
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
+                                </div>
+                            <% } %>
+                           
+                            <input type="file" name="mainImage" accept="image/*" id="mainImageInput">
+                        </div>
+                        <div class="error-message" id="mainImageError"></div>
+                    </div>
+                    
+                    <div>
+                        <label class="form-label">Additional Images</label>
+                        <div class="additional-images">
+                            <div class="upload-box additional-upload" id="additionalImageBox1">
+                                <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput1">
+                                  <% if (product.images) { %>
+                                <div class="preview-container">
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[1].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
+                                </div>
+                            <% } %>
+                            </div>
+                            <div class="upload-box additional-upload" id="additionalImageBox2">
+                                <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput2">
+                                <% if (product.images) { %>
+                                <div class="preview-container">
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[2].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
+                                </div>
+                            <% } %>
+                            </div>
+                            <div class="upload-box additional-upload" id="additionalImageBox3">
+                                <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput3">
+                                <% if (product.images) { %>
+                                <div class="preview-container">
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[3].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
+                                </div>
+                            <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Product Specifications</h3>
+                <div class="form-group">
+                    <label class="form-label" for="category">Category</label>
+                    <select name="category" id="category" class="form-control">
+                       
+                        <% categories.forEach(element => { %>
+                            <option value="<%= element._id %>" <%= element.category && element.category.toString() === element._id.toString() ? 'selected' : '' %>>
+                                <%= element.name %>
+                            </option>
+                        <% }) %>
+                    </select>
+                    <div class="error-message" id="categoryError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="additionalInfo">Additional Information</label>
+                    <textarea class="form-control" id="additionalInfo" placeholder="Enter any additional information" name="additionalInfo"><%= product.additionalInfo || '' %></textarea>
+                    <div class="error-message" id="additionalInfoError"></div>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/admin/product'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Product</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="cropperModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+        background: rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999;">
+        <div style="background:#fff; padding:20px; max-width:600px; width:100%; position:relative;">
+            <img id="cropperImage" style="max-width:100%; max-height:500px;">
+            <div style="margin-top:10px; text-align:right;">
+                <button id="cropConfirm" class="btn btn-primary">Crop & Save</button>
+                <button id="cropCancel" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script>
+        let activeInput = null;
+        let cropper = null;
+
+        // Initialize drag and drop
+        function initializeDragAndDrop(uploadBox, input) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadBox.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            uploadBox.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    input.files = files;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+
+            uploadBox.addEventListener('click', () => {
+                input.click();
+            });
+        }
+
+        // Handle image preview and cropping
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            const uploadBox = input.parentElement;
+            initializeDragAndDrop(uploadBox, input);
+
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const existingPreview = uploadBox.querySelector('.preview-container');
+                if (existingPreview) existingPreview.remove();
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    activeInput = input;
+                    const modal = document.getElementById('cropperModal');
+                    const cropImg = document.getElementById('cropperImage');
+                    cropImg.src = event.target.result;
+                    modal.style.display = 'flex';
+
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(cropImg, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 0.8,
+                        responsive: true,
+                        cropBoxResizable: true,
+                        dragMode: 'move',
+                        background: false,
+                        minContainerWidth: 200,
+                        minContainerHeight: 200
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Crop confirm
+        document.getElementById('cropConfirm').addEventListener('click', () => {
+            if (!cropper || !activeInput) return;
+
+            cropper.getCroppedCanvas({
+                width: 800,
+                height: 800,
+                imageSmoothingQuality: 'high'
+            }).toBlob((blob) => {
+                const fileName = activeInput.files[0]?.name || `cropped_${Date.now()}.jpg`;
+                const croppedFile = new File([blob], fileName, { type: 'image/jpeg' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(croppedFile);
+                activeInput.files = dataTransfer.files;
+
+                const uploadBox = activeInput.parentElement;
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'preview-container';
+                const previewImg = document.createElement('img');
+                previewImg.src = URL.createObjectURL(blob);
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = 'Remove';
+                removeBtn.className = 'remove-btn';
+
+                removeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    previewContainer.remove();
+                    activeInput.value = '';
+                });
+
+                previewContainer.appendChild(previewImg);
+                previewContainer.appendChild(removeBtn);
+                uploadBox.appendChild(previewContainer);
+
+                closeModal();
+            }, 'image/jpeg', 0.9);
+        });
+
+        // Crop cancel
+        document.getElementById('cropCancel').addEventListener('click', () => {
+            if (activeInput) activeInput.value = '';
+            closeModal();
+        });
+
+        function closeModal() {
+            const modal = document.getElementById('cropperModal');
+            modal.style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            activeInput = null;
+        }
+
+        // Remove existing image
+        function removeImage(button) {
+            const previewContainer = button.parentElement;
+            const uploadBox = previewContainer.parentElement;
+            const input = uploadBox.querySelector('input[type="file"]');
+            input.value = '';
+            previewContainer.remove();
+        }
+
+        // Form validation
+        const form = document.getElementById('editProductForm');
+        const fields = [
+            { id: 'productName', errorId: 'productNameError', validate: value => {
+                if (!value) return 'Product name is required';
+                if (value.length < 3) return 'Product name must be at least 3 characters';
+                if (value.length > 100) return 'Product name cannot exceed 100 characters';
+                if (!/^[a-zA-Z0-9\s\-]+$/.test(value)) return 'Product name can only contain letters, numbers, spaces, and hyphens';
+                return '';
+            }},
+            { id: 'description', errorId: 'descriptionError', validate: value => {
+                if (!value) return 'Description is required';
+                if (value.length < 10) return 'Description must be at least 10 characters';
+                if (value.length > 1000) return 'Description cannot exceed 1000 characters';
+                return '';
+            }},
+            { id: 'brand', errorId: 'brandError', validate: value => {
+                if (!value) return 'Brand is required';
+                if (value.length < 2) return 'Brand must be at least 2 characters';
+                if (value.length > 50) return 'Brand cannot exceed 50 characters';
+                if (!/^[a-zA-Z\s]+$/.test(value)) return 'Brand can only contain letters and spaces';
+                return '';
+            }},
+            { id: 'offer', errorId: 'offerError', validate: value => {
+                if (value && !/^[a-zA-Z0-9\s%\-]+$/.test(value)) return 'Offer can only contain letters, numbers, spaces, percentages, and hyphens';
+                return '';
+            }},
+            { id: 'model', errorId: 'modelError', validate: value => {
+                if (!value) return 'Model is required';
+                if (value.length < 2) return 'Model must be at least 2 characters';
+                if (value.length > 50) return 'Model cannot exceed 50 characters';
+                if (!/^[a-zA-Z0-9\s\-]+$/.test(value)) return 'Model can only contain letters, numbers, spaces, and hyphens';
+                return '';
+            }},
+            { id: 'regularPrice', errorId: 'regularPriceError', validate: value => {
+                if (!value) return 'Regular price is required';
+                if (isNaN(value) || value <= 0) return 'Regular price must be a positive number';
+                if (value > 1000000) return 'Regular price cannot exceed 1,000,000';
+                return '';
+            }},
+            { id: 'salePrice', errorId: 'salePriceError', validate: value => {
+                if (!value) return 'Sale price is required';
+                if (isNaN(value) || value <= 0) return 'Sale price must be a positive number';
+                if (value > 1000000) return 'Sale price cannot exceed 1,000,000';
+                const regularPrice = parseFloat(document.getElementById('regularPrice').value);
+                if (value >= regularPrice) return 'Sale price must be less than regular price';
+                return '';
+            }},
+            { id: 'stock', errorId: 'stockError', validate: value => {
+                if (value === '') return 'Stock is required';
+                if (isNaN(value) || value < 0) return 'Stock must be a non-negative number';
+                return '';
+            }},
+            { id: 'category', errorId: 'categoryError', validate: value => {
+                if (!value) return 'Category is required';
+                return '';
+            }},
+            { id: 'additionalInfo', errorId: 'additionalInfoError', validate: value => {
+                if (value && value.length > 1000) return 'Additional information cannot exceed 1000 characters';
+                return '';
+            }}
+        ];
+
+        function validateForm() {
+            let isValid = true;
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const errorElement = document.getElementById(field.errorId);
+                const value = input.value.trim();
+                const error = field.validate(value);
+                errorElement.textContent = error;
+                errorElement.style.display = error ? 'block' : 'none';
+                if (error) isValid = false;
+            });
+            return isValid;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (validateForm()) {
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: 'PUT',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    console.log(result,"this is result");
+                    if (response.ok && result.success) {
+                        showToast(result.message);
+                        setTimeout(()=>{
+                            window.location.href="/admin/product";
+                        },2000)
+                        
+                    } else {
+                        showToast('Error: ' + (result.message || 'Failed to update product'));
+                    }
+                } catch (error) {
+                    console.error('Form submission error:', error);
+                    showToast('Error updating product. Please try again.');
+                }
+            }
+        });
+
+        function showToast(message = 'Product updated successfully!') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+                window.location.href = '/admin/product';
+            }, 3000);
+        }
+
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html> 

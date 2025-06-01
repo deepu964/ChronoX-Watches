@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX - Customer List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/userlist.css">
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-text">ChronoX</span>
+            </div>
+        </div>
+        
+        <div class="nav-items">
+            <a href="dashboard" class="nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="product" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Order List</span>
+            </a>
+            <a href="userlist" class="nav-item active">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Sales</span>
+            </a>
+            <a href="category" class="nav-item">
+                <i class="fas fa-tags"></i>
+                <span>Category</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Coupons</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-qrcode"></i>
+                <span>Scanner</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="account-btn">Account</button>
+            <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1 class="page-title">CUSTOMER LIST</h1>
+                <div class="breadcrumb">Home/Customers > Customer List</div>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Deepak</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+        <form action="userlist" method="get">
+            <div class="search-filter">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" value="<%= search %>" name="search" placeholder="Search customer...">
+                    <a href="userlist"><i class="fas fa-close" style="margin-left: 90%;"></i></a>
+                </div>
+            </div>
+        </form>
+        
+        <div class="customer-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                      <% user.forEach(element => { %>
+                        <tr>
+                            <td>
+                            <div class="customer-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John">
+                            </div>
+                            <span class="customer-name"><%= element.fullname %></span>
+                        </td>
+                        <td><%= element.email %></td>
+                        <td><%= element.mobile %></td>
+                        <% if (element.isBlocked) { %>
+                         <td><span class="status-badge status-blocked">Blocked</span></td>
+                         <% } else { %>
+                          <td><span class="status-badge status-active">Active</span></td>
+                        <% } %>
+                        
+
+                        <td>
+                                <label class="switch">
+                                    <% if (element.isBlocked) { %>
+                                     <input type="checkbox" checked onclick="blockUnblock('<%=element._id %>')">
+                                     <% } else { %>
+                                      <input type="checkbox" onclick="blockUnblock('<%=element._id %>')">
+                                    <% } %>
+                                    <span class="slider"></span>
+                                
+                                </label>
+                        </td>
+                        
+                        </tr>
+                        <% }) %>
+                    
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+        <div class="page-info">
+            Showing <%= (currentPage - 1) * limit + 1 %> -
+            <%= Math.min(currentPage * limit, totalUser) %> from <%= totalUser %>
+        </div>
+
+        <div class="page-controls">
+            <!-- Previous Button -->
+            <% if (currentPage > 1) { %>
+            <a href="userlist?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <% } else { %>
+            <button class="page-btn" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <% } %>
+
+            <!-- Page Numbers -->
+            <% for (let i = 1; i <= totalPage; i++) { %>
+            <a href="userlist?page=<%= i %>&search=<%= search %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                <%= i %>
+            </a>
+            <% } %>
+
+            <!-- Next Button -->
+            <% if (currentPage < totalPage) { %>
+            <a href="userlist?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            <% } else { %>
+            <button class="page-btn" disabled>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <% } %>
+        </div>
+        </div>
+    </div>
+    
+    <script>
+        // Menu Toggle for Mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+        
+        // Toggle switches
+        const switches = document.querySelectorAll('.switch input');
+        switches.forEach(switchEl => {
+            switchEl.addEventListener('change', function() {
+                const row = this.closest('tr');
+                const statusBadge = row.querySelector('.status-badge');
+                const actionBtn = row.querySelector('.action-btn');
+                
+                if (this.checked) {
+                    statusBadge.className = 'status-badge status-blocked';
+                    statusBadge.textContent = 'Blocked';
+                    actionBtn.className = 'action-btn view';
+                    actionBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                } else {
+                    statusBadge.className = 'status-badge status-active';
+                    statusBadge.textContent = 'Active';
+                    actionBtn.className = 'action-btn block';
+                    actionBtn.textContent = 'Block';
+                }
+            });
+        });
+        
+        // Block buttons
+        const blockButtons = document.querySelectorAll('.action-btn.block');
+        blockButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const switchInput = row.querySelector('.switch input');
+                switchInput.checked = true;
+                
+                // Trigger the change event
+                const event = new Event('change');
+                switchInput.dispatchEvent(event);
+            });
+        });
+        
+        // Pagination
+        const pageButtons = document.querySelectorAll('.page-btn');
+        pageButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.classList.contains('active') && !this.querySelector('i')) {
+                    pageButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+        
+        // Hover effects for nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        function blockUnblock(id){
+            fetch(`/admin/userlist/block/${id}`,{
+                method:'put',
+                headers:{"Content-type":"application/json"}
+            }).then((response=>response.json()))
+            .then((data)=>{
+                if(data.success){
+                    showToast(data.message||'','success');
+                }else{
+                    showToast(data.message || "something went wrong", 'error');
+                }
+            })
+        }
+    </script>
+</body>
+</html>
+
+

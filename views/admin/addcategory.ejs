@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX - Add Category</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/addcategory.css">
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-text">Chrono</span>X
+            </div>
+        </div>
+        
+        <div class="nav-items">
+            <a href="/admin/dashboard" class="nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin/product" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+            <a href="/admin/orderlist" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Order List</span>
+            </a>
+            <a href="/admin/userlist" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
+            </a>
+            <a href="/admin/sales" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Sales</span>
+            </a>
+            <a href="/admin/category" class="nav-item active">
+                <i class="fas fa-tags"></i>
+                <span>Category</span>
+            </a>
+            <a href="/admin/coupons" class="nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Coupons</span>
+            </a>
+            <a href="/admin/banner" class="nav-item">
+                <i class="fas fa-image"></i>
+                <span>Banner</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="account-btn">Account</button>
+            <button class="logout-btn">Logout</button>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <div class="page-title">ADD A CATEGORY</div>
+            <a href="/admin/category"><button class="action-btn">Back to category</button></a>
+        </div>
+        
+        
+        <form id="categoryForm">
+            <div class="form-group">
+                <label class="form-label">Category Name</label>
+                <input type="text" id="categoryName" class="form-input" placeholder="Type category name here...">
+                <p id="categoryNameError" class="error-message" style="color: red; display: none;"></p>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="description" class="form-textarea" placeholder="Type category description here..."></textarea>
+                <p id="descriptionError" class="error-message" style="color: red; display: none;"></p>
+            </div>
+            
+            
+            <button type="submit" class="submit-btn">Add Category</button>
+        </form>
+    </div>
+    
+    <script>
+        
+        document.getElementById('menuToggle')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        
+        document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const categoryName = document.getElementById('categoryName').value.trim();
+            const description = document.getElementById('description').value.trim();
+            let isValid = true;
+
+            
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.style.display = 'none';
+                error.textContent = '';
+            });
+
+            
+            if (!categoryName) {
+                document.getElementById('categoryNameError').textContent = 'Category name is required';
+                document.getElementById('categoryNameError').style.display = 'block';
+                isValid = false;
+            } else if (categoryName.length < 3 || categoryName.length > 50) {
+                document.getElementById('categoryNameError').textContent = 'Category name must be 3-50 characters';
+                document.getElementById('categoryNameError').style.display = 'block';
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9\s-]+$/.test(categoryName)) {
+                document.getElementById('categoryNameError').textContent = 'Category name can only contain letters, numbers, spaces, and hyphens';
+                document.getElementById('categoryNameError').style.display = 'block';
+                isValid = false;
+            }
+
+           
+            if (!description) {
+                document.getElementById('descriptionError').textContent = 'Description is required';
+                document.getElementById('descriptionError').style.display = 'block';
+                isValid = false;
+            } else if (description.length < 10 || description.length > 500) {
+                document.getElementById('descriptionError').textContent = 'Description must be 10-500 characters';
+                document.getElementById('descriptionError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isValid) {
+                try {
+                    const response = await fetch('/admin/addcategory', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            categoryName,
+                            description
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast(data.message || 'Category added successfully', 'success');
+                        document.getElementById('categoryForm').reset();
+                        setTimeout(() => {
+                            window.location.href = '/admin/category';
+                        }, 2000);
+                    } else {
+                        showToast(data.message || 'Failed to add category', 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error: Failed to add category', 'error');
+                }
+            }
+        });
+
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = '4px';
+            toast.style.zIndex = '1000';
+            toast.style.color = 'white';
+            toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

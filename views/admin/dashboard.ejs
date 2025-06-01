@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-text">Chrono</span>X
+            </div>
+        </div>
+        
+        <div class="nav-items">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="product" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Order List</span>
+            </a>
+            <a href="userlist" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Sales</span>
+            </a>
+            <a href="category" class="nav-item">
+                <i class="fas fa-tags"></i>
+                <span>Category</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Coupons</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-qrcode"></i>
+                <span>Scanner</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="account-btn">Account</button>
+            <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Deepak</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">5,423</div>
+                    <div class="stat-label">Total Customers</div>
+                    <div class="stat-label">+10% this month</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">1,893</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">₹65,805</div>
+                    <div class="stat-label">Total Sales</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">189</div>
+                    <div class="stat-label">Total Pending</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sales Details -->
+        <div class="sales-details">
+            <h2 class="section-title">Sales Details</h2>
+            
+            <div class="sales-grid">
+                <div class="sales-card">
+                    <div class="sales-card-header">
+                        <div>
+                            <div class="sales-card-title">Sales Progress</div>
+                            <div class="sales-card-subtitle">This Quarter</div>
+                        </div>
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                    
+                    <div class="sales-card-body">
+                        <div class="progress-container">
+                            <div class="progress-circle">
+                                <canvas id="progressChart"></canvas>
+                                <div class="progress-value">75.55%</div>
+                            </div>
+                            <div class="progress-label">+10%</div>
+                        </div>
+                        
+                        <div class="success-message">
+                            You succeed earn ₹28963 today, its higher than yesterday
+                        </div>
+                        
+                        <div class="sales-metrics">
+                            <div class="metric">
+                                <div class="metric-label">Target</div>
+                                <div class="metric-value">₹30k <i class="fas fa-arrow-down down"></i></div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Revenue</div>
+                                <div class="metric-value">₹16k <i class="fas fa-arrow-up up"></i></div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Today</div>
+                                <div class="metric-value">₹28k <i class="fas fa-arrow-up up"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sales-card">
+                    <div class="sales-card-header">
+                        <div class="sales-card-title">Activity</div>
+                        <div class="dropdown">
+                            <span>Month</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="sales-card-body">
+                        <canvas id="activityChart" class="activity-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Menu Toggle for Mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+        
+        // Progress Chart
+        const progressCtx = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(progressCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [75.55, 24.45],
+                    backgroundColor: [
+                        '#4f46e5',
+                        '#e5e7eb'
+                    ],
+                    borderWidth: 0,
+                    cutout: '80%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            }
+        });
+        
+        // Activity Chart
+        const activityCtx = document.getElementById('activityChart').getContext('2d');
+        const activityChart = new Chart(activityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Activity',
+                    data: [100, 80, 120, 250, 180, 300, 200, 100, 280, 320, 350, 400],
+                    backgroundColor: '#4f46e5',
+                    borderRadius: 5,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: '#f3f4f6'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        // Hover effects for nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

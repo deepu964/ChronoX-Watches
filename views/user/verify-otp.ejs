@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="/css/verify-otp.css">
+
+</head>
+<body>
+    <div class="otp-container">
+        <h1 class="otp-title">Enter the OTP</h1>
+        <p class="otp-subtitle">
+            We've sent an email with an activation code to your email 
+            <span class="email-text" id="userEmail"><%= email %></span>
+        </p>
+        
+        <% if (typeof message !== 'undefined' && message) { %>
+        <div id="errormsg" class="alert alert-danger">
+            <%= message %>
+        </div>
+        <% } else { %>
+         <div id="errormsg" >
+            
+        </div>
+        <% } %>
+        
+        <div id="successAlert" class="alert alert-success" style="display: none;"></div>
+
+        <form id="otpForm" action="/verify-otp" method="POST">
+            <div class="otp-input-container">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" name="otp1">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" name="otp2">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" name="otp3">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" name="otp4">
+            </div>
+            
+         
+             <input type="hidden" name="otp" id="combinedOtp">
+
+            <div class="timer-section" id="timerSection">
+                <div class="timer-text">Send code again in</div>
+                <div class="timer" id="timer">1:00</div>
+            </div>
+
+            <div class="resend-section" id="resendSection" style="display: none;">
+                <span class="resend-text">I didn't receive a code. </span>
+                <a href="#" class="resend-link" id="resendLink">Resend</a>
+            </div>
+
+            <button type="submit" class="verify-button" id="verifyButton" disabled>
+                Verify
+            </button>
+        </form>
+    </div>
+    <script>
+        // Server-side data
+        const otpExpiration = parseInt(document.getElementById('otpExpr').value);
+        let timeLeft = Math.max(0, Math.floor((otpExpiration - Date.now()) / 1000));
+    
+        const resendBtn = document.querySelector('.resend');
+        const otpDisplay = document.getElementById('otpDisplay');
+        const otpForm = document.querySelector('form');
+        const otpInput = document.querySelector('input[name="otp"]');
+    
+        function updateTimer() {
+            if (timeLeft > 0) {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                otpDisplay.innerHTML = Resend OTP in ${minutes}:${seconds.toString().padStart(2, '0')};
+                timeLeft--;
+            } else {
+                otpDisplay.innerHTML = 'OTP has expired!';
+                otpInput.disabled = true;
+                resendBtn.style.display = 'inline-block';
+            }
+        }
+    
+        // Initial setup
+        if (timeLeft > 0) {
+            setInterval(updateTimer, 1000);
+            resendBtn.style.display = 'none';
+        } else {
+            otpDisplay.innerHTML = 'OTP has expired!';
+            otpInput.disabled = true;
+            resendBtn.style.display = 'inline-block';
+        }
+    
+        // Form submission handler
+        otpForm.addEventListener('submit', (e) => {
+            if (timeLeft <= 0) {
+                e.preventDefault();
+                alert('OTP has expired. Please request a new one.');
+                window.location.reload();
+            }
+        });
+    </script>
+
+</body>
+</html> 
+

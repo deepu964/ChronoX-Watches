@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronox | Luxury Watches</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a  href="/"><h2 class="logo-img"> ChronoX </h2></a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/shop">Shop</a></li>
+                    <li><a href="/login">Collections</a></li>
+                    
+                </ul>
+            </nav>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <div class="search-bar">
+                <form action="/search" method="GET">
+                    <input type="text" name="query" placeholder="Search..." class="search-input">
+                    <button type="submit" class="search-button"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="header-icons">
+                <a href="/login" class="icon-link"><i class="fas fa-user"></i></a>
+                <a href="/login" class="icon-link"><i class="fas fa-shopping-cart"></i></a>
+            </div>
+            <% if (!user) { %>
+                <div style="margin-left: 80px;">
+                   <a href="/login"><button style="padding: 7.5px;background-color: #3d3c3c; border: 1px solid transparent;color: white; border-radius: 5px;cursor: pointer;">Login</button></a>
+                </div>
+            <% } %>
+            <% if (user) { %>
+                <div style="margin-left: 80px;">
+                   <a href="/logout"><button style="padding: 7.5px;background-color: #3d3c3c; border: 1px solid transparent;color: white; border-radius: 5px;cursor: pointer;">Logout</button></a>
+                </div>
+            <% } %>
+            </div>
+            
+            
+        </div>
+    </header>

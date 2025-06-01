@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter New Password</title>
+    <link rel="stylesheet" href="/css/newPass.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Enter new Password</h1>
+        <form action="/newPass/<%= token %>" method="post" id="passwordForm">
+            <div class="form-group">
+                <input 
+                    type="password" 
+                    id="newPassword" 
+                    placeholder="Enter new Password" 
+                    name="password"
+                >
+                <div id="error1" class="error-message"></div>
+                <div class="password-strength" id="strengthIndicator"></div>
+            </div>
+            
+            <div class="form-group">
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    placeholder="Confirm new password" 
+                    name="confirm"
+                >
+                <div id="error2" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="verify-btn" id="verifyBtn">
+                    Verify
+                </button>
+            </div>
+        </form>
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('passwordForm');
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const error1 = document.getElementById('error1');
+        const error2 = document.getElementById('error2');
+        const strengthIndicator = document.getElementById('strengthIndicator');
+        const toast = document.getElementById('toast');
+
+        // Function to show toast message
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000); // Hide after 3 seconds
+        }
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            strengthIndicator.className = 'password-strength';
+            if (password.length === 0) {
+                strengthIndicator.classList.add('weak');
+            } else if (strength < 3) {
+                strengthIndicator.classList.add('weak');
+            } else if (strength < 5) {
+                strengthIndicator.classList.add('medium');
+            } else {
+                strengthIndicator.classList.add('strong');
+            }
+        }
+
+        // Real-time password strength update
+        newPassword.addEventListener('input', () => {
+            checkPasswordStrength(newPassword.value);
+        });
+
+        // Form validation on submit
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent form submission until validation passes
+            let isValid = true;
+            const password = newPassword.value;
+            const confirm = confirmPassword.value;
+
+            // Reset error messages
+            error1.textContent = '';
+            error2.textContent = '';
+
+            // Validate new password
+            if (password.length < 8) {
+                error1.textContent = 'Password must be at least 8 characters long';
+                isValid = false;
+            } else if (!/[A-Z]/.test(password)) {
+                error1.textContent = 'Password must contain at least one uppercase letter';
+                isValid = false;
+            } else if (!/[a-z]/.test(password)) {
+                error1.textContent = 'Password must contain at least one lowercase letter';
+                isValid = false;
+            } else if (!/[0-9]/.test(password)) {
+                error1.textContent = 'Password must contain at least one number';
+                isValid = false;
+            } else if (!/[^A-Za-z0-9]/.test(password)) {
+                error1.textContent = 'Password must contain at least one special character';
+                isValid = false;
+            }
+
+            // Validate confirm password
+            if (confirm !== password) {
+                error2.textContent = 'Passwords do not match';
+                isValid = false;
+            } else if (confirm === '') {
+                error2.textContent = 'Please confirm your password';
+                isValid = false;
+            }
+
+            // If valid, show toast and submit form
+            if (isValid) {
+                showToast('Password successfully updated!');
+                setTimeout(() => {
+                    form.submit(); // Submit the form after showing the toast
+                }, 1000); // Delay submission to allow user to see the toast
+            }
+        });
+    </script>
+</body>
+</html>

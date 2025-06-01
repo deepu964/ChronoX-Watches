@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - Chronox</title>
+    <link rel="stylesheet" href="/css/forgot-pass.css">
+</head>
+<body>
+    <div class="forgot-password-container">
+        <div class="logo">Chronox</div>
+        
+        <h1 class="forgot-password-title">Forgot Password?</h1>
+        <p class="subtitle">Enter your registered email to receive a password reset link</p>
+
+        <div id="responseMessage" class="response-message"></div>
+
+        <form id="forgotPasswordForm">
+           
+               <div class="form-group">
+                <label for="email" class="form-label">Enter your registered email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input" 
+                    placeholder="Enter Your Email"
+                   
+                >
+                <% if (error1) { %>
+                 <div id="error1" class="error-message"><%= error1 %></div>
+                <% } %>
+                <div id="error1" class="error-message"></div>
+                </div> 
+
+            <button type="submit" class="verify-btn" id="verifyBtn">
+                <span class="loading" id="loading"></span>
+                <span id="btnText">Verify Email</span>
+            </button>
+        </form>
+
+        <a href="/login" class="back-to-login">← Back to Login</a>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('forgotPasswordForm');
+        const emailInput = document.getElementById('email');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const btnText = document.getElementById('btnText');
+        const loading = document.getElementById('loading');
+        const error1 = document.getElementById('error1');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log("here 1")
+            // Clear old error
+            error1.textContent = '';
+
+            const email = emailInput.value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            console.log("here 2")
+            let isValid = true;
+
+            if (email === '') {
+                error1.textContent = 'Email is required';
+                isValid = false;
+            } else if (!emailPattern.test(email)) {
+                error1.textContent = 'Enter a valid email';
+                isValid = false;
+            }
+            console.log("here 3")
+            if (isValid) {
+                // Show spinner + disable button
+                loading.classList.add('spinner');
+                btnText.textContent = 'Verifying...';
+                verifyBtn.disabled = true;
+                console.log("here 4")
+                // Submit the form (since we blocked default above)
+                form.submit();
+
+                fetch('/forgot-pass',{
+                    method:"POST",
+                    headers:{'content-type':'application/json'},
+                    body:JSON.stringify({email})
+                })
+            }
+        });
+    });
+ </script>
+
+    
+</body>
+</html>

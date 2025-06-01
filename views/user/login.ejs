@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Chronox</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">Chronox</div>
+        <div id="responseMessage" class="response-message"></div>
+
+        <form action="/login" method="POST" class="login-form">
+            <h1 class="login-title">Log In</h1>
+            <% if (message) { %>
+             <p style="color: red; "><%= message %></p>
+            <% } %>
+             <% if (blocked) { %>
+             <p style="color: red; "><%= blocked %></p>
+            <% } %>
+                <% if (passChange) { %>
+                 <p style="color: red;" ><%= passChange %></p>
+                <% } %>
+            <div class="form-group">
+                <label for="email" class="form-label">Email address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input" 
+                    placeholder="Enter Your Email"
+                   
+                >
+               
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="****"
+                    
+                >
+                <span class="input-icon password-icon password-toggle" id="passwordToggle"></span>
+                <div class="forgot-password">
+                    <a href="/forgot-pass">Forgot password?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span class="loading" id="loading"></span>
+                <span id="btnText">Log in</span>
+            </button>
+        </form>
+
+        <div class="signup-link">
+            New user? <a href="/signup">Sign up</a>
+        </div>
+
+        <div class="divider">
+            <span>Or Login with</span>
+        </div>
+
+        
+         <a href="user/google" style="text-decoration: none;" class="google-btn">
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/042/165/816/small_2x/google-logo-transparent-free-png.png" alt="Google Icon" style="width: 50px;">
+                Register with Google
+            </a>
+    </div>
+
+    <script>
+        // Password toggle functionality
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.className = 'input-icon password-toggle show-password';
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.className = 'input-icon password-toggle hide-password';
+            }
+        });
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('btnText');
+            const loading = document.getElementById('loading');
+            const responseMessage = document.getElementById('responseMessage');
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loading.style.display = 'inline-block';
+            btnText.textContent = 'Logging in...';
+            responseMessage.style.display = 'none';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        email: email,
+                        password: password 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading state
+                loginBtn.disabled = false;
+                loading.style.display = 'none';
+                btnText.textContent = 'Log in';
+                
+                // Show response message
+                responseMessage.style.display = 'block';
+                
+                if (response.ok) {
+                    responseMessage.className = 'response-message success';
+                    responseMessage.textContent = data.message || 'Login successful! Redirecting...';
+                    
+                    // Redirect after success
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl || '/dashboard';
+                    }, 1500);
+                } else {
+                    responseMessage.className = 'response-message error';
+                    responseMessage.textContent = data.message || 'Invalid email or password. Please try again.';
+                }
+                
+            } catch (error) {
+                // Hide loading state
+                loginBtn.disabled = false;
+                loading.style.display = 'none';
+                btnText.textContent = 'Log in';
+                
+                // Show error message
+                responseMessage.style.display = 'block';
+                responseMessage.className = 'response-message error';
+                responseMessage.textContent = 'Network error. Please check your connection and try again.';
+            }
+        });
+
+        // Google login
+        document.getElementById('googleLogin').addEventListener('click', function() {
+            window.location.href = '/auth/google';
+        });
+
+        // Real-time email validation
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = '#dc3545';
+            } else if (email) {
+                this.style.borderColor = '#28a745';
+            } else {
+                this.style.borderColor = '#e1e5e9';
+            }
+        });
+
+        // Real-time password validation
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password && password.length < 6) {
+                this.style.borderColor = '#dc3545';
+            } else if (password) {
+                this.style.borderColor = '#28a745';
+            } else {
+                this.style.borderColor = '#e1e5e9';
+            }
+
+
+        //    document.getElementById(`${password} ,${email}`).addEventListener('input',function(){
+        //     const password = this.value;
+        //     const email = this.value;
+        //     if(!email || !password){
+        //         console.log("email or password something missing fill all required");
+        //     }
+        //    }) 
+        });
+    </script>
+</body>
+</html>
+
+

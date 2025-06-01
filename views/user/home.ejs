@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronox | Luxury Watches</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<%-include("../../views/partials/user/header") %>
+
+    <div class="hero-banner">
+        <div class="hero-text">
+            <h1>YOUR TIME, YOUR<br>STYLE, YOUR TRUE<br>IDENTITY</h1>
+        </div>
+        <div class="hero-image">
+            <img src="/images/banner/omega.webp" alt="Luxury Watch Mechanism">
+        </div>
+    </div>
+
+    <section class="product-section">
+        <h2 class="section-title">New Arrivals</h2>
+        <div class="product-grid">
+            <% if(locals.newArrivals && newArrivals.length > 0) { %>
+                <% newArrivals.forEach(function(product) { %>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <a href="/product/<%= product.id %>">
+                                <img src="<%= product.image %>" alt="<%= product.name %>">
+                            </a>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-name"><%= product.name %></h3>
+                            <div class="rating">
+                                <span class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </span>
+                            </div>
+                            <div class="product-price">
+                                <span class="current-price">$<%= product.price.toFixed(2) %></span>
+                                <% if(product.originalPrice) { %>
+                                    <span class="original-price">$<%= product.originalPrice.toFixed(2) %></span>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                    <% products.slice(0,8).forEach(element => { %>
+                        <div class="product-card">
+                            <div class="product-image">
+                                <a href="/productdetails/<%= element._id %>">
+                                    <% if (element.images && element.images.length > 0 && element.images[0].public_id) { %>
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= element.images[0].public_id %>" alt="<%= element.name || 'Ocean Blue Watch' %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <% } else { %>
+                                        <img src="/images/placeholder.jpg" alt="No image available">
+                                    <% } %>
+                                </a>
+                            </div>
+                            <div class="product-details">
+                                <h3 class="product-name"><%= element.name %></h3>
+                                <div class="rating">
+                        <span class="stars">
+                            <% for (let i = 0; i < Math.floor(element.rating || 0); i++) { %>
+                                <i class="fas fa-star"></i>
+                            <% } %>
+                            <% if ((element.rating || 0) % 1 !== 0) { %>
+                                <i class="fas fa-star-half-alt"></i>
+                            <% } %>
+                            <% for (let i = Math.ceil(element.rating || 0); i < 5; i++) { %>
+                                <i class="far fa-star"></i>
+                            <% } %>
+                        </span>
+                    </div>
+                    <div class="product-price">
+                        <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
+                           ₹<%= element.variants[0]?.salePrice %>
+                        </span>
+                        <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
+                           ₹<%= element.variants[0]?.regularPrice %>
+                        </span>
+                        </div>  
+                        <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                           <%= element.offer %>% OFF
+                        </span>
+                </div>
+            </div>
+        <% }) %>
+            <% } %>
+        </div>
+    </section>
+
+    <div class="feature-banner">
+        <img src="/images/banner/banner1.jpg" alt="Premium Watch Details" class="full-width-img">
+    </div>
+
+   
+    <section class="product-section">
+        <h2 class="section-title">Trending</h2>
+                <div class="product-grid trending-grid">
+                    <% products.slice(5, 8).forEach(element => { %>
+                        <div class="product-card">
+                            <div class="product-image">
+                                <a href="/productdetails/<%= element._id %>">
+                                    <% if (element.images && element.images.length > 0 && element.images[0].public_id) { %>
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= element.images[0].public_id %>" alt="<%= element.name || 'Gold Special' %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <% } else { %>
+                                        <img src="/images/placeholder.jpg" alt="No image available">
+                                    <% } %>
+                                </a>
+                            </div>
+                            <div class="product-overlay">
+                                <a href="/productdetails/<%= element._id %>"></a>
+                            </div>
+                            <div class="product-details">
+                                <h3 class="product-name"><%= element.name %></h3>
+                                <div class="rating">
+                                    <span class="stars">
+                                        <% for (let i = 0; i < Math.floor(element.rating || 0); i++) { %>
+                                            <i class="fas fa-star"></i>
+                                        <% } %>
+                                        <% if ((element.rating || 0) % 1 !== 0) { %>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        <% } %>
+                                        <% for (let i = Math.ceil(element.rating || 0); i < 5; i++) { %>
+                                            <i class="far fa-star"></i>
+                                        <% } %>
+                                    </span>
+                                </div>
+                                <div class="product-price">
+                                <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
+                                        ₹<%= element.variants[0]?.salePrice %>
+                                    </span>
+                                    <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
+                                        ₹<%= element.variants[0]?.regularPrice %>
+                                    </span>
+                                </div>
+                                <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                                        <%= element.offer %>% OFF
+                                </span>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+    
+        <div class="explore-more">
+            <h2 class="section-title">EXPLORE MORE</h2>
+        </div>
+    </section>
+    <section class="product-section">   
+                <div class="product-grid trending-grid">
+                <% products.slice(0, 3).forEach(element => { %>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <a href="/productdetails/<%= element._id %>">
+                                <% if (element.images && element.images.length > 0 && element.images[0].public_id) { %>
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= element.images[0].public_id %>" alt="<%= element.name || 'Gold Special' %>" onerror="this.src='/images/placeholder.jpg'">
+                                <% } else { %>
+                                    <img src="/images/placeholder.jpg" alt="No image available">
+                                <% } %>
+                            </a>
+                        </div>
+                        <div class="product-overlay">
+                            <a href="/productdetails/<%= element._id %>"></a>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-name"><%= element.name %></h3>
+                            <div class="rating">
+                                <span class="stars">
+                                    <% for (let i = 0; i < Math.floor(element.rating || 0); i++) { %>
+                                        <i class="fas fa-star"></i>
+                                    <% } %>
+                                    <% if ((element.rating || 0) % 1 !== 0) { %>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    <% } %>
+                                    <% for (let i = Math.ceil(element.rating || 0); i < 5; i++) { %>
+                                        <i class="far fa-star"></i>
+                                    <% } %>
+                                </span>
+                            </div>
+                           <div class="product-price">
+                                <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
+                                        ₹<%= element.variants[0]?.salePrice %>
+                                    </span>
+                                    <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
+                                        ₹<%= element.variants[0]?.regularPrice %>
+                                    </span>
+                                </div>
+                                <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                                        <%= element.offer %>% OFF
+                                </span>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+    
+    </section>
+
+   <%-include("../../views/partials/user/footer") %>
