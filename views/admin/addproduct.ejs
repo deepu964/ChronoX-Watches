@@ -285,8 +285,8 @@ in.css">
                 <h3 class="card-title">Product Specifications</h3>
                
                 <div class="form-group">
-                    <label class="form-label" for="quantity">Stock</label>
-                    <input type="number" class="form-control" id="quantity" placeholder="Enter product Qauntity" name="quantity">
+                    <label class="form-label" for="stock">Stock</label>
+                    <input type="number" class="form-control" id="stock" placeholder="Enter product Qauntity" name="stock">
                     <p id="quantityError" style="color: red;"></p>
                 </div>
                 <div class="form-group">
@@ -562,8 +562,8 @@ in.css">
             }
 
          
-            const quantity = parseInt(document.getElementById('quantity').value);
-            if (isNaN(quantity) || quantity < 0) {
+            const stock = parseInt(document.getElementById('stock').value);
+            if (isNaN(stock) || stock < 0) {
                 document.getElementById('quantityError').textContent = 'Stock must be a positive number';
                 document.getElementById('quantityError').style.display = 'block';
                 isValid = false;
@@ -586,6 +586,8 @@ in.css">
             }
 
             if (isValid) {
+                
+            
                 showToast('Product Added Successfully');
                 document.getElementById('addProductForm').submit();
             }

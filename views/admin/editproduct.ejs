@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,11 +22,30 @@
             color: white;
             background-color: #4CAF50;
         }
-        .error-message { color: red; font-size: 12px; }
-        .preview-container { max-width: 100px; margin: 10px 0; position: relative; }
-        .remove-btn { position: absolute; top: 0; right: 0; background: red; color: white; border: none; cursor: pointer; }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+        }
+
+        .preview-container {
+            max-width: 100px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
     <button class="menu-toggle" id="menuToggle">
         <i class="fas fa-bars"></i>
@@ -84,50 +104,59 @@
             <a href="/admin/product"><button class="action-btn">Back to Products</button></a>
         </div>
 
-        <form id="editProductForm" method="put" action="/admin/product/edit/<%= product._id %>"  enctype="multipart/form-data">
+        <form id="editProductForm" method="put" action="/admin/product/edit/<%= product._id %>"
+            enctype="multipart/form-data">
             <input type="hidden" name="productId" value="<%= product._id %>">
             <div class="card">
                 <h3 class="card-title">Product Details</h3>
                 <div class="form-group">
                     <label class="form-label" for="productName">Product Name</label>
-                    <input type="text" class="form-control" id="productName" placeholder="Enter product name" name="name" value="<%= product.name %>">
+                    <input type="text" class="form-control" id="productName" placeholder="Enter product name"
+                        name="name" value="<%= product.name %>">
                     <div class="error-message" id="productNameError"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="description">Description</label>
-                    <textarea class="form-control" id="description" placeholder="Enter product description" name="description"><%= product.description %></textarea>
+                    <textarea class="form-control" id="description" placeholder="Enter product description"
+                        name="description"><%= product.description %></textarea>
                     <div class="error-message" id="descriptionError"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="brand">Brand</label>
-                    <input type="text" class="form-control" id="brand" placeholder="Enter brand name" name="brand" value="<%= product.brand %>">
+                    <input type="text" class="form-control" id="brand" placeholder="Enter brand name" name="brand"
+                        value="<%= product.brand %>">
                     <div class="error-message" id="brandError"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="offer">Offer</label>
-                    <input type="text" class="form-control" id="offer" placeholder="Enter offer details" name="offer" value="<%= product.offer || '' %>">
+                    <input type="text" class="form-control" id="offer" placeholder="Enter offer details" name="offer"
+                        value="<%= product.offer || '' %>">
                     <div class="error-message" id="offerError"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="model">Model</label>
-                    <input type="text" class="form-control" id="model" placeholder="Enter model" name="model" value="<%= product.model %>">
+                    <input type="text" class="form-control" id="model" placeholder="Enter model" name="model"
+                        value="<%= product.model %>">
                     <div class="error-message" id="modelError"></div>
                 </div>
                 <div class="grid-2">
                     <div class="form-group">
                         <label class="form-label" for="regularPrice">Price</label>
-                        <input type="number" class="form-control" id="regularPrice" placeholder="0.00" name="regularPrice" value="<%= product.variants[0].regularPrice %>">
+                        <input type="number" class="form-control" id="regularPrice" placeholder="0.00"
+                            name="regularPrice" value="<%= product.variants[0].regularPrice %>">
                         <div class="error-message" id="regularPriceError"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="salePrice">Sale Price</label>
-                        <input type="number" class="form-control" id="salePrice" placeholder="0.00" name="salePrice" value="<%= product.variants[0].salePrice %>">
+                        <input type="number" class="form-control" id="salePrice" placeholder="0.00" name="salePrice"
+                            value="<%= product.variants[0].salePrice %>">
                         <div class="error-message" id="salePriceError"></div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="stock">Stock</label>
-                    <input type="text" class="form-control" id="stock" placeholder="Enter stock quantity" name="stock" value="<%= product.variants[0].quantity %>">
+                    <input type="text" class="form-control" id="stock" placeholder="Enter stock quantity" name="stock"
+                        value="<%= product.variants[0].quantity %>">
                     <div class="error-message" id="stockError"></div>
                 </div>
             </div>
@@ -140,45 +169,52 @@
                         <div class="upload-box main-upload" id="mainImageBox">
                             <% if (product.images) { %>
                                 <div class="preview-container">
-                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>"
+                                        alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
                                     <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
                                 </div>
-                            <% } %>
-                           
-                            <input type="file" name="mainImage" accept="image/*" id="mainImageInput">
+                                <% } %>
+
+                                    <input type="file" name="mainImage" accept="image/*" id="mainImageInput">
                         </div>
                         <div class="error-message" id="mainImageError"></div>
                     </div>
-                    
+
                     <div>
                         <label class="form-label">Additional Images</label>
                         <div class="additional-images">
                             <div class="upload-box additional-upload" id="additionalImageBox1">
                                 <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput1">
-                                  <% if (product.images) { %>
-                                <div class="preview-container">
-                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[1].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
-                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
-                                </div>
-                            <% } %>
+                                <% if (product.images) { %>
+                                    <div class="preview-container">
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[1].public_id %>"
+                                            alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                        <button type="button" class="remove-btn"
+                                            onclick="removeImage(this)">Remove</button>
+                                    </div>
+                                    <% } %>
                             </div>
                             <div class="upload-box additional-upload" id="additionalImageBox2">
                                 <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput2">
                                 <% if (product.images) { %>
-                                <div class="preview-container">
-                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[2].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
-                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
-                                </div>
-                            <% } %>
+                                    <div class="preview-container">
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[2].public_id %>"
+                                            alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                        <button type="button" class="remove-btn"
+                                            onclick="removeImage(this)">Remove</button>
+                                    </div>
+                                    <% } %>
                             </div>
                             <div class="upload-box additional-upload" id="additionalImageBox3">
                                 <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput3">
                                 <% if (product.images) { %>
-                                <div class="preview-container">
-                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[3].public_id %>" alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
-                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
-                                </div>
-                            <% } %>
+                                    <div class="preview-container">
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[3].public_id %>"
+                                            alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
+                                        <button type="button" class="remove-btn"
+                                            onclick="removeImage(this)">Remove</button>
+                                    </div>
+                                    <% } %>
                             </div>
                         </div>
                     </div>
@@ -190,24 +226,27 @@
                 <div class="form-group">
                     <label class="form-label" for="category">Category</label>
                     <select name="category" id="category" class="form-control">
-                       
-                        <% categories.forEach(element => { %>
-                            <option value="<%= element._id %>" <%= element.category && element.category.toString() === element._id.toString() ? 'selected' : '' %>>
+
+                        <% categories.forEach(element=> { %>
+                            <option value="<%= element._id %>" <%=element.category &&
+                                element.category.toString()===element._id.toString() ? 'selected' : '' %>>
                                 <%= element.name %>
                             </option>
-                        <% }) %>
+                            <% }) %>
                     </select>
                     <div class="error-message" id="categoryError"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="additionalInfo">Additional Information</label>
-                    <textarea class="form-control" id="additionalInfo" placeholder="Enter any additional information" name="additionalInfo"><%= product.additionalInfo || '' %></textarea>
+                    <textarea class="form-control" id="additionalInfo" placeholder="Enter any additional information"
+                        name="additionalInfo"><%= product.additionalInfo || '' %></textarea>
                     <div class="error-message" id="additionalInfoError"></div>
                 </div>
             </div>
 
             <div class="button-container">
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='/admin/product'">Cancel</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="window.location.href='/admin/product'">Cancel</button>
                 <button type="submit" class="btn btn-primary">Update Product</button>
             </div>
         </form>
@@ -268,7 +307,7 @@
                 if (existingPreview) existingPreview.remove();
 
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     activeInput = input;
                     const modal = document.getElementById('cropperModal');
                     const cropImg = document.getElementById('cropperImage');
@@ -330,7 +369,7 @@
             }, 'image/jpeg', 0.9);
         });
 
-        // Crop cancel
+       
         document.getElementById('cropCancel').addEventListener('click', () => {
             if (activeInput) activeInput.value = '';
             closeModal();
@@ -346,7 +385,7 @@
             activeInput = null;
         }
 
-        // Remove existing image
+        
         function removeImage(button) {
             const previewContainer = button.parentElement;
             const uploadBox = previewContainer.parentElement;
@@ -355,109 +394,177 @@
             previewContainer.remove();
         }
 
-        // Form validation
         const form = document.getElementById('editProductForm');
-        const fields = [
-            { id: 'productName', errorId: 'productNameError', validate: value => {
-                if (!value) return 'Product name is required';
-                if (value.length < 3) return 'Product name must be at least 3 characters';
-                if (value.length > 100) return 'Product name cannot exceed 100 characters';
-                if (!/^[a-zA-Z0-9\s\-]+$/.test(value)) return 'Product name can only contain letters, numbers, spaces, and hyphens';
-                return '';
-            }},
-            { id: 'description', errorId: 'descriptionError', validate: value => {
-                if (!value) return 'Description is required';
-                if (value.length < 10) return 'Description must be at least 10 characters';
-                if (value.length > 1000) return 'Description cannot exceed 1000 characters';
-                return '';
-            }},
-            { id: 'brand', errorId: 'brandError', validate: value => {
-                if (!value) return 'Brand is required';
-                if (value.length < 2) return 'Brand must be at least 2 characters';
-                if (value.length > 50) return 'Brand cannot exceed 50 characters';
-                if (!/^[a-zA-Z\s]+$/.test(value)) return 'Brand can only contain letters and spaces';
-                return '';
-            }},
-            { id: 'offer', errorId: 'offerError', validate: value => {
-                if (value && !/^[a-zA-Z0-9\s%\-]+$/.test(value)) return 'Offer can only contain letters, numbers, spaces, percentages, and hyphens';
-                return '';
-            }},
-            { id: 'model', errorId: 'modelError', validate: value => {
-                if (!value) return 'Model is required';
-                if (value.length < 2) return 'Model must be at least 2 characters';
-                if (value.length > 50) return 'Model cannot exceed 50 characters';
-                if (!/^[a-zA-Z0-9\s\-]+$/.test(value)) return 'Model can only contain letters, numbers, spaces, and hyphens';
-                return '';
-            }},
-            { id: 'regularPrice', errorId: 'regularPriceError', validate: value => {
-                if (!value) return 'Regular price is required';
-                if (isNaN(value) || value <= 0) return 'Regular price must be a positive number';
-                if (value > 1000000) return 'Regular price cannot exceed 1,000,000';
-                return '';
-            }},
-            { id: 'salePrice', errorId: 'salePriceError', validate: value => {
-                if (!value) return 'Sale price is required';
-                if (isNaN(value) || value <= 0) return 'Sale price must be a positive number';
-                if (value > 1000000) return 'Sale price cannot exceed 1,000,000';
-                const regularPrice = parseFloat(document.getElementById('regularPrice').value);
-                if (value >= regularPrice) return 'Sale price must be less than regular price';
-                return '';
-            }},
-            { id: 'stock', errorId: 'stockError', validate: value => {
-                if (value === '') return 'Stock is required';
-                if (isNaN(value) || value < 0) return 'Stock must be a non-negative number';
-                return '';
-            }},
-            { id: 'category', errorId: 'categoryError', validate: value => {
-                if (!value) return 'Category is required';
-                return '';
-            }},
-            { id: 'additionalInfo', errorId: 'additionalInfoError', validate: value => {
-                if (value && value.length > 1000) return 'Additional information cannot exceed 1000 characters';
-                return '';
-            }}
-        ];
 
-        function validateForm() {
-            let isValid = true;
-            fields.forEach(field => {
-                const input = document.getElementById(field.id);
-                const errorElement = document.getElementById(field.errorId);
-                const value = input.value.trim();
-                const error = field.validate(value);
-                errorElement.textContent = error;
-                errorElement.style.display = error ? 'block' : 'none';
-                if (error) isValid = false;
-            });
-            return isValid;
-        }
+        if (!form) {
+            console.error('Form with ID "editProductForm" not found');
+        } else {
+            // console.log('Form found, attaching submit event listener');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (validateForm()) {
-                try {
-                    const formData = new FormData(form);
-                    const response = await fetch(form.action, {
-                        method: 'PUT',
-                        body: formData
-                    });
-                    const result = await response.json();
-                    console.log(result,"this is result");
-                    if (response.ok && result.success) {
-                        showToast(result.message);
-                        setTimeout(()=>{
-                            window.location.href="/admin/product";
-                        },2000)
-                        
-                    } else {
-                        showToast('Error: ' + (result.message || 'Failed to update product'));
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+
+                let isValid = true;
+
+                
+                const clearError = (id) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.textContent = '';
+                        el.style.display = 'none';
                     }
-                } catch (error) {
-                    console.error('Form submission error:', error);
-                    showToast('Error updating product. Please try again.');
+                };
+
+                const showError = (id, message) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.textContent = message;
+                        el.style.display = 'block';
+                    }
+                };
+
+               
+                const getInputValue = (id) => document.getElementById(id)?.value.trim() || '';
+
+                const productName = getInputValue('productName');
+                const description = getInputValue('description');
+                const brand = getInputValue('brand');
+                const offer = getInputValue('offer');
+                const model = getInputValue('model');
+                const regularPrice = parseFloat(getInputValue('regularPrice'));
+                const salePrice = parseFloat(getInputValue('salePrice'));
+                const stock = parseInt(getInputValue('stock'));
+                const category = getInputValue('category');
+                const additionalInfo = getInputValue('additionalInfo');
+
+                
+                const errorFields = [
+                    'productNameError', 'descriptionError', 'brandError', 'offerError',
+                    'modelError', 'regularPriceError', 'salePriceError', 'stockError',
+                    'categoryError', 'additionalInfoError'
+                ];
+                errorFields.forEach(clearError);
+
+               
+                if (!productName) {
+                    showError('productNameError', 'Product name is required');
+                    isValid = false;
+                } else if (productName.length < 3 || productName.length > 100) {
+                    showError('productNameError', 'Product name must be 3-100 characters');
+                    isValid = false;
+                } else if (!/^[a-zA-Z0-9\s\-]+$/.test(productName)) {
+                    showError('productNameError', 'Product name can only contain letters, numbers, spaces, and hyphens');
+                    isValid = false;
                 }
-            }
-        });
+
+               
+                if (!description) {
+                    showError('descriptionError', 'Description is required');
+                    isValid = false;
+                } else if (description.length < 10 || description.length > 1000) {
+                    showError('descriptionError', 'Description must be 10-1000 characters');
+                    isValid = false;
+                }
+
+               
+                if (!brand) {
+                    showError('brandError', 'Brand is required');
+                    isValid = false;
+                } else if (brand.length < 2 || brand.length > 50) {
+                    showError('brandError', 'Brand must be 2-50 characters');
+                    isValid = false;
+                } else if (!/^[a-zA-Z\s]+$/.test(brand)) {
+                    showError('brandError', 'Brand can only contain letters and spaces');
+                    isValid = false;
+                }
+
+                
+                if (offer && !/^[a-zA-Z0-9\s%\-]+$/.test(offer)) {
+                    showError('offerError', 'Offer can only contain letters, numbers, spaces, %, and hyphens');
+                    isValid = false;
+                }
+
+                
+                if (!model) {
+                    showError('modelError', 'Model is required');
+                    isValid = false;
+                } else if (model.length < 2 || model.length > 50) {
+                    showError('modelError', 'Model must be 2-50 characters');
+                    isValid = false;
+                } else if (!/^[a-zA-Z0-9\s\-]+$/.test(model)) {
+                    showError('modelError', 'Model can only contain letters, numbers, spaces, and hyphens');
+                    isValid = false;
+                }
+
+                
+                if (isNaN(regularPrice) || regularPrice <= 0) {
+                    showError('regularPriceError', 'Regular price must be a positive number');
+                    isValid = false;
+                } else if (regularPrice > 1000000) {
+                    showError('regularPriceError', 'Regular price cannot exceed 1,000,000');
+                    isValid = false;
+                }
+
+                
+                if (isNaN(salePrice) || salePrice <= 0) {
+                    showError('salePriceError', 'Sale price must be a positive number');
+                    isValid = false;
+                } else if (salePrice > 1000000) {
+                    showError('salePriceError', 'Sale price cannot exceed 1,000,000');
+                    isValid = false;
+                } else if (salePrice >= regularPrice) {
+                    showError('salePriceError', 'Sale price must be less than regular price');
+                    isValid = false;
+                }
+
+               
+                if (isNaN(stock) || stock < 0) {
+                    showError('stockError', 'Stock must be a non-negative number');
+                    isValid = false;
+                }
+
+                
+                if (!category) {
+                    showError('categoryError', 'Category is required');
+                    isValid = false;
+                }
+
+                
+                if (additionalInfo && additionalInfo.length > 1000) {
+                    showError('additionalInfoError', 'Additional info cannot exceed 1000 characters');
+                    isValid = false;
+                }
+
+                
+
+                if (isValid) {
+                    try {
+                        const formData = new FormData(form);
+                        const response = await fetch(form.action, {
+                            method: 'PUT',
+                            body: formData
+                        });
+
+                       
+                        const data = await response.json();
+                        
+
+                        if (response.ok && data.success) {
+                            showToast(data.message || 'Product updated successfully');
+                            setTimeout(() => {
+                                window.location.href = '/admin/product';
+                            }, 2000);
+                        } else {
+                            showToast(data.message || 'Failed to update product', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                        showToast('Network error: Failed to update product');
+                    }
+                }
+            });
+        }
 
         function showToast(message = 'Product updated successfully!') {
             const toast = document.getElementById('toast');
@@ -474,4 +581,5 @@
         });
     </script>
 </body>
-</html> 
+
+</html>
