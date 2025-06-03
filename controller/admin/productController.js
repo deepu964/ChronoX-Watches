@@ -204,7 +204,7 @@ const getEditProduct = async(req,res)=>{
   try {
     const productId = req.params.id;
 
-    const product = await productSchema.findOne({_id:productId});
+    const product = await productSchema.findOne({_id:productId}).populate("categoryId");
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     const categories = await categorySchema.find()
     res.render('admin/editproduct',{product,categories,cloudName});
@@ -219,6 +219,8 @@ const editProduct =async(req,res)=>{
        const { name, description, category, brand, offer,model, regularPrice, salePrice, quantity,additionalInfo,mainImage,} = req.body;
        const editId = req.params.id;
        const existProduct = await productSchema.findOne({_id:editId});
+
+       console.log(category,'this dnjbkcn')
        
        if(existProduct.name == name){
         return res.json({success:false, message:"Product name is alredy exist.use diffrent name"});

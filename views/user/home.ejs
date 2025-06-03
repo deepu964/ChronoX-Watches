@@ -10,7 +10,7 @@
 
 </head>
 <%-include("../../views/partials/user/header") %>
-
+   
     <div class="hero-banner">
         <div class="hero-text">
             <h1>YOUR TIME, YOUR<br>STYLE, YOUR TRUE<br>IDENTITY</h1>
@@ -203,3 +203,7 @@
     </section>
 
    <%-include("../../views/partials/user/footer") %>
+   <script>
+    const registerMessage = document.getElementById('regmes').value
+    showToast(registerMessage||'success')
+   </script>

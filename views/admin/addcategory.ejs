@@ -126,7 +126,7 @@
                 document.getElementById('categoryNameError').textContent = 'Category name can only contain letters, numbers, spaces, and hyphens';
                 document.getElementById('categoryNameError').style.display = 'block';
                 isValid = false;
-            }
+            };
 
            
             if (!description) {
@@ -151,14 +151,17 @@
                     });
 
                     const data = await response.json();
+                    console.log(data,'this fdknfknknkns  jnk')
+
                     if (data.success) {
                         showToast(data.message || 'Category added successfully', 'success');
-                        document.getElementById('categoryForm').reset();
+                        
                         setTimeout(() => {
                             window.location.href = '/admin/category';
                         }, 2000);
                     } else {
                         showToast(data.message || 'Failed to add category', 'error');
+                       
                     }
                 } catch (error) {
                     showToast('Network error: Failed to add category', 'error');

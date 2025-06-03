@@ -154,9 +154,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="stock">Stock</label>
-                    <input type="text" class="form-control" id="stock" placeholder="Enter stock quantity" name="stock"
-                        value="<%= product.variants[0].quantity %>">
+                    <label class="form-label" for="quantity">Stock</label>
+                    <input type="text" class="form-control" id="quantity" placeholder="Enter stock quantity"
+                        name="quantity" value="<%= product.variants[0].quantity %>">
                     <div class="error-message" id="stockError"></div>
                 </div>
             </div>
@@ -182,73 +182,66 @@
 
                     <div>
                         <label class="form-label">Additional Images</label>
-                        <div class="additional-images">
-                            <div class="upload-box additional-upload" id="additionalImageBox1">
-                                <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput1">
-                                <% if (product.images) { %>
-                                    <div class="preview-container">
-                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[1].public_id %>"
-                                            alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
-                                        <button type="button" class="remove-btn"
-                                            onclick="removeImage(this)">Remove</button>
-                                    </div>
-                                    <% } %>
-                            </div>
-                            <div class="upload-box additional-upload" id="additionalImageBox2">
-                                <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput2">
-                                <% if (product.images) { %>
-                                    <div class="preview-container">
-                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[2].public_id %>"
-                                            alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
-                                        <button type="button" class="remove-btn"
-                                            onclick="removeImage(this)">Remove</button>
-                                    </div>
-                                    <% } %>
-                            </div>
-                            <div class="upload-box additional-upload" id="additionalImageBox3">
-                                <input type="file" name="additionalImages" accept="image/*" id="additionalImageInput3">
-                                <% if (product.images) { %>
-                                    <div class="preview-container">
-                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[3].public_id %>"
-                                            alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
-                                        <button type="button" class="remove-btn"
-                                            onclick="removeImage(this)">Remove</button>
-                                    </div>
-                                    <% } %>
-                            </div>
+                        <div class="additional-images" style="display: flex; gap: 20px; flex-wrap: wrap;">
+
+                            <% for (let i=0; i < 3; i++) { %>
+                                <div class="upload-box additional-upload" id="additionalImageBox<%= i + 1 %>"
+                                    style="position: relative; width: 150px; height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                                    <input type="file" name="additionalImages" accept="image/*"
+                                        id="additionalImageInput<%= i + 1 %>"
+                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+
+                                    <% if (product.images && product.images[i + 1]) { %>
+                                        <div class="preview-container" style="text-align: center;">
+                                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[i + 1].public_id %>"
+                                                alt="<%= product.name %>"
+                                                style="width: 100%; height: 100%; object-fit: cover;" />
+                                            <button type="button" class="remove-btn" onclick="removeImage(this)"
+                                                style="position: absolute; top: 5px; right: 5px; background-color: red; color: white; border: none; padding: 2px 6px; cursor: pointer;">Remove</button>
+                                        </div>
+                                        <% } else { %>
+                                            <i class="fas fa-plus" style="color: gray; font-size: 24px;"></i>
+                                            <% } %>
+
+                                </div>
+                                <% } %>
+
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="card">
-                <h3 class="card-title">Product Specifications</h3>
-                <div class="form-group">
-                    <label class="form-label" for="category">Category</label>
-                    <select name="category" id="category" class="form-control">
-
-                        <% categories.forEach(element=> { %>
-                            <option value="<%= element._id %>" <%=element.category &&
-                                element.category.toString()===element._id.toString() ? 'selected' : '' %>>
-                                <%= element.name %>
+                <div class="card">
+                    <h3 class="card-title">Product Specifications</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="category">Category</label>
+                        <select name="category" id="category" class="form-control">
+                            <option value="<%= product.categoryId.name %>">
+                                <%= product.categoryId.name %>
                             </option>
-                            <% }) %>
-                    </select>
-                    <div class="error-message" id="categoryError"></div>
+                            <% categories.forEach(element=> { %>
+                                <% if(product.categoryId._id.toString() !==element._id.toString()){ %>
+                                    <option value="<%= element._id %>" <%=element.category &&
+                                        element.category.toString()===element._id.toString() ? 'selected' : '' %>>
+                                        <%= element.name %>
+                                    </option>
+                                    <% }}) %>
+                        </select>
+                        <div class="error-message" id="categoryError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="additionalInfo">Additional Information</label>
+                        <textarea class="form-control" id="additionalInfo"
+                            placeholder="Enter any additional information"
+                            name="additionalInfo"><%= product.additionalInfo || '' %></textarea>
+                        <div class="error-message" id="additionalInfoError"></div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="additionalInfo">Additional Information</label>
-                    <textarea class="form-control" id="additionalInfo" placeholder="Enter any additional information"
-                        name="additionalInfo"><%= product.additionalInfo || '' %></textarea>
-                    <div class="error-message" id="additionalInfoError"></div>
-                </div>
-            </div>
 
-            <div class="button-container">
-                <button type="button" class="btn btn-secondary"
-                    onclick="window.location.href='/admin/product'">Cancel</button>
-                <button type="submit" class="btn btn-primary">Update Product</button>
-            </div>
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="window.location.href='/admin/product'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Product</button>
+                </div>
         </form>
     </div>
 
@@ -369,7 +362,7 @@
             }, 'image/jpeg', 0.9);
         });
 
-       
+
         document.getElementById('cropCancel').addEventListener('click', () => {
             if (activeInput) activeInput.value = '';
             closeModal();
@@ -385,7 +378,7 @@
             activeInput = null;
         }
 
-        
+
         function removeImage(button) {
             const previewContainer = button.parentElement;
             const uploadBox = previewContainer.parentElement;
@@ -403,11 +396,11 @@
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+
 
                 let isValid = true;
 
-                
+
                 const clearError = (id) => {
                     const el = document.getElementById(id);
                     if (el) {
@@ -424,7 +417,7 @@
                     }
                 };
 
-               
+
                 const getInputValue = (id) => document.getElementById(id)?.value.trim() || '';
 
                 const productName = getInputValue('productName');
@@ -434,11 +427,11 @@
                 const model = getInputValue('model');
                 const regularPrice = parseFloat(getInputValue('regularPrice'));
                 const salePrice = parseFloat(getInputValue('salePrice'));
-                const stock = parseInt(getInputValue('stock'));
+                const quantity = parseInt(getInputValue('quantity'));
                 const category = getInputValue('category');
                 const additionalInfo = getInputValue('additionalInfo');
 
-                
+
                 const errorFields = [
                     'productNameError', 'descriptionError', 'brandError', 'offerError',
                     'modelError', 'regularPriceError', 'salePriceError', 'stockError',
@@ -446,7 +439,7 @@
                 ];
                 errorFields.forEach(clearError);
 
-               
+
                 if (!productName) {
                     showError('productNameError', 'Product name is required');
                     isValid = false;
@@ -458,7 +451,7 @@
                     isValid = false;
                 }
 
-               
+
                 if (!description) {
                     showError('descriptionError', 'Description is required');
                     isValid = false;
@@ -467,7 +460,7 @@
                     isValid = false;
                 }
 
-               
+
                 if (!brand) {
                     showError('brandError', 'Brand is required');
                     isValid = false;
@@ -479,13 +472,13 @@
                     isValid = false;
                 }
 
-                
+
                 if (offer && !/^[a-zA-Z0-9\s%\-]+$/.test(offer)) {
                     showError('offerError', 'Offer can only contain letters, numbers, spaces, %, and hyphens');
                     isValid = false;
                 }
 
-                
+
                 if (!model) {
                     showError('modelError', 'Model is required');
                     isValid = false;
@@ -497,7 +490,7 @@
                     isValid = false;
                 }
 
-                
+
                 if (isNaN(regularPrice) || regularPrice <= 0) {
                     showError('regularPriceError', 'Regular price must be a positive number');
                     isValid = false;
@@ -506,7 +499,7 @@
                     isValid = false;
                 }
 
-                
+
                 if (isNaN(salePrice) || salePrice <= 0) {
                     showError('salePriceError', 'Sale price must be a positive number');
                     isValid = false;
@@ -518,25 +511,25 @@
                     isValid = false;
                 }
 
-               
-                if (isNaN(stock) || stock < 0) {
+
+                if (isNaN(quantity) || quantity < 0) {
                     showError('stockError', 'Stock must be a non-negative number');
                     isValid = false;
                 }
 
-                
+
                 if (!category) {
                     showError('categoryError', 'Category is required');
                     isValid = false;
                 }
 
-                
+
                 if (additionalInfo && additionalInfo.length > 1000) {
                     showError('additionalInfoError', 'Additional info cannot exceed 1000 characters');
                     isValid = false;
                 }
 
-                
+
 
                 if (isValid) {
                     try {
@@ -546,9 +539,9 @@
                             body: formData
                         });
 
-                       
+
                         const data = await response.json();
-                        
+
 
                         if (response.ok && data.success) {
                             showToast(data.message || 'Product updated successfully');

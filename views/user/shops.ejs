@@ -50,7 +50,7 @@
                 <div class="filter-group">
                     <h4 class="filter-group-title">Category</h4>
                     <% categories.forEach(cat => { %>
-                        <div class="filter-option">
+                        <div class="filter-option active" >
                             <input 
                                 type="checkbox" 
                                 name="categoryId" 
@@ -158,7 +158,7 @@
 </section>
 
 <script>
-// ⚠ CHANGES MADE: cleaned up form auto-submit logic and added sort handling
+
 document.addEventListener('DOMContentLoaded', function() {
     const sortSelect = document.querySelector('select[name="sortBy"]');
     if (sortSelect) {

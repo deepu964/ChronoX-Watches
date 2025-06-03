@@ -267,11 +267,13 @@ const getVerifyOtp = (req, res) => {
         if (!req.session.tempUser) {
             return res.redirect('/signup?message=Session expired. Please sign up again.');
         }
+        const otpExpr = req.session.tempUser.otpExpr
         
         const message = req.query.message || '';
         res.render('user/verify-otp', { 
             message,
-            email: req.session.tempUser.email 
+            email: req.session.tempUser.email,
+            otpExpr
         });
     } catch (error) {
         console.error("OTP page error:", error);
@@ -318,7 +320,7 @@ const verifyOtp = async (req, res) => {
             };
             
             delete req.session.tempUser;
-            return res.redirect('/?message=Account verified successfully');
+            return res.redirect('/?message=Account created successfully');
         } else {
        
             const newUser = new User({
@@ -396,6 +398,8 @@ const getShopPage = async (req, res) => {
             sortBy
         } = req.query;
 
+        
+
         const page = parseInt(req.query.page) || 1;
         const limit = 6;
         const skip = (page - 1) * limit;
@@ -420,9 +424,9 @@ const getShopPage = async (req, res) => {
             categoryIds = categoryIds ? [categoryIds] : [];
         }
         if (categoryIds.length > 0) {
+            categoryIds = categoryIds.map(id => new mongoose.Types.ObjectId(id));
             filter.categoryId = { $in: categoryIds };
         }
-
         const totalProduct = await productSchema.countDocuments(filter);
         const totalPage = Math.ceil(totalProduct / limit);
 
@@ -459,10 +463,11 @@ const getShopPage = async (req, res) => {
         } else {
             
             let sortOption = { createdAt: -1 };
+           
             if (sortBy === 'name-asc') {
-                sortOption = { name: 1 };
+                sortOption = { categoryId: 1, name: 1 };
             } else if (sortBy === 'name-desc') {
-                sortOption = { name: -1 };
+                sortOption = { categoryId: 1, name: -1 };
             }
 
             products = await productSchema.find(filter)
@@ -478,7 +483,6 @@ const getShopPage = async (req, res) => {
         }
 
        
-
         res.render('user/shops', {
             user: req.session.user,
             products,

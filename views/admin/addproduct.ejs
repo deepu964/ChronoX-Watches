@@ -498,12 +498,36 @@ in.css">
                 error.style.display = 'none';
             });
 
-            
+
+            function showError(id, message) {
+                const el = document.getElementById(id);
+                el.textContent = message;
+                el.style.display = 'block';
+            }
+
+            function clearError(id) {
+                const el = document.getElementById(id);
+                el.textContent = '';
+                el.style.display = 'none';
+            }
+
+            // Usage
             const productName = document.getElementById('productName').value.trim();
-            if (productName.length < 3 || productName.length > 100) {
-                document.getElementById('productNameError').textContent = 'Product name must be 3-100 characters';
-                document.getElementById('productNameError').style.display = 'block';
+
+            if (!productName) {
+                showError('productNameError', 'Product name is required');
                 isValid = false;
+            } else if (productName.length < 3 || productName.length > 100) {
+                showError('productNameError', 'Product name must be between 3 and 100 characters');
+                isValid = false;
+            }else if (!/^[a-zA-Z0-9\s\-]+$/.test(productName) || !/[a-zA-Z0-9]/.test(productName)) {
+                showError('productNameError', 'Product name must contain at least one letter or number and can only use letters, numbers, spaces, and hyphens');
+                isValid = false;
+            }else if (!/^[A-Z]/.test(productName)) {
+                showError('productNameError', 'Product name must start with a capital letter');
+                isValid = false;
+            }else {
+                clearError('productNameError');
             }
 
             

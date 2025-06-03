@@ -46,11 +46,12 @@ const getAddCategory = async (req,res) => {
 }
 
 const addCategory = async (req,res) => {
-    console.log(req.body);
-    const {categoryName,description,maxRedeemable,categoryOffer,isListed} = req.body;
-    console.log("here")
+    
+    const {categoryName,description,isListed} = req.body;
+    
     try {
       const existingCategory =  await categorySchema.findOne({categoryName});
+      
       if(existingCategory){
         return res.json({success:false, message:"Category already exists"});
       } 
@@ -58,13 +59,12 @@ const addCategory = async (req,res) => {
       const newCategory = new categorySchema({
         name:categoryName,
         description:description,
-        MaxPrice:maxRedeemable,
-        offer:categoryOffer,
         isListed:isListed,
         addedDate: new Date()
 
       });
       await newCategory.save();
+      
       return res.json({ success:true, message:"Category added successfully"});
     } catch (error) {
         console.log(error,'something happen addcategory');
@@ -109,6 +109,7 @@ const editCategory = async (req,res) => {
         if(existCategory.name == categoryName){
             return res.json({success:false,message:"Category name already Exist. Use different name"})
         }
+        
         await categorySchema.findByIdAndUpdate(catId,{
             $set:{
                 name:categoryName,
