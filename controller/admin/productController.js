@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const { nextTick } = require('process');
 
-const product = async (req, res) => {
+const product = async (req, res,next) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 3;
@@ -69,8 +69,7 @@ const product = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("Product page error:", error);
-        res.status(500).send("Internal Server Error");
+         next(error);
     }
 };
 
@@ -213,18 +212,19 @@ const getEditProduct = async(req,res)=>{
   }
 }
 
-const editProduct =async(req,res)=>{
+const editProduct =async(req,res,next)=>{
     try {
         
        const { name, description, category, brand, offer,model, regularPrice, salePrice, quantity,additionalInfo,mainImage,} = req.body;
        const editId = req.params.id;
-       const existProduct = await productSchema.findOne({_id:editId});
+       const existProduct = await productSchema.findOne({name:name});
 
-       console.log(category,'this dnjbkcn')
        
-       if(existProduct.name == name){
-        return res.json({success:false, message:"Product name is alredy exist.use diffrent name"});
+       
+       if(existProduct){
+        return res.json({success:false,message:"Name is already exist"})
        }
+
        await productSchema.findByIdAndUpdate(editId,{
         $set:{
             name:name,
@@ -247,7 +247,8 @@ const editProduct =async(req,res)=>{
        return res.json({success:true, message:"Product Updatedd successfull"});
        
     } catch (error) {
-        console.log("updated error",error);
+         next(error);
+        
 
     }
 }
@@ -267,7 +268,7 @@ const deleteProduct = async (req,res) => {
     }    
 }
 
-const blockedProduct = async (req,res) => {
+const blockedProduct = async (req,res,next) => {
     try {
         const productId = req.params.id;
         console.log(productId)
@@ -282,23 +283,23 @@ const blockedProduct = async (req,res) => {
             res.json({success:false, message:"Product unblocked"});
         }
     } catch (error) {
-        console.log(error);
+        next(error);
     }
     
 }
 
-        const getProductDetails = async (req, res) => {
+ const getProductDetails = async (req, res,next) => {
     const productId = req.params.id;
 
     try {
         const product = await Product.findById(productId).populate('reviews.user', 'name');
         res.render('productDetails', { product });
     } catch (error) {
-        res.status(500).send('Error loading product details');
+        next(error);
     }
 };
 
-const addReview = async (req, res) => {
+const addReview = async (req, res,next) => {
     const productId = req.params.id;
     const userId = req.session.user;
     
@@ -317,7 +318,7 @@ const addReview = async (req, res) => {
         await product.save();
         res.status(200).json({ message: 'Review saved' });
     } catch (error) {
-        res.status(500).json({ error: 'Error saving review' });
+        next(error);
     }
 };
 

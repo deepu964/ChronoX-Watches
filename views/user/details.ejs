@@ -134,24 +134,19 @@
             margin-bottom: 1rem;
             overflow: hidden;
             position: relative;
-            cursor: zoom-in;
-            transition: transform 0.3s ease;
-        }
-
-        .main-image:hover {
-            transform: scale(1.02);
+            cursor: crosshair; /* optional: zoom-in look */
         }
 
         .main-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.2s ease;
+            transform: scale(1);
+            transform-origin: center center;
         }
 
-        .main-image:hover img {
-            transform: scale(1.1);
-        }
+        
 
         .watch-placeholder {
             font-size: 80px;
@@ -783,7 +778,7 @@
 
         </section>
 
-        <!-- Specifications Section -->
+        
         <section class="specs-section">
             <h2 class="specs-title">Specifications</h2>
             <div class="specs-grid">
@@ -818,7 +813,7 @@
             </div>
         </section>
 
-        <!-- Related Products -->
+        
         <section class="related-section">
             <h2 class="related-title">You May Also Like</h2>
              <div class="related-grid">
@@ -856,7 +851,7 @@
     </div>
 
     <script>
-        // Quantity Controls
+        
         function increaseQty() {
             const qtyInput = document.getElementById('quantity');
             qtyInput.value = parseInt(qtyInput.value) + 1;
@@ -869,21 +864,21 @@
             }
         }
 
-        // Add to Cart Function
+       
         function addToCart() {
             const quantity = document.getElementById('quantity').value;
             const btn = document.querySelector('.add-to-cart');
             
-            // Add loading state
+            
             btn.innerHTML = 'Adding to Cart...';
             btn.disabled = true;
             
-            // Simulate API call
+            
             setTimeout(() => {
                 btn.innerHTML = 'Added to Cart ✓';
                 btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
                 
-                // Reset after 2 seconds
+                
                 setTimeout(() => {
                     btn.innerHTML = 'Add to Cart';
                     btn.disabled = false;
@@ -897,23 +892,40 @@
         //     window.location.href = `/productdetails/${id}`;
         // }
 
-        // Thumbnail Gallery
+        
         document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
             thumb.addEventListener('click', () => {
-                // Remove active class from all thumbnails
+                
                 document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
                 
-                // Add active class to clicked thumbnail
+                
                 thumb.classList.add('active');
                 const newImageSrc = thumb.getAttribute('data-img');
                 document.getElementById('mainImage').setAttribute('src', newImageSrc);  
                 
-                // Here you would typically change the main image
+                
                 console.log(`Switched to image ${index + 1}`);
             });
         });
 
-        // Search functionality
+            const mainImage = document.getElementById('mainImage');
+            const mainImageContainer = document.querySelector('.main-image');
+
+            mainImageContainer.addEventListener('mousemove', function (e) {
+                const rect = mainImageContainer.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+                mainImage.style.transform = 'scale(2)';
+                mainImage.style.transformOrigin = `${x}% ${y}%`;
+            });
+
+            mainImageContainer.addEventListener('mouseleave', function () {
+                mainImage.style.transform = 'scale(1)';
+                mainImage.style.transformOrigin = 'center center';
+            });
+
+        
         document.querySelector('.search-box').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const searchTerm = e.target.value;
@@ -921,12 +933,12 @@
             }
         });
 
-        // Cart icon click
+        
         document.querySelector('.cart-icon').addEventListener('click', () => {
             window.location.href = '/cart';
         });
 
-        // Smooth scrolling for internal links
+        
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -940,10 +952,10 @@
             });
         });
 
-        // Image zoom effect on mobile
+        
         if (window.innerWidth <= 768) {
             document.querySelector('.main-image').addEventListener('click', () => {
-                // Open image in fullscreen or modal
+               
                 console.log('Open image modal');
             });
         }

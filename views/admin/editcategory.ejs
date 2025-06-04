@@ -184,11 +184,11 @@
                             })
                         });
 
-                        console.log('Fetch response status:', response.status);
+                        
                         const data = await response.json();
-                        console.log('Fetch response data:', data);
-
-                        if (data.success) {
+                        
+                        
+                        if (data.success){
                             showToast(data.message || 'Category updated successfully');
                             setTimeout(() => {
                                 window.location.href = '/admin/category';
@@ -197,8 +197,9 @@
                             showToast(data.message || 'Failed to update category','error');
                         }
                     } catch (error) {
+                        
                         console.error('Fetch error:', error);
-                        showToast('Network error: Failed to update category');
+                        showToast('Network error: Failed to update category','error');
                     }
                 }
             });

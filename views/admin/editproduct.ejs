@@ -215,7 +215,7 @@
                     <div class="form-group">
                         <label class="form-label" for="category">Category</label>
                         <select name="category" id="category" class="form-control">
-                            <option value="<%= product.categoryId.name %>">
+                            <option value="<%= product.categoryId._id %>">
                                 <%= product.categoryId.name %>
                             </option>
                             <% categories.forEach(element=> { %>

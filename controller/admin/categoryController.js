@@ -2,7 +2,7 @@ const { json } = require('express');
 const  categorySchema = require('../../models/categorySchema');
 const productSchema = require('../../models/productSchema');
 
-const listCategories = async (req,res) => {
+const listCategories = async (req,res,next) => {
     try {
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
@@ -30,22 +30,22 @@ const listCategories = async (req,res) => {
 
     });
     } catch (error) {
-        console.log("this is category render error");
-        res.status(500).send("server error");
-    }
+        // console.log("this is category render error");
+        next(error)
     
 }
+} 
 
-const getAddCategory = async (req,res) => {
+const getAddCategory = async (req,res,next) => {
     try {
         res.render('admin/addcategory');
     } catch (error) {
-        
+        next(error)
     }
     
 }
 
-const addCategory = async (req,res) => {
+const addCategory = async (req,res,next) => {
     
     const {categoryName,description,isListed} = req.body;
     
@@ -67,12 +67,13 @@ const addCategory = async (req,res) => {
       
       return res.json({ success:true, message:"Category added successfully"});
     } catch (error) {
-        console.log(error,'something happen addcategory');
+        // console.log(error,'something happen addcategory');
+        next(error);
     }
     
 }
 
-const toggleCategoryStatus = async (req, res) => {
+const toggleCategoryStatus = async (req, res,next) => {
   try {
     const { id } = req.params;
     const category = await categorySchema.findById(id)
@@ -84,7 +85,8 @@ const toggleCategoryStatus = async (req, res) => {
     console.log(newStatus)
     res.json({ success: true, message:"Updated successfully" });
   } catch (err) {
-    console.error('Toggle status error:', err);
+    // console.error('Toggle status error:', err);
+    next(err)
     res.status(500).json({ success: false });
   }
 };
@@ -101,7 +103,7 @@ const getEditCategory = async (req,res) => {
     }
 }
 
-const editCategory = async (req,res) => {
+const editCategory = async (req,res,next) => {
     try {
         const {categoryName,description,} = req.body;
         const catId = req.params.id
@@ -119,14 +121,15 @@ const editCategory = async (req,res) => {
         })
         return res.json({success:true,message:"Updated Successfully"})
     } catch (error) {
-        console.log("edit category side",error)
+        next(error)
+
     }
     
 }
 
 
 
-const deleteCategory = async (req,res) => {
+const deleteCategory = async (req,res,next) => {
     try {
         const id = req.params.id;
         const category = await categorySchema.findByIdAndDelete(id);

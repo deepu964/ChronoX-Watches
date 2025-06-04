@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 
 
-const getAdminLogin =async (req,res) => {
+const getAdminLogin =async (req,res,next) => {
     try {
         if(req.session.admin){
           return res.redirect('/admin/dashboard')
@@ -12,7 +12,7 @@ const getAdminLogin =async (req,res) => {
         const error = req.query.error
         return res.render('admin/login',{error})
     } catch (error) {
-        res.status(500).send("admin login side",error);
+        next(error)
     }
     
 }
