@@ -5,6 +5,7 @@ const adminController = require('../controller/admin/adminController');
 const userListController = require('../controller/admin/userListController');
 const productController = require('../controller/admin/productController');
 const categoryController = require('../controller/admin/categoryController')
+const couponController = require('../controller/admin/couponController');
 // const isAdmin = require('../middlewares/adminAuth');
 const {authMiddleware,adminAuth} = require('../middlewares/adminAuth')
 
@@ -54,7 +55,12 @@ router.put('/category/edit/:id',authMiddleware,adminAuth, categoryController.edi
 router.delete('/category/:id', authMiddleware,adminAuth,categoryController.deleteCategory)
 
 
+router.get('/coupon',couponController.getCoupon);
 
+router.get('/coupon/addCoupon',couponController.getAddCoupon);
+router.post('/coupon/addCoupon',couponController.addCoupon);
+
+router.delete('/coupon/delete/:id',couponController.deleteCoupon)
 
 
 

@@ -103,29 +103,45 @@ const getEditCategory = async (req,res) => {
     }
 }
 
-const editCategory = async (req,res,next) => {
-    try {
-        const {categoryName,description,} = req.body;
-        const catId = req.params.id
-        const existCategory = await categorySchema.findOne({_id:catId})
-        if(existCategory.name == categoryName){
-            return res.json({success:false,message:"Category name already Exist. Use different name"})
-        }
-        
-        await categorySchema.findByIdAndUpdate(catId,{
-            $set:{
-                name:categoryName,
-                description:description,
-           
-            }
-        })
-        return res.json({success:true,message:"Updated Successfully"})
-    } catch (error) {
-        next(error)
+const editCategory = async (req, res, next) => {
+  try {
+    const { categoryName, description } = req.body;
+    const catId = req.params.id;
 
+    const currentCategory = await categorySchema.findById(catId);
+    if (!currentCategory) {
+      return res.json({ success: false, message: "Category not found" });
     }
+
     
-}
+    if (categoryName && categoryName !== currentCategory.name) {
+      const nameExists = await categorySchema.findOne({
+        name: categoryName,
+        _id: { $ne: catId } 
+      });
+
+      if (nameExists) {
+        return res.json({
+          success: false,
+          message: "Category name already exists. Use a different name"
+        });
+      }
+    }
+
+    
+    await categorySchema.findByIdAndUpdate(catId, {
+      $set: {
+        name: categoryName,
+        description: description
+      }
+    });
+
+    return res.json({ success: true, message: "Updated Successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 
 

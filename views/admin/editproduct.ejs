@@ -83,7 +83,7 @@
                 <i class="fas fa-tags"></i>
                 <span>Category</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="/admin/coupon" class="nav-item">
                 <i class="fas fa-ticket-alt"></i>
                 <span>Coupons</span>
             </a>
@@ -127,12 +127,12 @@
                         value="<%= product.brand %>">
                     <div class="error-message" id="brandError"></div>
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label class="form-label" for="offer">Offer</label>
                     <input type="text" class="form-control" id="offer" placeholder="Enter offer details" name="offer"
                         value="<%= product.offer || '' %>">
                     <div class="error-message" id="offerError"></div>
-                </div>
+                </div> -->
                 <div class="form-group">
                     <label class="form-label" for="model">Model</label>
                     <input type="text" class="form-control" id="model" placeholder="Enter model" name="model"
@@ -163,52 +163,62 @@
 
             <div class="card">
                 <h3 class="card-title">Product Images</h3>
-                <div class="image-upload-container">
-                    <div class="main-image-upload">
-                        <label class="form-label">Main Product Image</label>
-                        <div class="upload-box main-upload" id="mainImageBox">
-                            <% if (product.images) { %>
-                                <div class="preview-container">
-                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>"
-                                        alt="<%= product.name %>" onerror="this.src='/images/placeholder.jpg'">
-                                    <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
-                                </div>
-                                <% } %>
+               <div class="image-upload-container">
+  
+                <div class="main-image-upload">
+                    <label class="form-label">Main Product Image</label>
+                    <div class="upload-box main-upload" id="mainImageBox">
 
-                                    <input type="file" name="mainImage" accept="image/*" id="mainImageInput">
+                    <% if (product.images && product.images.length > 0 && product.images[0].public_id) { %>
+                        <div class="preview-container">
+                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>"
+                            alt="<%= product.name %>"
+                            onerror="this.src='/images/placeholder.jpg'">
+                        <button type="button" class="remove-btn" onclick="removeImage(this)">Remove</button>
                         </div>
-                        <div class="error-message" id="mainImageError"></div>
+                    <% } else { %>
+                        <div class="preview-container">
+                        <img src="/images/placeholder.jpg" alt="No Image">
+                        </div>
+                    <% } %>
+
+                    <input type="file" name="mainImage" accept="image/*" id="mainImageInput">
                     </div>
+                    <div class="error-message" id="mainImageError"></div>
+                </div>
 
-                    <div>
-                        <label class="form-label">Additional Images</label>
-                        <div class="additional-images" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                
+                <div>
+                    <label class="form-label">Additional Images</label>
+                    <div class="additional-images" style="display: flex; gap: 20px; flex-wrap: wrap;">
 
-                            <% for (let i=0; i < 3; i++) { %>
-                                <div class="upload-box additional-upload" id="additionalImageBox<%= i + 1 %>"
-                                    style="position: relative; width: 150px; height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
-                                    <input type="file" name="additionalImages" accept="image/*"
-                                        id="additionalImageInput<%= i + 1 %>"
-                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                    <% for (let i = 0; i < 3; i++) { %>
+                        <div class="upload-box additional-upload" id="additionalImageBox<%= i + 1 %>"
+                            style="position: relative; width: 150px; height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                        <input type="file" name="additionalImages" accept="image/*"
+                                id="additionalImageInput<%= i + 1 %>"
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
 
-                                    <% if (product.images && product.images[i + 1]) { %>
-                                        <div class="preview-container" style="text-align: center;">
-                                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[i + 1].public_id %>"
-                                                alt="<%= product.name %>"
-                                                style="width: 100%; height: 100%; object-fit: cover;" />
-                                            <button type="button" class="remove-btn" onclick="removeImage(this)"
-                                                style="position: absolute; top: 5px; right: 5px; background-color: red; color: white; border: none; padding: 2px 6px; cursor: pointer;">Remove</button>
-                                        </div>
-                                        <% } else { %>
-                                            <i class="fas fa-plus" style="color: gray; font-size: 24px;"></i>
-                                            <% } %>
-
-                                </div>
-                                <% } %>
+                        <% if (product.images && product.images[i + 1] && product.images[i + 1].public_id) { %>
+                            <div class="preview-container" style="text-align: center;">
+                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[i + 1].public_id %>"
+                                alt="Additional Image"
+                                style="width: 100%; height: 100%; object-fit: cover;"
+                                onerror="this.src='/images/placeholder.jpg'" />
+                            <button type="button" class="remove-btn" onclick="removeImage(this)"
+                                    style="position: absolute; top: 5px; right: 5px; background-color: red; color: white; border: none; padding: 2px 6px; cursor: pointer;">Remove</button>
+                            </div>
+                        <% } else { %>
+                            <i class="fas fa-plus" style="color: gray; font-size: 24px;"></i>
+                        <% } %>
 
                         </div>
+                    <% } %>
+
                     </div>
                 </div>
+                </div>
+
 
                 <div class="card">
                     <h3 class="card-title">Product Specifications</h3>
@@ -423,7 +433,7 @@
                 const productName = getInputValue('productName');
                 const description = getInputValue('description');
                 const brand = getInputValue('brand');
-                const offer = getInputValue('offer');
+                // const offer = getInputValue('offer');
                 const model = getInputValue('model');
                 const regularPrice = parseFloat(getInputValue('regularPrice'));
                 const salePrice = parseFloat(getInputValue('salePrice'));
@@ -433,7 +443,7 @@
 
 
                 const errorFields = [
-                    'productNameError', 'descriptionError', 'brandError', 'offerError',
+                    'productNameError', 'descriptionError', 'brandError',
                     'modelError', 'regularPriceError', 'salePriceError', 'stockError',
                     'categoryError', 'additionalInfoError'
                 ];
@@ -473,10 +483,10 @@
                 }
 
 
-                if (offer && !/^[a-zA-Z0-9\s%\-]+$/.test(offer)) {
-                    showError('offerError', 'Offer can only contain letters, numbers, spaces, %, and hyphens');
-                    isValid = false;
-                }
+                // if (offer && !/^[a-zA-Z0-9\s%\-]+$/.test(offer)) {
+                //     showError('offerError', 'Offer can only contain letters, numbers, spaces, %, and hyphens');
+                //     isValid = false;
+                // }
 
 
                 if (!model) {

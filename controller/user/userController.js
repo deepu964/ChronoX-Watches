@@ -482,7 +482,6 @@ const getShopPage = async (req, res) => {
                 .lean();
         }
 
-       
         res.render('user/shops', {
             user: req.session.user,
             products,

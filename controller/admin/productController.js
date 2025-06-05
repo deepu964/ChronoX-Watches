@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const { nextTick } = require('process');
 
-const product = async (req, res,next) => {
+const product = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 3;
@@ -15,14 +15,14 @@ const product = async (req, res,next) => {
         const category = req.query.category || 'all';
         // const priceOrder = req.query.price || 'none';
 
-        
+
         let query = {};
-        
+
         if (search) {
             query.name = { $regex: search, $options: "i" };
         }
 
-         if (category !== 'all') {
+        if (category !== 'all') {
             const categoryDoc = await categorySchema.findOne({ name: category });
             if (categoryDoc) {
                 query.categoryId = categoryDoc._id;
@@ -30,28 +30,20 @@ const product = async (req, res,next) => {
                 console.log("Category not found");
             }
         }
-        
-        
-        const totalProducts = await productSchema.countDocuments(query);
 
-        
-        // let sortOption = {};
-        // if (priceOrder === 'low') {
-        //     sortOption.price = 1;
-        // } else if (priceOrder === 'high') {
-        //     sortOption.price = -1;
-        // }
+
+        const totalProducts = await productSchema.countDocuments(query);
 
         const products = await productSchema.find(query)
             .populate('categoryId')
-            .sort({createdAt:-1})
+            .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit);
-       
+
         const totalPage = Math.ceil(totalProducts / limit);
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
-        const categories = await categorySchema.find({isListed:true})
+        const categories = await categorySchema.find({ isListed: true })
 
 
         res.render('admin/product', {
@@ -64,19 +56,18 @@ const product = async (req, res,next) => {
             cloudName,
             categories,
             selectedCategory: category,
-            // categoryDoc
-            // selectedPrice: priceOrder
+
         });
 
     } catch (error) {
-         next(error);
+        next(error);
     }
 };
 
 
 const getproductAdd = async (req, res) => {
     try {
-        const categories = await categorySchema.find({isListed:true}) || [];
+        const categories = await categorySchema.find({ isListed: true }) || [];
         res.render('admin/addproduct', { categories });
     } catch (error) {
         console.log("Product add page error:", error);
@@ -87,7 +78,7 @@ const getproductAdd = async (req, res) => {
 const addProduct = async (req, res) => {
     try {
         console.log("evd ethi")
-        const{
+        const {
             name, description, category, brand, offer, stock,
             model, regularPrice, salePrice, additionalInfo
         } = req.body;
@@ -95,48 +86,45 @@ const addProduct = async (req, res) => {
         let images = [];
 
         const uploadToCloudinary = (buffer, originalFilename) => {
-        return new Promise((resolve, reject) => {
-           
-            const sanitizedFilename = path.parse(originalFilename).name.replace(/[^a-zA-Z0-9-_]/g, '');
-            const uniqueFilename = `${Date.now()}_${sanitizedFilename}`;
-            
+            return new Promise((resolve, reject) => {
 
-            const uploadStream = cloudinary.uploader.upload_stream(
-                {
-                    folder: 'products',
-                    public_id: uniqueFilename,
-                    
-                    transformation: [
-                        { width: 300, height: 300, crop: 'fill', quality: 'auto' }
-                    ]
-                },
-                (error, result) => {
-                    if (error) {
-                        console.error('Cloudinary upload error:', error);
-                        reject(error);
-                    } else {
-                        console.log('Cloudinary upload success:', {
-                            public_id: result.public_id,
-                            secure_url: result.secure_url
-                        });
-                        resolve(result);
+                const sanitizedFilename = path.parse(originalFilename).name.replace(/[^a-zA-Z0-9-_]/g, '');
+                const uniqueFilename = `${Date.now()}_${sanitizedFilename}`;
+
+
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: 'products',
+                        public_id: uniqueFilename,
+
+                        transformation: [
+                            { width: 300, height: 300, crop: 'fill', quality: 'auto' }
+                        ]
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error('Cloudinary upload error:', error);
+                            reject(error);
+                        } else {
+                            console.log('Cloudinary upload success:', {
+                                public_id: result.public_id,
+                                secure_url: result.secure_url
+                            });
+                            resolve(result);
+                        }
                     }
-                }
-            );
-            uploadStream.end(buffer);
-        });
-    };
+                );
+                uploadStream.end(buffer);
+            });
+        };
 
-        
-
-      
         if (req.files && req.files.mainImage) {
             const mainImage = Array.isArray(req.files.mainImage)
                 ? req.files.mainImage[0]
                 : req.files.mainImage;
 
             if (!mainImage.tempFilePath) {
-                
+
             }
 
             const processedFilename = `main-${uuidv4()}.jpg`;
@@ -150,7 +138,7 @@ const addProduct = async (req, res) => {
             throw new Error("Main product image is required");
         }
 
-        
+
         if (req.files && req.files.additionalImages) {
             const additionalImageFiles = Array.isArray(req.files.additionalImages)
                 ? req.files.additionalImages
@@ -159,7 +147,7 @@ const addProduct = async (req, res) => {
             for (let file of additionalImageFiles) {
                 if (!file.tempFilePath) {
                     console.warn(`Skipping invalid additional image: Missing temp file path for ${file?.name || 'unknown'}`);
-                    continue; 
+                    continue;
                 }
 
                 const processedFilename = `additional-${uuidv4()}.jpg`;
@@ -187,108 +175,154 @@ const addProduct = async (req, res) => {
                 quantity: stock
             }]
         });
-         console.log(newProduct,'thisi sjnfn dghbnx')
+        console.log(newProduct, 'thisi sjnfn dghbnx')
         await newProduct.save();
-            res.redirect('/admin/product');
+        res.redirect('/admin/product');
 
-        
+
     } catch (error) {
         console.error("Error adding product:", error.message, error.stack);
         res.status(500).send(`Internal Server Error: ${error.message}`);
     }
 };
 
-const getEditProduct = async(req,res)=>{
-     
-  try {
-    const productId = req.params.id;
+const getEditProduct = async (req, res) => {
 
-    const product = await productSchema.findOne({_id:productId}).populate("categoryId");
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    const categories = await categorySchema.find()
-    res.render('admin/editproduct',{product,categories,cloudName});
-  } catch (error) {
-    next(error);
-  }
+    try {
+        const productId = req.params.id;
+
+        const product = await productSchema.findOne({ _id: productId }).populate("categoryId");
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        const categories = await categorySchema.find()
+        res.render('admin/editproduct', { product, categories, cloudName });
+    } catch (error) {
+        next(error);
+    }
 }
 
-const editProduct =async(req,res,next)=>{
+const editProduct = async (req, res, next) => {
+  try {
+    const editId = req.params.id;
+    const {
+      name, description, category, brand, model, regularPrice, salePrice, quantity, additionalInfo
+    } = req.body;
+
+    const product = await productSchema.findById(editId);
+    if (!product) return res.json({ success: false, message: "Product not found" });
+
+    
+    if (name && name !== product.name) {
+      const existProduct = await productSchema.findOne({ name, _id: { $ne: editId } });
+      if (existProduct) return res.json({ success: false, message: "Name already exists" });
+    }
+
+    let images = product.images || [];
+
+   
+    if (req.files && req.files.mainImage) {
+      const mainImageFile = Array.isArray(req.files.mainImage) ? req.files.mainImage[0] : req.files.mainImage;
+      const buffer = await sharp(mainImageFile.tempFilePath)
+        .resize(800, 800)
+        .toBuffer();
+
+      const uploadResult = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({
+          folder: 'products',
+          transformation: [{ width: 300, height: 300, crop: 'fill', quality: 'auto' }]
+        }, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        });
+        stream.end(buffer);
+      });
+
+     
+      images = images.filter(img => !img.isMain); 
+      images.unshift({ public_id: uploadResult.public_id, isMain: true }); 
+    }
+
+    
+    if (req.files && req.files.additionalImages) {
+      const addImages = Array.isArray(req.files.additionalImages) ? req.files.additionalImages : [req.files.additionalImages];
+
+      for (const file of addImages) {
+        const buffer = await sharp(file.tempFilePath)
+          .resize(800, 800)
+          .toBuffer();
+
+        const uploadResult = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream({
+            folder: 'products',
+            transformation: [{ width: 300, height: 300, crop: 'fill', quality: 'auto' }]
+          }, (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          });
+          stream.end(buffer);
+        });
+
+        images.push({ public_id: uploadResult.public_id, isMain: false });
+      }
+    }
+
+   
+    await productSchema.findByIdAndUpdate(editId, {
+      $set: {
+        name,
+        description,
+        categoryId: category,
+        brand,
+        model,
+        additionalInfo,
+        variants: [{ regularPrice, salePrice, quantity }],
+        images
+      }
+    });
+
+    res.json({ success: true, message: "Product updated successfully" });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+const deleteProduct = async (req, res) => {
     try {
-        
-       const { name, description, category, brand, offer,model, regularPrice, salePrice, quantity,additionalInfo,mainImage,} = req.body;
-       const editId = req.params.id;
-       const existProduct = await productSchema.findOne({name:name});
-
-       
-       
-       if(existProduct){
-        return res.json({success:false,message:"Name is already exist"})
-       }
-
-       await productSchema.findByIdAndUpdate(editId,{
-        $set:{
-            name:name,
-            description:description,
-            categoryId:category,
-            brand:brand,
-            offer:offer,
-            variants: [{
-                regularPrice: regularPrice,
-                salePrice: salePrice,
-                quantity:quantity
-            }],         
-            model:model,
-            additionalInfo:additionalInfo,
-            images:mainImage,
-            
-
+        const id = req.params.id;
+        const product = await productSchema.findByIdAndDelete(id);
+        if (!product) {
+            return res.json({ success: false, message: "Product is not found" });
+        } else {
+            return res.json({ success: true, message: "product Delete Successfull" });
         }
-       })
-       return res.json({success:true, message:"Product Updatedd successfull"});
-       
     } catch (error) {
-         next(error);
-        
+        next(error);
 
     }
 }
 
-const deleteProduct = async (req,res) => {
-    try {
-       const id = req.params.id;
-       const product =await productSchema.findByIdAndDelete(id);
-       if(!product){
-        return res.json({success:false, message:"Product is not found"});
-       }else{
-        return res.json({success:true, message:"product Delete Successfull"});
-       } 
-    } catch (error) {
-        next(error);
-
-    }    
-}
-
-const blockedProduct = async (req,res,next) => {
+const blockedProduct = async (req, res, next) => {
     try {
         const productId = req.params.id;
         console.log(productId)
-        const product = await productSchema.findOne({_id:productId});
-        const newStatus = product.isActive ? false: true;
-        console.log(newStatus,'thsdnkndk')
-        
-        await productSchema.findByIdAndUpdate(productId,{isActive:newStatus});
-        if(newStatus){
-            res.json({success:true, message:"product blocked"});
-        }else{
-            res.json({success:false, message:"Product unblocked"});
+        const product = await productSchema.findOne({ _id: productId });
+        const newStatus = product.isActive ? false : true;
+        console.log(newStatus, 'thsdnkndk')
+
+        await productSchema.findByIdAndUpdate(productId, { isActive: newStatus });
+        if (newStatus) {
+            res.json({ success: true, message: "product blocked" });
+        } else {
+            res.json({ success: false, message: "Product unblocked" });
         }
     } catch (error) {
         next(error);
     }
-    
+
 }
 
- const getProductDetails = async (req, res,next) => {
+const getProductDetails = async (req, res, next) => {
     const productId = req.params.id;
 
     try {
@@ -299,10 +333,10 @@ const blockedProduct = async (req,res,next) => {
     }
 };
 
-const addReview = async (req, res,next) => {
+const addReview = async (req, res, next) => {
     const productId = req.params.id;
     const userId = req.session.user;
-    
+
 
     const { rating, comment } = req.body;
 

@@ -17,19 +17,19 @@ const getAdminLogin =async (req,res,next) => {
     
 }
 
-const getDashBoard = async (req,res) => {
+const getDashBoard = async (req,res,next) => {
     try {
         if(!req.session.admin){
             return res.redirect('/admin')
         }
         res.render('admin/dashboard')
     } catch (error) {
-        res.status(500).send("dashboard not found");
+        next(error)
     }
     
 }
 
-const adminLogin =async (req,res) => {
+const adminLogin =async (req,res,next) => {
    try {
     const {email,password} = req.body;
     if(!email || !password)return res.redirect('/admin?error=email and password is required');
@@ -52,7 +52,7 @@ const adminLogin =async (req,res) => {
     res.redirect('/admin/dashboard');
 
    }catch (error) {
-        console.log('ti is fkdkd ',error);
+        next(error)
 
    }
     

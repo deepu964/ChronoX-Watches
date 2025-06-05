@@ -44,7 +44,7 @@
                 <i class="fas fa-tags"></i>
                 <span>Category</span>
             </a>
-            <a href="/admin/coupons" class="nav-item">
+            <a href="/admin/coupon" class="nav-item">
                 <i class="fas fa-ticket-alt"></i>
                 <span>Coupons</span>
             </a>
@@ -126,7 +126,12 @@
                 document.getElementById('categoryNameError').textContent = 'Category name can only contain letters, numbers, spaces, and hyphens';
                 document.getElementById('categoryNameError').style.display = 'block';
                 isValid = false;
-            };
+            }else if (!/^[A-Za-z][A-Za-z0-9\s-]*$/.test(categoryName) || !/[A-Za-z]/.test(categoryName) || (categoryName.match(/\d/g) || []).length > 2) {
+                document.getElementById('categoryNameError').textContent =
+                    'Name must start with a letter, allow max 2 numbers, and contain only letters, numbers, spaces or hyphens';
+                document.getElementById('categoryNameError').style.display = 'block';
+                isValid = false;
+            }
 
            
             if (!description) {

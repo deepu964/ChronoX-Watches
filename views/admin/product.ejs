@@ -46,7 +46,7 @@
                 <i class="fas fa-tags"></i>
                 <span>Category</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="coupon" class="nav-item">
                 <i class="fas fa-ticket-alt"></i>
                 <span>Coupons</span>
             </a>
@@ -123,7 +123,7 @@
                         <th>Stock</th>
                         <th>List</th>
                         <th>Action</th>
-                        <th>Offer</th>
+                        <!-- <th>Offer</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -160,13 +160,13 @@
                                 <i class="fas fa-trash"></i>
                                 </button>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <% if (element.offer) { %>
                                 <div class="offer-tag"><%= element.offer %>%Off</div>
                                 <% } else { %>
                                 <div class="offer-tag">-</div>
                                 <% } %>
-                            </td>
+                            </td> -->
                             </tr>
                         <% }) %>
                 </tbody>
@@ -276,19 +276,19 @@
             });
         });
         
-        // Add Offer Button
-        const addOfferButtons = document.querySelectorAll('.add-offer-btn');
-        addOfferButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const offerType = prompt('Enter offer type (e.g., "20%Off" or "200rs Off"):');
-                if (offerType) {
-                    const offerTag = document.createElement('div');
-                    offerTag.className = 'offer-tag';
-                    offerTag.textContent = offerType;
-                    this.parentNode.replaceChild(offerTag, this);
-                }
-            });
-        });
+        // // Add Offer Button
+        // const addOfferButtons = document.querySelectorAll('.add-offer-btn');
+        // addOfferButtons.forEach(btn => {
+        //     btn.addEventListener('click', function() {
+        //         const offerType = prompt('Enter offer type (e.g., "20%Off" or "200rs Off"):');
+        //         if (offerType) {
+        //             const offerTag = document.createElement('div');
+        //             offerTag.className = 'offer-tag';
+        //             offerTag.textContent = offerType;
+        //             this.parentNode.replaceChild(offerTag, this);
+        //         }
+        //     });
+        // });
 
         function editProduct(id){
             window.location.href=`/admin/editproduct/edit/${id}`

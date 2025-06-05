@@ -1,6 +1,6 @@
 const User = require('../../models/userSchema')
 
-const userList = async (req,res) => {
+const userList = async (req,res,next) => {
     try {
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
@@ -32,14 +32,13 @@ const userList = async (req,res) => {
                  
             })
     } catch (error) {
-        console.log("userlist side", error);
         res.redirect('/admin/dashboard');
-
+        next(error)
     }
     
 }
 
-const blockUser = async (req,res) => {
+const blockUser = async (req,res,next) => {
     try {
         const userId = req.params.id;
        

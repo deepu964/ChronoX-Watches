@@ -216,11 +216,11 @@ in.css">
                     <input type="text" class="form-control" id="brand" placeholder="Enter brand name" name="brand">
                     <p id="brandError" style="color: red;"></p>
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label class="form-label" for="offer">Offer</label>
                     <input type="text" class="form-control" id="offer" placeholder="Enter offer details" name="offer">
                     <p id="offerError" style="color: red;"></p>
-                </div>
+                </div> -->
                 <!-- <div class="form-group">
                     <label class="form-label" for="sku">SKU</label>
                     <input type="text" class="form-control" id="sku" placeholder="Enter SKU" name="sku">
@@ -547,12 +547,12 @@ in.css">
             }
 
             
-            const offer = document.getElementById('offer').value.trim();
-            if (offer < 1 || offer > 100) {
-                document.getElementById('offerError').textContent = 'Offer must be 1-100 characters';
-                document.getElementById('offerError').style.display = 'block';
-                isValid = false;
-            }
+            // const offer = document.getElementById('offer').value.trim();
+            // if (offer < 1 || offer > 100) {
+            //     document.getElementById('offerError').textContent = 'Offer must be 1-100 characters';
+            //     document.getElementById('offerError').style.display = 'block';
+            //     isValid = false;
+            // }
 
             
             const model = document.getElementById('model').value.trim();
