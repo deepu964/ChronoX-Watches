@@ -6,11 +6,15 @@ const jwt = require('jsonwebtoken')
 
 const getAdminLogin =async (req,res,next) => {
     try {
+        
         if(req.session.admin){
           return res.redirect('/admin/dashboard')
         }
+
         const error = req.query.error
         return res.render('admin/login',{error})
+
+
     } catch (error) {
         next(error)
     }
