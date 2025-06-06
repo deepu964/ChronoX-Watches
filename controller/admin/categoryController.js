@@ -30,7 +30,7 @@ const listCategories = async (req,res,next) => {
 
     });
     } catch (error) {
-        // console.log("this is category render error");
+       
         next(error)
     
 }
@@ -50,11 +50,13 @@ const addCategory = async (req,res,next) => {
     const {categoryName,description,isListed} = req.body;
     
     try {
-      const existingCategory =  await categorySchema.findOne({categoryName});
-      
-      if(existingCategory){
-        return res.json({success:false, message:"Category already exists"});
-      } 
+      const existingCategory = await categorySchema.findOne({
+        name: { $regex: new RegExp(`^${categoryName}$`, 'i') } 
+      });
+
+      if (existingCategory) {
+        return res.json({ success: false, message: "Category already exists || Only first letter should be Capital" });
+      }
 
       const newCategory = new categorySchema({
         name:categoryName,
@@ -67,11 +69,12 @@ const addCategory = async (req,res,next) => {
       
       return res.json({ success:true, message:"Category added successfully"});
     } catch (error) {
-        // console.log(error,'something happen addcategory');
         next(error);
     }
     
 }
+
+
 
 const toggleCategoryStatus = async (req, res,next) => {
   try {
@@ -82,14 +85,15 @@ const toggleCategoryStatus = async (req, res,next) => {
     await categorySchema.findByIdAndUpdate(id,
         {isListed:newStatus}
     );
-    console.log(newStatus)
+    
     res.json({ success: true, message:"Updated successfully" });
   } catch (err) {
-    // console.error('Toggle status error:', err);
     next(err)
     res.status(500).json({ success: false });
   }
 };
+
+
 const getEditCategory = async (req,res) => {
     try {
        
@@ -103,6 +107,7 @@ const getEditCategory = async (req,res) => {
     }
 }
 
+
 const editCategory = async (req, res, next) => {
   try {
     const { categoryName, description } = req.body;
@@ -113,11 +118,10 @@ const editCategory = async (req, res, next) => {
       return res.json({ success: false, message: "Category not found" });
     }
 
-    
     if (categoryName && categoryName !== currentCategory.name) {
       const nameExists = await categorySchema.findOne({
-        name: categoryName,
-        _id: { $ne: catId } 
+        _id: { $ne: catId }, 
+        name: { $regex: new RegExp(`^${categoryName}$`, "i") } 
       });
 
       if (nameExists) {
@@ -128,7 +132,6 @@ const editCategory = async (req, res, next) => {
       }
     }
 
-    
     await categorySchema.findByIdAndUpdate(catId, {
       $set: {
         name: categoryName,
@@ -149,8 +152,8 @@ const deleteCategory = async (req,res,next) => {
     try {
         const id = req.params.id;
         const category = await categorySchema.findByIdAndDelete(id);
-        const product = await productSchema.findOne({}).populate()
-        console.log(product, "this is product");
+        
+        
     
 
         if(!category){

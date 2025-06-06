@@ -305,10 +305,10 @@ const deleteProduct = async (req, res) => {
 const blockedProduct = async (req, res, next) => {
     try {
         const productId = req.params.id;
-        console.log(productId)
+        
         const product = await productSchema.findOne({ _id: productId });
         const newStatus = product.isActive ? false : true;
-        console.log(newStatus, 'thsdnkndk')
+       
 
         await productSchema.findByIdAndUpdate(productId, { isActive: newStatus });
         if (newStatus) {

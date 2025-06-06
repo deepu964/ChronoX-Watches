@@ -125,7 +125,7 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            width: 117%;
+            width: 150%;
             margin-left: var(--sidebar-width);
             padding: 20px;
             transition: var(--transition);

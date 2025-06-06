@@ -129,7 +129,7 @@
             margin-left: var(--sidebar-width);
             padding: 20px;
             transition: var(--transition);
-            width: 126.5%;
+            width: 75%;
         }
         
         /* Header */
@@ -256,39 +256,48 @@
             overflow: hidden;
             box-shadow: var(--shadow-sm);
             margin-bottom: 20px;
+            border: 1px solid #b4b5b6;  /* Optional: border for consistency */
         }
-        
+
         .customer-table table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;   /* ✅ Ensures equal width columns */
         }
-        
+
+        .customer-table th,
+        .customer-table td {
+            padding: 15px;
+            font-size: 14px;
+            text-align: left;
+            vertical-align: middle;
+            overflow: hidden;           /* ✅ Prevents overflow */
+            text-overflow: ellipsis;   /* ✅ Adds "..." if content is long */
+            white-space: nowrap;       /* ✅ Keeps everything on one line */
+        }
+
         .customer-table th {
             background-color: #111827;
             color: white;
-            text-align: left;
-            padding: 15px;
             font-weight: 500;
-            font-size: 14px;
         }
-        
+
         .customer-table td {
-            padding: 15px;
             border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
         }
-        
+
         .customer-table tr:last-child td {
             border-bottom: none;
         }
-        
+
         .customer-table tbody tr {
             transition: var(--transition);
         }
-        
+
         .customer-table tbody tr:hover {
             background-color: #f9fafb;
         }
+
         
         /* Customer Row */
         .customer-avatar {
