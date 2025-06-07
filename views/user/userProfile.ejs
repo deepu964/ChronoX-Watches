@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX - User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .hamburger {
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 45px 10px 20px;
+            border: none;
+            border-radius: 25px;
+            width: 280px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.02);
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .search-icon:hover {
+            color: white;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+        }
+
+        .header-icons i {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .header-icons i:hover {
+            color: #667eea;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            display: flex;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 0;
+            height: fit-content;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .profile-section {
+            padding: 40px 30px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05) rotateY(10deg);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .menu-item {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 30px;
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+
+        .menu-item a:hover::before {
+            width: 100%;
+        }
+
+        .menu-item a:hover {
+            color: #667eea;
+            padding-left: 40px;
+            transform: translateX(5px);
+        }
+
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .wishlist-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .breadcrumb {
+            padding: 20px 40px;
+            font-size: 14px;
+            color: #666;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            border-radius: 20px 20px 0 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .content-header {
+            padding: 40px 40px 20px;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+
+        .profile-form {
+            padding: 0 40px 40px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group.full-width {
+            width: 100%;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 12px;
+            font-size: 15px;
+            background: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .form-input:hover {
+            border-color: rgba(0,0,0,0.2);
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .edit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .message-section {
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding: 40px;
+            background: rgba(102, 126, 234, 0.02);
+            border-radius: 0 0 20px 20px;
+        }
+
+        .message-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .message-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transform: scale(0.7);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-form-group {
+            margin-bottom: 25px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .modal-form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .modal-footer {
+            padding: 0 30px 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .main-container > * {
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .sidebar {
+            animation-delay: 0.1s;
+        }
+
+        .main-content {
+            animation-delay: 0.2s;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                padding: 0 15px;
+                gap: 20px;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-box input {
+                width: 200px;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .content-header,
+            .profile-form,
+            .message-section {
+                padding: 30px 25px;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+            }
+
+            .modal {
+                width: 95%;
+                margin: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0 15px;
+            }
+
+            .search-box {
+                display: none;
+            }
+
+            .content-header,
+            .profile-form,
+            .message-section {
+                padding: 20px;
+            }
+
+            .profile-section {
+                padding: 30px 20px;
+            }
+
+            .welcome-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <span class="hamburger">≡</span>
+                <div class="logo">ChronoX</div>
+                <ul class="nav-menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/shop">SHOP</a></li>
+                    <li>  <a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" placeholder="Search products...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="header-icons">
+                    <i class="far fa-heart"></i>
+                    <a href="/cart" style="color: white;"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="/userProfile" style="color: white;"><i class="fas fa-user"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <div class="profile-info">
+                    <div class="profile-avatar"></div>
+                    <div class="profile-name"><%= user.fullname %></div>
+                </div>
+            </div>
+            
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-user"></i></div>
+                            <span>My Profile</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/address">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <span>My Address</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
+                            <span>My Order</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-heart"></i></div>
+                            <span>My Wishlist</span>
+                        </div>
+                        <span class="wishlist-badge">4</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-wallet"></i></div>
+                            <span>My Wallet</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-ticket-alt"></i></div>
+                            <span>My Coupon</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" id="changePasswordBtn">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-key"></i></div>
+                            <span>Change password</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/logout">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                            <span>Log out</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-gift"></i></div>
+                            <span>Referral Code</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <i class="fas fa-home"></i> Profile &gt;
+            </div>
+            
+            <div class="content-header">
+                <h1 class="welcome-title">Welcome <%= user.fullname %></h1>
+            </div>
+            
+            <form class="profile-form" id="profileForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full name</label>
+                        <input type="text" class="form-input" name="fullname" value="<%= user.fullname %>">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" name="email" value="<%= user.email %>">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-input" name="mobile" value="<%= user.mobile %>">
+                    </div>
+                </div>
+                
+                <button type="submit" class="edit-btn">
+                    <i class="fas fa-save"></i> UPDATE
+                </button>
+                <!-- <button type="submit" class="edit-btn">
+                    <i class="fas fa-save"></i> ChangeEmail
+                </button> -->
+            </form>
+
+            <div class="modal-overlay" id="otpModal">
+            <div class="modal">
+                <div class="modal-header">
+                <h5>Verify New Email</h5>
+                <button type="button" class="modal-close" onclick="closeOtpModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                <p>Enter the OTP sent to your new email.</p>
+                <input type="text" id="emailOtp" placeholder="Enter OTP">
+                </div>
+                <div class="modal-footer">
+                <button onclick="verifyOtp()" class="btn btn-primary">Verify</button>
+                </div>
+            </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="changePasswordModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="changePasswordForm" >
+                <div class="modal-body">
+                    <div class="modal-form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" >
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" >
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" >
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancelModal">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+<%-include('../../views/partials/user/footer')%>
+    <script>
+        // Modal functionality
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changePasswordModal = document.getElementById('changePasswordModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelModal = document.getElementById('cancelModal');
+        const changePasswordForm = document.getElementById('changePasswordForm');
+
+        // Open modal
+        changePasswordBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            changePasswordModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Close modal functions
+        function closeModalFunc() {
+            changePasswordModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            changePasswordForm.reset();
+        }
+
+        closeModal.addEventListener('click', closeModalFunc);
+        cancelModal.addEventListener('click', closeModalFunc);
+
+        // Close modal when clicking outside
+        changePasswordModal.addEventListener('click', function(e) {
+            if (e.target === changePasswordModal) {
+                closeModalFunc();
+            }
+        });
+
+        // Handle form submission
+        changePasswordForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = document.getElementById('changePasswordForm');
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showToast('New passwords do not match!');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showToast('New password must be at least 6 characters long!');
+                return;
+            }
+            
+           
+            // Simulate password change
+            const submitBtn = changePasswordForm.querySelector('.btn-primary');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+            submitBtn.disabled = true;
+
+            const res = await fetch('/profile-change-pass', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+            });
+
+            const data = await res.json();
+
+            setTimeout(() => {
+                showToast('Password changed successfully!');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                closeModalFunc();
+            }, 2000);
+        });
+
+        // Profile form functionality
+        document.getElementById("profileForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const name = e.target.fullname.value;
+            const mobile = e.target.mobile.value || "";
+            const email = e.target.email.value;
+
+            const originalEmail = "<%= user.email %>"; // from backend
+            console.log(originalEmail, email);
+            if (email !== originalEmail) {
+                // Email changed → OTP flow
+                const res = await fetch('/user-email-change', {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, mobile, newEmail: email })
+                });
+
+                const data = await res.json();
+                if(data.message){
+                    window.location.href = '/profile/otp-sent';
+                }
+
+                // const verifyRes = await fetch('/profile/verify-email-otp', {
+                // method: "POST",
+                // headers: {'Content-Type': 'application/json'},
+                // body: JSON.stringify({ otp })
+                // });
+
+                // const result = await verifyRes.json();
+                // alert(result.message);
+                // if (verifyRes.ok) location.reload();
+            } else {
+                
+                const res = await fetch('/userProfile', {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name,email, mobile })
+                });
+
+                const data = await res.json();
+                if(data.success){
+                    setTimeout(()=>{location.reload()},2000)
+                     showToast('Profile updated successfully!');
+                    
+                } else {
+                    showToast('Failed to update profile.');
+                }
+                 
+            }
+            });
+
+            document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+            const otp = document.getElementById('otpInput').value;
+            const email = document.querySelector('#email').value;
+
+            const response = await fetch('/verify-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, otp })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                updateUserProfile(); // Proceed to save the user data
+            } else {
+                showToast('Invalid OTP.');
+            }
+            });
+
+            function updateUserProfile() {
+            const formData = new FormData(document.querySelector('#profileForm'));
+            fetch('/update-profile', {
+                method: 'POST',
+                body: formData
+            }).then(res => res.json())
+                .then(data => {
+                if (data.success) {
+                    showToast('Profile updated!');
+                    location.reload();
+                }
+                });
+            }
+
+        // Menu hover effects and active states
+        document.querySelectorAll('.menu-item a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (this.id !== 'changePasswordBtn') {
+                    // Remove active class from all items
+                    document.querySelectorAll('.menu-item a').forEach(i => i.classList.remove('active'));
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Message button functionality
+        document.querySelector('.message-btn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Messages...';
+            setTimeout(() => {
+                alert('Messages feature coming soon!');
+                this.innerHTML = '<i class="fas fa-envelope"></i> Your Messages';
+            }, 1000);
+        });
+
+        // Mobile menu toggle
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            if (navMenu.style.display === 'flex') {
+                navMenu.style.display = 'none';
+            } else {
+                navMenu.style.display = 'flex';
+                navMenu.style.flexDirection = 'column';
+                navMenu.style.position = 'absolute';
+                navMenu.style.top = '100%';
+                navMenu.style.left = '0';
+                navMenu.style.background = 'rgba(0,0,0,0.95)';
+                navMenu.style.width = '100%';
+                navMenu.style.padding = '20px';
+                navMenu.style.borderRadius = '0 0 10px 10px';
+            }
+        });
+
+        // Search functionality
+        document.querySelector('.search-icon').addEventListener('click', function() {
+            const searchInput = document.querySelector('.search-box input');
+            if (searchInput.value.trim()) {
+                alert(`Searching for: ${searchInput.value}`);
+            }
+        });
+
+        // Header icons functionality
+        document.querySelectorAll('.header-icons i').forEach(icon => {
+            icon.addEventListener('click', function() {
+                if (this.classList.contains('fa-heart')) {
+                    alert('Wishlist feature coming soon!');
+                } else if (this.classList.contains('fa-shopping-cart')) {
+                    alert('Shopping cart feature coming soon!');
+                } else if (this.classList.contains('fa-user')) {
+                    alert('User menu feature coming soon!');
+                }
+            });
+        });
+
+        // Smooth scrolling for better UX
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(0, 0, 0, 0.98)';
+            } else {
+                header.style.background = 'rgba(0, 0, 0, 0.95)';
+            }
+        });
+
+        // Add loading animation on page load
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

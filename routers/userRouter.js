@@ -52,4 +52,25 @@ router.get('/productdetails/:id',isAuth,userController.getProductDetails)
 router.get('/productdetails/:id', productController.getProductDetails);
 router.post('/productdetails/review/:id', productController.addReview);
 
+router.get('/userProfile',isAuth,userController.getUserProfile);
+router.post('/userProfile',isAuth,userController.updateProfile);
+router.post("/user-email-change", isAuth, userController.changeEmail);
+router.get("/profile/otp-sent", isAuth, userController.getChangeEmailOtp);
+router.post("/email-verify-otp", isAuth, userController.verifyChangeEmailOtp);
+
+
+router.post('/profile-change-pass',isAuth,userController.changePassword);
+
+router.get('/address',isAuth,userController.getAddress);
+
+router.get('/add-address',isAuth,userController.getAddAddress);
+router.post('/add-address',isAuth,userController.addAddress);
+
+router.get('/edit-address/:id',isAuth,userController.getEditAddress);
+router.put('/edit-address/:id',isAuth,userController.editAddress);
+
+router.get('/cart',isAuth,userController.getCart);
+// router.post('/add-to-cart',isAuth,userController.addToCart);
+
+
 module.exports = router;

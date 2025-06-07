@@ -3,6 +3,15 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const addressSchema = new Schema({
+    house: { type: String, required: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: { type: String, required: true },
+    phone: { type: String, required: true }
+}, { _id: false });
+
 const userSchema = new Schema({
     fullname: {
         type: String,
@@ -30,6 +39,7 @@ const userSchema = new Schema({
         type: String,
         required: false
     },
+    addresses: [addressSchema], 
     resetToken: String,
     resetTokenExpr: Date,
     
@@ -47,7 +57,17 @@ const userSchema = new Schema({
     },
     lastLogin: {
         type: Date
-    }
+    },
+    cart: [
+  {
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product'
+    },
+    quantity: Number,
+    price: Number         
+  }
+]
 });
 
 const User = mongoose.model('User', userSchema);
