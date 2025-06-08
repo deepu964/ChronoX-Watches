@@ -68,9 +68,13 @@ router.post('/add-address',isAuth,userController.addAddress);
 
 router.get('/edit-address/:id',isAuth,userController.getEditAddress);
 router.put('/edit-address/:id',isAuth,userController.editAddress);
+router.delete('/delete-address/:id', isAuth, userController.deleteAddress);
+
+
+router.get('/wish-list',isAuth,userController.getWishList);
 
 router.get('/cart',isAuth,userController.getCart);
-// router.post('/add-to-cart',isAuth,userController.addToCart);
+router.post('/add-to-cart',isAuth,userController.addToCart);
 
 
 module.exports = router;

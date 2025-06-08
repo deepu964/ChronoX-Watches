@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/css/shops.css">
 </head>
 <body>
-<%- include("../../views/partials/user/header") %>
+<%-include("../partials/user/header") %>
 
 <section class="hero-banner">
     <div class="hero-content">
@@ -128,9 +128,14 @@
                             <span class="rating-count">(<%= product.ratingCount || 4.5 %>)</span>
                         </div>
 
+                        <div class="product-card">
+                        <p><%= product.name %></p>
                         <div class="add-to-cart">
-                            <button class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="cart-btn" onclick="addToCart('<%= product._id %>', this)">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
                             <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -174,6 +179,66 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+    function addToCart(productId, button) {
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = 'Adding...';
+
+    fetch('/add-to-cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+        // Success Toast
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Product added to cart',
+            showConfirmButton: false,
+            timer: 2000
+        });
+
+        button.innerHTML = '✓ Added';
+        button.style.backgroundColor = '#28a745';
+
+        } else {
+        // Error Toast
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: data.message,
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        button.innerHTML = originalText;
+        }
+    })
+    .catch(() => {
+        // Error case JSON parse issue etc
+        Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Something went wrong',
+        showConfirmButton: false,
+        timer: 3000
+        });
+
+        button.innerHTML = originalText;
+    })
+    .finally(() => {
+        setTimeout(() => {
+        button.disabled = false;
+        }, 2000);
+    });
+    }
+
 </script>
 
 <%- include("../../views/partials/user/footer") %>

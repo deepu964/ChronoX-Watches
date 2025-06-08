@@ -3,8 +3,11 @@
 const bcrypt = require('bcrypt');
 const User = require('../../models/userSchema');
 const categorySchema = require('../../models/categorySchema')
-const generateOtp = require('../../utils/generateOtp');
+const addressSchema = require('../../models/addressSchema');
 const productSchema = require('../../models/productSchema');
+const Cart = require('../../models/cartSchema');
+const WishList = require('../../models/wishlistSchema');
+const generateOtp = require('../../utils/generateOtp');
 const sendOtpEmail = require('../../utils/sendOtpEmail');
 const sendResetPass = require('../../utils/sendResetPass');
 const mongoose = require('mongoose')
@@ -710,14 +713,23 @@ console.log("checkpoint 2");
 
 const getAddress = async (req, res, next) => {
     try {
-        res.render('user/address');
+        if(!req.session.user) {
+            return res.redirect('/login?message=Please login to view your address');
+        }
+        const userId = req.session.user._id;
+        const user = await User.findById(userId);
+        const addresses = await addressSchema.find({ userId: userId }).lean();
+        res.render('user/address',{user,addresses});
     } catch (error) {
         next(error);    
     }
 }
 const getAddAddress = async (req, res, next) => {
     try {
-        res.render('user/addAddress');
+        const user = req.session.user._id;
+        res.render('user/addAddress',{ user });
+      
+
     } catch (error) {
         next(error);
     }
@@ -725,62 +737,105 @@ const getAddAddress = async (req, res, next) => {
     
 const addAddress = async (req, res, next) => {
     try {
-        const { house, street, city, state, pincode, phone } = req.body;
         const userId = req.session.user._id;
+       
+        const {fullName, phone, pinCode, city, state, district, address, landmark, addressType } = req.body;
 
-        if (!house || !street || !city || !state || !pincode || !phone) {
-            return res.status(400).json({ success: false, message: 'All fields are required' });
-        }
-
-        const address = {
-            house,
-            street,
+        const newAddress = new addressSchema({ 
+            userId,
+            fullName,
+            phone,
+            pinCode,
             city,
             state,
-            pincode,
-            phone
-        };
-
-        await User.findByIdAndUpdate(userId, { $push: { addresses: address } });
-
-        return res.status(200).json({ success: true, message: 'Address added successfully' });
+            district,
+            address,
+            landmark,
+            addressType
+        });
+        await newAddress.save();
+        return res.status(200).redirect('/address?message=Address added successfully');
     } catch (error) {
         next(error);
     }
 }
+
 
 const getEditAddress = async (req, res, next) => {
+  try {
+    const addressId = req.params.id;
+    const address = await addressSchema.findById(addressId);
+    if (!address) return res.status(404).send('Address not found');
+    res.render('user/editAddress', {
+         user: req.session.user,
+        address });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+const editAddress = async(req, res, next) => {
     try {
-        res.render('user/editAddress');
+      const addressId = req.params.id;
+      console.log("addressId",addressId);
+
+        const { fullName, phone, pinCode, city, state, district, address, landmark, addressType } = req.body;
+        console.log(req.body, "req.body in edit address");
+        const currentAddress = await addressSchema.findById(addressId);
+        if (!currentAddress) {
+            return res.status(404).json({ success: false, message: 'Address not found' });
+        }
+        let existingAddress = null;   
+        if(fullName && fullName !== currentAddress.fullName) {
+             existingAddress = await addressSchema.findOne({ 
+                _id: { $ne: addressId },
+                fullName: new RegExp(`^${fullName}$`, 'i')
+            });
+        }
+
+        if(existingAddress){
+            return res.status(400).json({ success: false, message: 'Address with this name already exists' });
+        }
+
+        await addressSchema.findByIdAndUpdate(addressId, {
+            fullName,
+            phone,
+            pinCode,
+            city,
+            state,
+            district,
+            address,
+            landmark,
+            addressType
+        });
+        return res.status(200).json({ success: true, message: 'Address updated successfully' });
     } catch (error) {
         next(error);
     }
 }
 
-const editAddress = async (req, res, next) => {
+const deleteAddress = async (req, res, next) => {
     try {
-        const { addressId, house, street, city, state, pincode, phone } = req.body;
-        const userId = req.session.user._id;
+        const addressId = req.params.id;
+        console.log("addressId",addressId);
 
-        if (!addressId || !house || !street || !city || !state || !pincode || !phone) {
-            return res.status(400).json({ success: false, message: 'All fields are required' });
+        const address = await addressSchema.findById(addressId);
+        if (!address) {
+            return res.status(404).json({ success: false, message: 'Address not found' });
         }
+        await addressSchema.findByIdAndDelete(addressId);
+        return res.status(200).json({ success: true, message: 'Address deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+}
 
-        await User.findOneAndUpdate(
-            { _id: userId, 'addresses._id': addressId },
-            {
-                $set: {
-                    'addresses.$.house': house,
-                    'addresses.$.street': street,
-                    'addresses.$.city': city,
-                    'addresses.$.state': state,
-                    'addresses.$.pincode': pincode,
-                    'addresses.$.phone': phone
-                }
-            }
-        );
-
-        return res.status(200).json({ success: true, message: 'Address updated successfully' });
+const getWishList = async(req,res,next)=>{
+    try {
+        res.render('user/wishlist',{
+            user: req.session.user,
+        });
     } catch (error) {
         next(error);
     }
@@ -789,12 +844,60 @@ const editAddress = async (req, res, next) => {
 
 const getCart =async (req,res,next) => {
     try {
-        res.render('user/cart');
+       
+        res.render('user/cart',{
+             user: req.session.user,
+        });
     } catch (error) {
         next(error);
     }
     
 }
+
+const addToCart = async (req, res, next) => {
+    try {
+        const userId = req.session.user._id;
+        const productId = req.body.productId;
+
+        const product = await productSchema.findById(productId).populate('categoryId');
+        
+       
+        if (
+        !product || 
+        product.isActive || 
+        !product.categoryId.isListed || 
+        product.isDeleted
+        ) {
+        return res.status(404).json({ success: false, message: 'Product is unavailable or blocked.' });
+        }
+        
+    
+        let cart = await Cart.findOne({ user: userId });
+        if(!cart){
+            cart = new Cart({ user: userId, items: [] });
+        }
+
+        const existsingItem = cart.items.find(item => item.product.toString() === productId);
+
+        if (existsingItem) {
+            existsingItem.quantity += 1;
+        }else {
+            cart.items.push({ product: productId, quantity: 1 });
+        }
+
+        await WishList.updateOne(
+            {user: userId},
+            { $pull: { items: productId } },
+        )
+        await cart.save();
+        return res.status(200).json({ success: true, message: 'Product added to cart successfully' });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 
 module.exports = {
     getLoadHomePage,
@@ -824,6 +927,10 @@ module.exports = {
     addAddress,
     getEditAddress,
     editAddress,
-    getCart
+    deleteAddress,
+    getWishList,
+    getCart,
+    addToCart,
+
 
 };

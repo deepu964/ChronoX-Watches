@@ -55,11 +55,12 @@ body {
     padding: 20px;
     text-align: center;
 }
-
 .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-}
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-color);
+            text-align: center;
+        }
 
 .logo-text {
     color: #01060a;

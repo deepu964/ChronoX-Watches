@@ -17,11 +17,6 @@ const categorySchema = new mongoose.Schema({
     type: String,
     default: ''
   },
- 
-  quantity: {
-    type: Number,
-    default: 0
-  },
   addedDate: {
     type: Date,
     default: Date.now

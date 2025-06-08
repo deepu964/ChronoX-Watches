@@ -48,12 +48,13 @@
             padding: 20px;
             border-bottom: 1px solid var(--border-color);
         }
-        
         .logo {
             font-size: 24px;
-            font-weight: bold;
+            font-weight: 600;
             color: var(--text-color);
+            text-align: center;
         }
+        
         
         .nav-items {
             flex: 1;

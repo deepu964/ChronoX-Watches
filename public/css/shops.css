@@ -53,12 +53,7 @@
             box-shadow: var(--shadow-sm);
         }
         
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-dark);
-            letter-spacing: 1px;
-        }
+        
         
         .logo span {
             color: var(--primary-color);

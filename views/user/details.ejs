@@ -38,14 +38,6 @@
             padding: 0 2rem;
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
         .logo:hover {
             color: #ff6b35;
         }
@@ -650,25 +642,7 @@
     </style>
 </head>
 <body>
-    
-    <header class="header">
-        <nav class="nav">
-            <a href="/" class="logo">ChronoX</a>
-            <ul class="nav-menu">
-                <li><a href="/">Home</a></li>
-                <li><a href="/shop">Watches</a></li>
-                <li><a href="#">Brands</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-            <div class="search-cart">
-                <input type="text" class="search-box" placeholder="Search watches...">
-                <span class="cart-icon">🛒</span>
-            </div>
-        </nav>
-    </header>
-
-   
+  <%-include("../../views/partials/user/header")%>
     <div class="container">
        
         <section class="product-section">
@@ -727,20 +701,19 @@
                    <li>STOCK:  <%= product.variants[0].quantity %></li>
                 </ul>
 
-                <div class="quantity-section">
-                    <span class="quantity-label">Quantity:</span>
-                    <div class="quantity-controls">
-                        <button class="qty-btn" onclick="decreaseQty()">−</button>
-                        <input type="number" class="qty-input" value="1" min="1" id="quantity">
-                        <button class="qty-btn" onclick="increaseQty()">+</button>
-                    </div>
+              <div class="quantity-section">
+                <span class="quantity-label">Quantity:</span>
+                <div class="quantity-controls">
+                    <button class="qty-btn" onclick="decreaseQty()">−</button>
+                    <input type="number" class="qty-input" value="1" min="1" id="quantity">
+                    <button class="qty-btn" onclick="increaseQty()">+</button>
                 </div>
-
-                <button class="add-to-cart" onclick="addToCart()">Add to Cart</button>
             </div>
+            <button class="add-to-cart" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+
         </section>
 
-        <!-- Description Section -->
+        
         <section class="description-section">
             <h2 class="description-title">Description</h2>
             <div class="description-content">
@@ -852,46 +825,63 @@
 
     <script>
         
-        function increaseQty() {
-            const qtyInput = document.getElementById('quantity');
-            qtyInput.value = parseInt(qtyInput.value) + 1;
-        }
+       const maxStock = '<%= product.variants[0].quantity %>'; 
 
-        function decreaseQty() {
-            const qtyInput = document.getElementById('quantity');
-            if (parseInt(qtyInput.value) > 1) {
-                qtyInput.value = parseInt(qtyInput.value) - 1;
+        function increaseQty() {
+            const input = document.getElementById('quantity');
+            let current = parseInt(input.value);
+            if (current < maxStock) {
+                input.value = current + 1;
             }
         }
 
+        function decreaseQty() {
+            const input = document.getElementById('quantity');
+            let current = parseInt(input.value);
+            if (current > 1) {
+                input.value = current - 1;
+            }
+        }
        
-        function addToCart() {
-            const quantity = document.getElementById('quantity').value;
-            const btn = document.querySelector('.add-to-cart');
-            
-            
-            btn.innerHTML = 'Adding to Cart...';
-            btn.disabled = true;
-            
-            
-            setTimeout(() => {
+  function addToCart(productId) {
+        const quantity = document.getElementById('quantity').value || 1;
+        const btn = document.querySelector('.add-to-cart');
+
+        btn.innerHTML = 'Adding to Cart...';
+        btn.disabled = true;
+
+        
+        fetch('/add-to-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, quantity })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.message) {
                 btn.innerHTML = 'Added to Cart ✓';
                 btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
-                
-                
-                setTimeout(() => {
-                    btn.innerHTML = 'Add to Cart';
-                    btn.disabled = false;
-                    btn.style.background = 'linear-gradient(135deg, #ff6b35, #ff8c42)';
-                }, 2000);
-            }, 1000);
-        }
+            } else {
+                btn.innerHTML = 'Failed to Add';
+            }
 
-        // View Related Product
-        // function viewProduct(id) {
-        //     window.location.href = `/productdetails/${id}`;
-        // }
-
+            setTimeout(() => {
+                btn.innerHTML = 'Add to Cart';
+                btn.disabled = false;
+                btn.style.background = 'linear-gradient(135deg, #ff6b35, #ff8c42)';
+            }, 2000);
+        })
+        .catch(err => {
+            console.error(err);
+            btn.innerHTML = 'Error';
+            setTimeout(() => {
+                btn.innerHTML = 'Add to Cart';
+                btn.disabled = false;
+            }, 2000);
+        });
+    }
         
         document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
             thumb.addEventListener('click', () => {

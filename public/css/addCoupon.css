@@ -48,10 +48,7 @@ body {
     border-bottom: 1px solid var(--border);
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-}
+
 
 .nav-items {
     flex: 1;
@@ -86,6 +83,12 @@ body {
     padding: 20px;
     border-top: 1px solid var(--border);
 }
+.logo {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-color);
+    text-align: center;
+        }
 
 .account-btn,
 .logout-btn {

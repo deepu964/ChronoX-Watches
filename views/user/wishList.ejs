@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Minimal Header */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            display: flex;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        /* Sidebar - Using exact styles from profile page */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 0;
+            height: fit-content;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .profile-section {
+            padding: 40px 30px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05) rotateY(10deg);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .menu-item {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 30px;
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+
+        .menu-item a:hover::before {
+            width: 100%;
+        }
+
+        .menu-item a:hover {
+            color: #667eea;
+            padding-left: 40px;
+            transform: translateX(5px);
+        }
+
+        .menu-item.active a {
+            color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            font-weight: 600;
+        }
+
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .wishlist-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .breadcrumb {
+            padding: 20px 40px;
+            font-size: 14px;
+            color: #666;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            border-radius: 20px 20px 0 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .content-header {
+            padding: 40px 40px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .wishlist-title-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .wishlist-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .wishlist-count {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Products Grid */
+        .products-section {
+            padding: 0 40px 40px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .product-discount {
+            font-size: 14px;
+            color: #27ae60;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .product-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-cart {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-remove {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-remove:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .wishlist-heart {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .product-card:hover .wishlist-heart {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .empty-wishlist {
+            text-align: center;
+            padding: 80px 40px;
+            color: #666;
+        }
+
+        .empty-wishlist h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .empty-wishlist p {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            color: #ddd;
+            margin-bottom: 30px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .main-container > * {
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .sidebar {
+            animation-delay: 0.1s;
+        }
+
+        .main-content {
+            animation-delay: 0.2s;
+        }
+
+        .product-card {
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.3s; }
+        .product-card:nth-child(2) { animation-delay: 0.4s; }
+        .product-card:nth-child(3) { animation-delay: 0.5s; }
+        .product-card:nth-child(4) { animation-delay: 0.6s; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                padding: 0 15px;
+                gap: 20px;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .content-header,
+            .products-section {
+                padding: 30px 25px;
+            }
+
+            .wishlist-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0 15px;
+            }
+
+            .content-header,
+            .products-section {
+                padding: 20px;
+            }
+
+            .profile-section {
+                padding: 30px 20px;
+            }
+
+            .wishlist-title {
+                font-size: 20px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+ <%- include("../partials/user/header") %>
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <div class="profile-info">
+                    <div class="profile-avatar"></div>
+                    <div class="profile-name"><%= user.fullname %></div>
+                </div>
+            </div>
+            
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="/userProfile">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-user"></i></div>
+                            <span>My Profile</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/address">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <span>My Address</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
+                            <span>My Order</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-heart"></i></div>
+                            <span>My Wishlist</span>
+                        </div>
+                        <span class="wishlist-badge">4</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/wish-list">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-wallet"></i></div>
+                            <span>My Wallet</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/coupon">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-ticket-alt"></i></div>
+                            <span>My Coupon</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" id="changePasswordBtn">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-key"></i></div>
+                            <span>Change password</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/logout">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                            <span>Log out</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-gift"></i></div>
+                            <span>Referral Code</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="breadcrumb">
+                Home > My Account > Wishlist
+            </div>
+            
+            <div class="content-header">
+                <div class="wishlist-title-section">
+                    <h1 class="wishlist-title">My Wishlist</h1>
+                    <span class="wishlist-count">4</span>
+                </div>
+                <div class="header-actions">
+                    <a href="#" class="btn btn-outline">Move All To Bag</a>
+                    <a href="#" class="btn btn-primary">Empty My Wishlist</a>
+                </div>
+            </div>
+
+            <div class="products-section">
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="wishlist-heart">❤️</div>
+                        <div class="product-image">
+                            <img src="https://via.placeholder.com/120x120/667eea/ffffff?text=⌚" alt="Casio Watch">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Casio Digital Watch</h3>
+                            <div class="product-price">₹29,999</div>
+                            <div class="product-discount">13% off</div>
+                            <div class="product-actions">
+                                <button class="product-btn btn-add-cart">Add To Cart</button>
+                                <button class="product-btn btn-remove">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="wishlist-heart">❤️</div>
+                        <div class="product-image">
+                            <img src="https://via.placeholder.com/120x120/764ba2/ffffff?text=⌚" alt="Casio Watch">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Casio Analog Watch</h3>
+                            <div class="product-price">₹29,999</div>
+                            <div class="product-discount">13% off</div>
+                            <div class="product-actions">
+                                <button class="product-btn btn-add-cart">Add To Cart</button>
+                                <button class="product-btn btn-remove">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="wishlist-heart">❤️</div>
+                        <div class="product-image">
+                            <img src="https://via.placeholder.com/120x120/f093fb/ffffff?text=⌚" alt="Casio Watch">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Casio Sports Watch</h3>
+                            <div class="product-price">₹29,999</div>
+                            <div class="product-discount">13% off</div>
+                            <div class="product-actions">
+                                <button class="product-btn btn-add-cart">Add To Cart</button>
+                                <button class="product-btn btn-remove">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="wishlist-heart">❤️</div>
+                        <div class="product-image">
+                            <img src="https://via.placeholder.com/120x120/4facfe/ffffff?text=⌚" alt="Casio Watch">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Casio Smart Watch</h3>
+                            <div class="product-price">₹29,999</div>
+                            <div class="product-discount">13% off</div>
+                            <div class="product-actions">
+                                <button class="product-btn btn-add-cart">Add To Cart</button>
+                                <button class="product-btn btn-remove">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ <%- include("../partials/user/footer") %>
+    <script>
+        // Add interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle button clicks
+            const addToCartBtns = document.querySelectorAll('.btn-add-cart');
+            const removeBtns = document.querySelectorAll('.btn-remove');
+            const wishlistCount = document.querySelector('.wishlist-count');
+            const wishlistBadge = document.querySelector('.wishlist-badge');
+            
+            addToCartBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+                    this.textContent = 'Added!';
+                    setTimeout(() => {
+                        this.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                        this.textContent = 'Add To Cart';
+                    }, 2000);
+                });
+            });
+            
+            removeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.product-card');
+                    card.style.transform = 'scale(0.8)';
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.remove();
+                        updateWishlistCount();
+                    }, 300);
+                });
+            });
+            
+            function updateWishlistCount() {
+                const currentCount = parseInt(wishlistCount.textContent);
+                const newCount = Math.max(0, currentCount - 1);
+                wishlistCount.textContent = newCount;
+                wishlistBadge.textContent = newCount;
+                
+                if (newCount === 0) {
+                    document.querySelector('.products-section').innerHTML = 
+                        '<div class="empty-wishlist">' +
+                        '<div class="empty-icon">💔</div>' +
+                        '<h2>Your wishlist is empty!</h2>' +
+                        '<p>Discover amazing products and add them to your wishlist.</p>' +
+                        '<a href="#" class="btn btn-primary">Start Shopping</a>' +
+                        '</div>';
+                }
+            }
+            
+            // Empty wishlist functionality
+            document.querySelector('.btn-primary').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to empty your wishlist?')) {
+                    document.querySelector('.products-grid').innerHTML = '';
+                    wishlistCount.textContent = '0';
+                    wishlistBadge.textContent = '0';
+                    document.querySelector('.products-section').innerHTML = 
+                        '<div class="empty-wishlist">' +
+                        '<div class="empty-icon">💔</div>' +
+                        '<h2>Your wishlist is empty!</h2>' +
+                        '<p>Discover amazing products and add them to your wishlist.</p>' +
+                        '<a href="#" class="btn btn-primary">Start Shopping</a>' +
+                        '</div>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

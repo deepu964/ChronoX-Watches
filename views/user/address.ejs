@@ -56,15 +56,6 @@
             transform: scale(1.1);
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #fff, #f0f0f0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255,255,255,0.5);
-        }
-
         .nav-menu {
             display: flex;
             gap: 30px;
@@ -692,39 +683,55 @@
                 padding: 20px;
             }
         }
+        .modal-overlay {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100vw; height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex; justify-content: center; align-items: center;
+                z-index: 1000;
+                }
+
+                .modal-content {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                padding: 30px;
+                border-radius: 20px;
+                width: 350px;
+                color: #fff;
+                text-align: center;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                }
+
+                .modal-actions {
+                margin-top: 20px;
+                display: flex;
+                justify-content: space-around;
+                }
+
+                .btn-secondary,
+                .btn-danger {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 10px;
+                font-weight: bold;
+                cursor: pointer;
+                }
+
+                .btn-secondary {
+                background-color: #f1f1f1;
+                color: #333;
+                }
+
+                .btn-danger {
+                background-color: #ff4d4d;
+                color: white;
+                }
+
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="header-left">
-                <div class="hamburger">
-                    <i class="fas fa-bars"></i>
-                </div>
-                <div class="logo">Chronox</div>
-                <nav class="nav-menu">
-                    <a href="#">Home</a>
-                    <a href="#">Shop</a>
-                    <a href="#">About</a>
-                    <a href="#">Contact</a>
-                </nav>
-            </div>
-            <div class="header-right">
-                <div class="search-box">
-                    <input type="text" placeholder="Search for products...">
-                    <div class="search-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                </div>
-                <div class="header-icons">
-                    <i class="fas fa-heart"></i>
-                    <a href="/cart" style="color: white;"><i class="fas fa-shopping-cart"></i></a>
-                    <a href="/userProfile" style="color: white;"><i class="fas fa-user"></i></a>
-                </div>
-            </div>
-        </div>
-    </header>
+    <%-include("../partials/user/header") %>
+  
 
     <!-- Main Container -->
     <div class="main-container">
@@ -746,7 +753,7 @@
                     </a>
                 </li>
                 <li class="menu-item active">
-                    <a href="#">
+                    <a href="/address">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
                             <span>My Address</span>
@@ -762,7 +769,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#">
+                    <a href="/wish-list">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-heart"></i></div>
                             <span>My Wishlist</span>
@@ -779,7 +786,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#">
+                    <a href="/coupon">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-ticket-alt"></i></div>
                             <span>My Coupon</span>
@@ -795,7 +802,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#">
+                    <a href="/logout">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
                             <span>Log out</span>
@@ -816,7 +823,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="breadcrumb">
-                <a href="#">Profile</a> > <strong>ACTIVE ADDRESS</strong>
+                <a href="userProfile">Profile</a> > <strong>ACTIVE ADDRESS</strong>
             </div>
             
             <div class="content-header">
@@ -824,255 +831,101 @@
             </div>
 
             <div class="delivery-section">
-                <div class="address-grid">
-                    <!-- Address Card 1 -->
+            <div class="address-grid">
+                <% if (addresses && addresses.length > 0) { %>
+                <% addresses.forEach(address => { %>
                     <div class="address-card">
-                        <div class="address-header">
-                            <div>
-                                <div class="address-name">John wick</div>
-                                <div class="address-type">Permenent</div>
-                            </div>
-                            <a href="/edit-address/:id"><i class="fas fa-edit" style="color: #667eea; cursor: pointer;"></i></a>
+                    <div class="address-header">
+                        <div>
+                        <div class="address-name"><%= address.fullName %></div>
+                        <div class="address-type">Permanent</div>
                         </div>
-                        <div class="address-details">
-                            Kalluveettilakam Buildings,<br>
-                            394/6-C Bharatham Thekkile,<br>
-                            Bharatham P.O., Aluva,<br>
-                            Kerala, India
-                        </div>
-                        <div class="address-actions">
-                            <button class="btn-delete">DELETE</button>
-                        </div>
+                        <a href="/edit-address/<%= address._id %>">
+                        <i class="fas fa-edit" style="color: #667eea; cursor: pointer;"></i>
+                        </a>
                     </div>
-
-                    <!-- Address Card 2 -->
-                    <div class="address-card">
-                        <div class="address-header">
-                            <div>
-                                <div class="address-name">John wick</div>
-                                <div class="address-type">Temporary</div>
-                            </div>
-                            <i class="fas fa-edit" style="color: #667eea; cursor: pointer;"></i>
-                        </div>
-                        <div class="address-details">
-                            Kalluveettilakam Buildings,<br>
-                            394/6-C Bharatham Thekkile,<br>
-                            Bharatham P.O., Aluva,<br>
-                            Kerala, India
-                        </div>
-                        <div class="address-actions">
-                            <button class="btn-delete">DELETE</button>
-                        </div>
+                    <div class="address-details">
+                        <%= address.address %>, <%= address.addressType %>,<br>
+                        <%= address.landmark %>, <%= address.city %>,<br>
+                        <%= address.district %>, <%= address.state %>,<br>
+                        <%= address.pinCode %>
                     </div>
-                </div>
-
-                <form action="/add-address"><button class="add-address-btn" onclick="openModal()">
-                    <i class="fas fa-plus"></i>
-                    Add New Address
-                </button>
-                </form>
+                    <div class="address-actions">
+                        <button type="button" class="btn-delete" data-address-id="<%= address._id %>">DELETE</button>
+                    </div>
+                    </div>
+                <% }) %>
+                <% } else { %>
+                <p>No addresses found.</p>
+                <% } %>
             </div>
+
+            <form action="/add-address">
+                <button class="add-address-btn">
+                <i class="fas fa-plus"></i> Add New Address
+                </button>
+            </form>
+            </div>
+
+            <div id="deleteModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>Confirm Deletion</h2>
+                <p>Are you sure you want to delete this address?</p>
+                <div class="modal-actions">
+                <button id="cancelDelete" class="btn-secondary">Cancel</button>
+                <button id="confirmDelete" class="btn-danger">Yes, Delete</button>
+                </div>
+            </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- Add Address Modal -->
-    <!-- <div class="modal-overlay" id="addressModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Add New Address</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="addressForm">
-                    <div class="modal-form-group">
-                        <label for="fullName">Full Name</label>
-                        <input type="text" id="fullName" name="fullName" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label for="addressType">Address Type</label>
-                        <select id="addressType" name="addressType" required>
-                            <option value="">Select Address Type</option>
-                            <option value="permanent">Permanent</option>
-                            <option value="temporary">Temporary</option>
-                            <option value="office">Office</option>
-                        </select>
-                    </div>
-                    <div class="modal-form-group">
-                        <label for="addressLine1">Address Line 1</label>
-                        <input type="text" id="addressLine1" name="addressLine1" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label for="addressLine2">Address Line 2</label>
-                        <input type="text" id="addressLine2" name="addressLine2">
-                    </div>
-                    <div class="modal-form-group">
-                        <label for="city">City</label>
-                        <input type="text" id="city" name="city" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label for="state">State</label>
-                        <input type="text" id="state" name="state" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label for="pincode">Pin Code</label>
-                        <input type="text" id="pincode" name="pincode" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label for="country">Country</label>
-                        <input type="text" id="country" name="country" value="India" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary" onclick="addAddress()">Add Address</button>
-            </div>
-        </div>
-    </div> -->
- <%-include("../../views/partials/user/footer") %>
+   <%-include("../partials/user/footer") %>
     <script>
-        // Modal functionality
-        function openModal() {
-            document.getElementById('addressModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+  let addressIdToDelete = null;
 
-        function closeModal() {
-            document.getElementById('addressModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
+  // On "Delete" button click, open modal
+  document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', function () {
+      addressIdToDelete = this.getAttribute('data-address-id');
+      document.getElementById('deleteModal').style.display = 'flex';
+    });
+  });
 
-        // Close modal when clicking outside
-        document.getElementById('addressModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
+  // Cancel button closes the modal
+  document.getElementById('cancelDelete').addEventListener('click', () => {
+    document.getElementById('deleteModal').style.display = 'none';
+    addressIdToDelete = null;
+  });
 
-        // Add address functionality
-        function addAddress() {
-            const form = document.getElementById('addressForm');
-            const formData = new FormData(form);
-            
-            // Validate form
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+  // Confirm delete
+  document.getElementById('confirmDelete').addEventListener('click', function () {
+    if (!addressIdToDelete) return;
 
-            // Create new address card
-            const addressGrid = document.querySelector('.address-grid');
-            const newAddressCard = document.createElement('div');
-            newAddressCard.className = 'address-card';
-            
-            const addressType = formData.get('addressType');
-            const fullName = formData.get('fullName');
-            const addressLine1 = formData.get('addressLine1');
-            const addressLine2 = formData.get('addressLine2');
-            const city = formData.get('city');
-            const state = formData.get('state');
-            const pincode = formData.get('pincode');
-            const country = formData.get('country');
+    fetch(`/delete-address/${addressIdToDelete}`, {
+      method: "DELETE"
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showToast(data.message || "Address deleted", "success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        showToast(data.message || "Failed to delete", "error");
+      }
+    })
+    .catch(error => {
+      console.error("Delete error:", error);
+      showToast("An error occurred", "error");
+    });
 
-            newAddressCard.innerHTML = `
-                <div class="address-header">
-                    <div>
-                        <div class="address-name">${fullName}</div>
-                        <div class="address-type">${addressType.charAt(0).toUpperCase() + addressType.slice(1)}</div>
-                    </div>
-                    <i class="fas fa-edit" style="color: #667eea; cursor: pointer;" onclick="editAddress(this)"></i>
-                </div>
-                <div class="address-details">
-                    ${addressLine1}<br>
-                    ${addressLine2 ? addressLine2 + '<br>' : ''}
-                    ${city}, ${state}<br>
-                    ${pincode}, ${country}
-                </div>
-                <div class="address-actions">
-                    <button class="btn-delete" onclick="deleteAddress(this)">DELETE</button>
-                </div>
-            `;
+    document.getElementById('deleteModal').style.display = 'none';
+  });
+</script>
 
-            addressGrid.appendChild(newAddressCard);
-            
-            // Reset form and close modal
-            form.reset();
-            closeModal();
-            
-            // Add animation
-            newAddressCard.style.opacity = '0';
-            newAddressCard.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                newAddressCard.style.transition = 'all 0.3s ease';
-                newAddressCard.style.opacity = '1';
-                newAddressCard.style.transform = 'translateY(0)';
-            }, 100);
-        }
 
-        // Delete address functionality
-        function deleteAddress(button) {
-            const addressCard = button.closest('.address-card');
-            if (confirm('Are you sure you want to delete this address?')) {
-                addressCard.style.transition = 'all 0.3s ease';
-                addressCard.style.opacity = '0';
-                addressCard.style.transform = 'translateY(-20px)';
-                setTimeout(() => {
-                    addressCard.remove();
-                }, 300);
-            }
-        }
-
-        // Edit address functionality (placeholder)
-        function editAddress(button) {
-            alert('Edit functionality would open a modal with pre-filled data');
-        }
-
-        // Smooth scrolling for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-
-        // Add loading animation on page load
-        window.addEventListener('load', function() {
-            const elements = document.querySelectorAll('.address-card');
-            elements.forEach((element, index) => {
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    element.style.transition = 'all 0.5s ease';
-                    element.style.opacity = '1';
-                    element.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-        });
-
-        // Mobile menu toggle
-        document.querySelector('.hamburger').addEventListener('click', function() {
-            const navMenu = document.querySelector('.nav-menu');
-            navMenu.classList.toggle('active');
-        });
-
-        // Search functionality
-        document.querySelector('.search-icon').addEventListener('click', function() {
-            const searchInput = document.querySelector('.search-box input');
-            if (searchInput.value.trim()) {
-                alert('Searching for: ' + searchInput.value);
-            }
-        });
-
-        document.querySelector('.search-box input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.querySelector('.search-icon').click();
-            }
-        });
-    </script>
 </body>
 </html>

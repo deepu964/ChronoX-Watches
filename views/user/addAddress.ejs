@@ -56,15 +56,6 @@
             transform: scale(1.1);
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #fff, #f0f0f0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255,255,255,0.5);
-        }
-
         .nav-menu {
             display: flex;
             gap: 30px;
@@ -619,51 +610,21 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="header-left">
-                <div class="hamburger">
-                    <i class="fas fa-bars"></i>
-                </div>
-                <div class="logo">ShopEasy</div>
-                <nav>
-                    <ul class="nav-menu">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Shop</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="header-right">
-                <div class="search-box">
-                    <input type="text" placeholder="Search products...">
-                    <i class="fas fa-search search-icon"></i>
-                </div>
-                <div class="header-icons">
-                    <i class="fas fa-heart"></i>
-                    <i class="fas fa-shopping-cart"></i>
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-        </div>
-    </header>
-
+    <%- include("../partials/user/header") %>
     <!-- Main Container -->
     <div class="main-container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="profile-section">
                 <div class="profile-info">
-                    <div class="profile-avatar">JW</div>
-                    <div class="profile-name">John Wick</div>
+                    <div class="profile-avatar"></div>
+                      <div class="profile-name"><%= user.fullname %></div>
                 </div>
             </div>
             <nav>
                 <ul class="menu-list">
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="/userProfile">
                             <div class="menu-left">
                                 <div class="menu-icon"><i class="fas fa-user"></i></div>
                                 <span>My Profile</span>
@@ -671,7 +632,7 @@
                         </a>
                     </li>
                     <li class="menu-item active">
-                        <a href="#">
+                        <a href="/address">
                             <div class="menu-left">
                                 <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
                                 <span>My Address</span>
@@ -687,7 +648,7 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="/wish-list">
                             <div class="menu-left">
                                 <div class="menu-icon"><i class="fas fa-heart"></i></div>
                                 <span>My Wishlist</span>
@@ -704,7 +665,7 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="/coupon">
                             <div class="menu-left">
                                 <div class="menu-icon"><i class="fas fa-ticket-alt"></i></div>
                                 <span>My Coupons</span>
@@ -712,7 +673,7 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="/changePassword">
                             <div class="menu-left">
                                 <div class="menu-icon"><i class="fas fa-lock"></i></div>
                                 <span>Change Password</span>
@@ -720,7 +681,7 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="/logout">
                             <div class="menu-left">
                                 <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
                                 <span>Logout</span>
@@ -742,7 +703,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="breadcrumb">
-                <a href="#">Profile</a> > <a href="#">Delivery Address</a> > Add Address
+                <a href="/userProfile">Profile</a> > <a href="/address">Delivery Address</a> > Add Address
             </div>
 
             <div class="content-header">
@@ -750,7 +711,7 @@
             </div>
 
             <div class="add-address-form">
-                <form>
+                <form id="addAddressForm" action="/add-address" method="POST">
                     <!-- Personal Information Section -->
                     <div class="form-section">
                         <h2 class="section-title">
@@ -761,27 +722,26 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="fullName">Full Name <span class="required">*</span></label>
-                                <input type="text" id="fullName" name="fullName" placeholder="John Doe" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" name="email" placeholder="example@gmail.com">
+                                <input type="text" id="fullName" name="fullName" placeholder="Enter Youe Name" >
+                                <span class="error-text" id="error-fullName"></span>
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="phone">Phone Number <span class="required">*</span></label>
-                                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567" required>
+                                <input type="tel" id="phone" name="phone" placeholder="Enter Mobile Number" >
+                                <span class="error-text" id="error-phone"></span>
                             </div>
                             <div class="form-group">
                                 <label for="addressType">Address Type <span class="required">*</span></label>
-                                <select id="addressType" name="addressType" required>
+                                <select id="addressType" name="addressType" >
                                     <option value="">Select Address Type</option>
                                     <option value="home">Home</option>
                                     <option value="work">Work</option>
                                     <option value="other">Other</option>
                                 </select>
+                                <span class="error-text" id="error-fullName"></span>
                             </div>
                         </div>
                     </div>
@@ -796,29 +756,34 @@
                         <div class="form-row single">
                             <div class="form-group">
                                 <label for="address">Address <span class="required">*</span></label>
-                                <textarea id="address" name="address" placeholder="House Name, House Number, Locality" required></textarea>
+                                <textarea id="address" name="address" placeholder="House Name, House Number, Locality" ></textarea>
+                                <span class="error-text" id="error-address"></span>
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="district">District <span class="required">*</span></label>
-                                <input type="text" id="district" name="district" placeholder="eg. Ernakulam" required>
+                                <input type="text" id="district" name="district" placeholder="eg. Ernakulam">
+                                <span class="error-text" id="error-district"></span>
                             </div>
                             <div class="form-group">
                                 <label for="state">State <span class="required">*</span></label>
-                                <input type="text" id="state" name="state" placeholder="eg. Kerala" required>
+                                <input type="text" id="state" name="state" placeholder="eg. Kerala" >
+                                <span class="error-text" id="error-state"></span>
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="city">City <span class="required">*</span></label>
-                                <input type="text" id="city" name="city" placeholder="eg. Hospital" required>
+                                <input type="text" id="city" name="city" placeholder="eg. Hospital" >
+                                <span class="error-text" id="error-city"></span>
                             </div>
                             <div class="form-group">
                                 <label for="pinCode">Pin Code <span class="required">*</span></label>
-                                <input type="text" id="pinCode" name="pinCode" placeholder="eg. 682230" required>
+                                <input type="text" id="pinCode" name="pinCode" placeholder="eg. 682230" >
+                                <span class="error-text" id="error-pinCode"></span>
                             </div>
                         </div>
                         
@@ -826,6 +791,7 @@
                             <div class="form-group">
                                 <label for="landmark">Landmark (Optional)</label>
                                 <input type="text" id="landmark" name="landmark" placeholder="eg. Hospital">
+                                <span class="error-text" id="error-landmark"></span>
                             </div>
                         </div>
                     </div>
@@ -845,77 +811,190 @@
             </div>
         </main>
     </div>
+  <%-include("../partials/user/footer") %>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('addAddressForm');
 
-    <script>
-        // Form validation and interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const inputs = document.querySelectorAll('input, select, textarea');
-            
-            // Add focus effects
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.classList.add('focused');
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentElement.classList.remove('focused');
-                });
-            });
-            
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Basic validation
-                let isValid = true;
-                const requiredFields = document.querySelectorAll('[required]');
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        field.style.borderColor = '#ff6b6b';
-                        field.addEventListener('input', function() {
-                            this.style.borderColor = '';
-                        }, { once: true });
-                    }
-                });
-                
-                if (isValid) {
-                    // Simulate form submission
-                    const submitBtn = document.querySelector('.btn-primary');
-                    const originalText = submitBtn.innerHTML;
-                    
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-                    submitBtn.disabled = true;
-                    
-                    setTimeout(() => {
-                        alert('Address added successfully!');
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                        form.reset();
-                    }, 2000);
-                } else {
-                    alert('Please fill in all required fields.');
-                }
-            });
-            
-            // Phone number formatting
-            const phoneInput = document.getElementById('phone');
-            phoneInput.addEventListener('input', function() {
-                let value = this.value.replace(/\D/g, '');
-                if (value.length >= 6) {
-                    value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
-                }
-                this.value = value;
-            });
-            
-            // Pin code validation
-            const pinCodeInput = document.getElementById('pinCode');
-            pinCodeInput.addEventListener('input', function() {
-                this.value = this.value.replace(/\D/g, '').substring(0, 6);
-            });
-        });
-    </script>
+    // Regex
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+    const pinRegex = /^\d{6}$/;
+    
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        let isValid = true;
+
+        // Clear old errors
+        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+
+        // Get all field values
+        const fullName = document.getElementById('fullName');
+        const phone = document.getElementById('phone');
+        const pinCode = document.getElementById('pinCode');
+        const city = document.getElementById('city');
+        const state = document.getElementById('state');
+        const district = document.getElementById('district');
+        const address = document.getElementById('address');
+        const landmark = document.getElementById('landmark');
+
+        const fullNameVal = fullName.value.trim();        const phoneVal = phone.value.trim();
+        const pinVal = pinCode.value.trim();
+        const cityVal = city.value.trim();
+        const stateVal = state.value.trim();
+        const districtVal = district.value.trim();
+        const addressVal = address.value.trim();
+        const landmarkVal = landmark.value.trim();
+
+        // Full Name
+        if (!fullNameVal) {
+            showError(fullName, 'Full Name is required');
+            isValid = false;
+        }else if (fullNameVal.length < 3) {
+            showError(fullName, 'Full Name must be at least 3 characters');
+            isValid = false;
+        }else if (!nameRegex.test(fullNameVal)) {
+            showError(fullName, 'Only letters and spaces allowed');
+            isValid = false;
+        } else if (fullNameVal[0] !== fullNameVal[0].toUpperCase()) {
+            showError(fullName, 'First letter must be capital');
+            isValid = false;
+        }
+
+       
+
+        // Phone
+        if (!phoneVal) {
+            showError(phone, 'Mobile number is required');
+            isValid = false;
+        } else if (!phoneRegex.test(phoneVal)) {
+            showError(phone, '10 digits & starts with 6-9');
+            isValid = false;
+        }
+
+        // Pincode
+        if (!pinVal) {
+            showError(pinCode, 'Pincode is required');
+            isValid = false;
+        } else if (!pinRegex.test(pinVal)) {
+            showError(pinCode, 'Pincode must be 6 digits');
+            isValid = false;
+        }
+
+        // City
+        if (!cityVal) {
+            showError(city, 'City is required');
+            isValid = false;
+        } else if (!nameRegex.test(cityVal)) {
+            showError(city, 'Only letters and spaces allowed');
+            isValid = false;
+        } else if (cityVal[0] !== cityVal[0].toUpperCase()) {
+            showError(city, 'First letter must be capital');
+            isValid = false;
+        }
+
+        // State
+        if (!stateVal) {
+            showError(state, 'State is required');
+            isValid = false;
+        } else if (!nameRegex.test(stateVal)) {
+            showError(state, 'Only letters and spaces allowed');
+            isValid = false;
+        } else if (stateVal[0] !== stateVal[0].toUpperCase()) {
+            showError(state, 'First letter must be capital');
+            isValid = false;
+        }
+
+        // District
+        if (!districtVal) {
+            showError(district, 'District is required');
+            isValid = false;
+        } else if (!nameRegex.test(districtVal)) {
+            showError(district, 'Only letters and spaces allowed');
+            isValid = false;
+        } else if (districtVal[0] !== districtVal[0].toUpperCase()) {
+            showError(district, 'First letter must be capital');
+            isValid = false;
+        }
+
+        // Address
+        if (!addressVal) {
+            showError(address, 'Address is required');
+            isValid = false;
+        } else if (addressVal.length < 5) {
+            showError(address, 'Min 5 characters required');
+            isValid = false;
+        } else if (addressVal[0] !== addressVal[0].toUpperCase()) {
+            showError(address, 'First letter must be capital');
+            isValid = false;
+        }
+
+        // Landmark
+        if (!landmarkVal) {
+            showError(landmark, 'Landmark is required');
+            isValid = false;
+        } else if (landmarkVal.length < 5) {
+            showError(landmark, 'Min 5 characters required');
+            isValid = false;
+        } else if (landmarkVal[0] !== landmarkVal[0].toUpperCase()) {
+            showError(landmark, 'First letter must be capital');
+            isValid = false;
+        }
+
+         
+        
+
+        if (isValid) {
+            showToast('Address added successfully!');
+            setTimeout(() => {
+                form.submit();
+            }, 2000);
+        }
+           
+    });
+
+
+
+    const pinCodeInput = document.getElementById('pinCode');
+    pinCodeInput.addEventListener('input', () => {
+        pinCodeInput.value = pinCodeInput.value.replace(/\D/g, '').substring(0, 6);
+    });
+
+    // Show error
+    function showError(inputEl, message) {
+        const errorEl = document.getElementById('error-' + inputEl.id);
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.style.color = 'red';
+        }
+    }
+
+    // Toast message
+    function showToast(message) {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.background = '#28a745';
+            toast.style.color = '#fff';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '5px';
+            toast.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+            document.body.appendChild(toast);
+        }
+        toast.innerText = message;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+});
+</script>
+
+      
 </body>
 </html>
