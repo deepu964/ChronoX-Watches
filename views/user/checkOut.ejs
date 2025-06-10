@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Your Store</title>
+    <link rel="stylesheet" href="/css/checkOut.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+ <!-- Header and Styles -->
+<%- include('../partials/user/header') %>
+<main class="checkout-container">
+    <h1>Checkout</h1>
+    <div class="checkout-grid">
+
+        <!-- Shipping Address Section -->
+        <section class="address-section">
+            <div class="section-header">
+                <h2>Shipping Address</h2>
+                <button class="open-modal-btn" data-modal-id="addAddressModal" style="color: rgb(253, 253, 253); font-size: 15px; padding: 12px; background-color: rgb(1, 1, 14); border-radius: 5px;">Add New Address</button>
+            </div>
+
+            <div class="addresses-container">
+                <% if (addresses && addresses.length > 0) { %>
+                    <% addresses.forEach((address, index) => { %>
+                        <div class="address-card <%= address.isDefault ? 'default' : '' %>">
+                            <div class="address-content">
+                                <div class="address-header">
+                                    <h3><%= address.fullName %></h3>
+                                    <% if (address.isDefault) { %>
+                                        <span class="default-badge">Default</span>
+                                    <% } %>
+                                </div>
+                                <p><%= address.address %>, <%= address.city %>, <%= address.state %><br>PinCode: <%= address.pinCode %></p>
+                                <p><%= address.landmark %></p>
+                                <p>Phone: <%= address.phone %></p>
+                            </div>
+
+                            <div class="address-actions">
+                                <% if (!address.isDefault) { %>
+                                    <button type="button" style="text-decoration: none;" class="btn btn-text set-default-btn" data-id="<%= address._id %>">
+                                        Set as Default
+                                    </button>
+                                <% } %>
+
+                                <!-- EDIT BUTTON WITH DATA -->
+                                <button class="open-modal-btn edit-address-btn"  style="color: rgb(26, 89, 184); border: none; background-color: white;"
+                                        data-modal-id="addAddressModal"
+                                        data-id="<%= address._id %>"
+                                        data-name="<%= address.fullName %>"
+                                        data-address="<%= address.address %>"
+                                        data-city="<%= address.city %>"
+                                        data-state="<%= address.state %>"
+                                        data-pin="<%= address.pinCode %>"
+                                        data-landmark="<%= address.landmark %>"
+                                        data-phone="<%= address.phone %>"
+                                        data-default="<%= address.isDefault %>">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+
+                               
+                                    <button type="button" style="text-decoration: none;" class="btn btn-text delete-address-btn" onclick="deleteAddress('<%= address._id %>')" data-id="<%= address._id %>" >
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                               
+                            </div>
+
+                            <div class="address-select">
+                                <input type="radio" name="selectedAddress" id="address<%= index %>"
+                                    value="<%= address._id %>" <%= address.isDefault ? 'checked' : '' %>>
+                                <label for="address<%= index %>">Ship to this address</label>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="no-addresses">
+                        <p>You don't have any saved addresses.</p>
+                        <button id="first-address-btn" class="btn btn-primary open-modal-btn" data-modal-id="addAddressModal">Add Your First Address</button>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Add/Edit Address Modal -->
+            <div id="addAddressModal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h2 id="modal-title">Add New Address</h2>
+                    <form id="address-form">
+                        <input type="hidden" id="address-id" name="addressId">
+                        <div class="form-group"><label for="fullName">Full Name</label><input type="text" id="fullName" name="fullName"></div>
+                        <div class="form-group"><label for="address">Street Address</label><input type="text" id="address" name="address"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label for="city">City</label><input type="text" id="city" name="city"></div>
+                            <div class="form-group"><label for="state">State</label><input type="text" id="state" name="state"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label for="pinCode">PIN Code</label><input type="text" id="pinCode" name="pinCode"></div>
+                            <div class="form-group"><label for="landmark">LandMark</label><input type="text" id="landmark" name="landmark"></div>
+                        </div>
+                        <div class="form-group"><label for="phone">Phone Number</label><input type="tel" id="phone" name="phone"></div>
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="isDefault" name="isDefault">
+                            <label for="isDefault">Set as default address</label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancel-address">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Address</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Summary Section -->
+        <section class="order-summary">
+            <h2>Order Summary</h2>
+            <div class="cart-items">
+                <% if (cartItems && cartItems.length > 0) { %>
+                    <% let subtotal = 0; %>
+                    <% cartItems.forEach(function(item) { 
+                        const itemTotal = item.price * item.quantity;
+                        subtotal += itemTotal;
+                    %>
+                        <div class="cart-item">
+                            <div class="item-image"><img src="<%= item.image %>" alt="<%= item.name %>"></div>
+                            <div class="item-details">
+                                <h3><%= item.name %></h3>
+                                <p class="item-variant"><%= item.variant || '' %></p>
+                                <div class="item-quantity"><span>Qty: <%= item.quantity %></span></div>
+                            </div>
+                            <div class="item-price">
+                                <p class="price">₹<%= itemTotal.toFixed(2) %></p>
+                                <% if (item.discount > 0) { %>
+                                    <p class="discount">-₹<%= item.discount.toFixed(2) %></p>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+
+                    <div class="price-summary">
+                        <div class="summary-row"><span>Subtotal</span><span>₹<%= subtotal.toFixed(2) %></span></div>
+                        <% if (discount && discount > 0) { %>
+                            <div class="summary-row discount"><span>Discount</span><span>-₹<%= discount.toFixed(2) %></span></div>
+                        <% } %>
+                        <div class="summary-row"><span>Shipping</span><span>₹<%= shipping.toFixed(2) %></span></div>
+                        <% if (tax && tax > 0) { %>
+                            <div class="summary-row"><span>Tax</span><span>₹<%= tax.toFixed(2) %></span></div>
+                        <% } %>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span>₹<%= (subtotal - (discount || 0) + shipping + (tax || 0)).toFixed(2) %></span>
+                        </div>
+                    </div>
+
+                    <!-- <div class="promo-code">
+                        <input type="text" placeholder="Promo code" id="promo-code">
+                        <button class="btn btn-secondary" id="apply-promo">Apply</button>
+                    </div> -->
+                    <a href="/payment"><button class="btn btn-primary btn-place-order">Place Order</button></a>
+                    <p class="terms-notice">By placing your order, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy</a>.</p>
+                <% } else { %>
+                    <div class="empty-cart">
+                        <p>Your cart is empty.</p>
+                        <a href="/products" class="btn btn-primary">Continue Shopping</a>
+                    </div>
+                <% } %>
+            </div>
+        </section>
+    </div>
+</main>
+<div id="toast" class="toast hidden"></div>
+<%- include('../partials/user/footer') %>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const addressForm = document.getElementById("address-form");
+  const addressIdInput = document.getElementById("address-id");
+
+  // OPEN MODAL
+  document.querySelectorAll('.open-modal-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const modalId = button.getAttribute('data-modal-id');
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.remove('hidden');
+    });
+  });
+
+  // CLOSE MODAL
+  document.querySelectorAll('.close-modal').forEach(span => {
+    span.addEventListener('click', () => {
+      span.closest('.modal').classList.add('hidden');
+    });
+  });
+
+  window.addEventListener('click', e => {
+    if (e.target.classList.contains('modal')) {
+      e.target.classList.add('hidden');
+    }
+  });
+
+  // ✅ Handle edit button click
+  document.querySelectorAll(".edit-address-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      addressForm.reset();
+      document.getElementById("modal-title").textContent = "Edit Address";
+      addressIdInput.value = btn.dataset.id;
+      document.getElementById("fullName").value = btn.dataset.name;
+      document.getElementById("address").value = btn.dataset.address;
+      document.getElementById("city").value = btn.dataset.city;
+      document.getElementById("state").value = btn.dataset.state;
+      document.getElementById("pinCode").value = btn.dataset.pin;
+      document.getElementById("landmark").value = btn.dataset.landmark;
+      document.getElementById("phone").value = btn.dataset.phone;
+      document.getElementById("isDefault").checked = btn.dataset.default === "true";
+    });
+  });
+
+  const fields = ["fullName", "address", "city", "state", "pinCode", "landmark", "phone"];
+  const validators = {
+    fullName: val => /^[A-Za-z ]{2,}$/.test(val.trim()) || "Please enter a valid name.",
+    address: val => val.trim() !== '' || " address is required.",
+    city: val => /^[A-Za-z ]+$/.test(val.trim()) || "Enter a valid city name.",
+    state: val => /^[A-Za-z ]+$/.test(val.trim()) || "Enter a valid state name.",
+    pinCode: val => /^\d{6}$/.test(val.trim()) || "PIN Code must be 6 digits.",
+    landmark: val => val.trim() !== '' || "Landmark is required.",
+    phone: val => /^[5-9]\d{9}$/.test(val.trim()) || "Enter a valid 10-digit phone."
+  };
+
+  fields.forEach(field => {
+    const input = document.getElementById(field);
+    const error = document.createElement("div");
+    error.className = "error-message";
+    error.style.color = "red";
+    error.style.fontSize = "0.8em";
+    input.insertAdjacentElement("afterend", error);
+  });
+
+  function validateForm() {
+    let isValid = true;
+    fields.forEach(field => {
+      const input = document.getElementById(field);
+      const error = input.nextElementSibling;
+      const validation = validators[field](input.value);
+      if (validation !== true) {
+        error.textContent = validation;
+        isValid = false;
+      } else {
+        error.textContent = "";
+      }
+    });
+    return isValid;
+  }
+
+ 
+
+  addressForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    const formData = new FormData(addressForm);
+    const plainData = Object.fromEntries(formData.entries());
+    const isEdit = plainData.addressId !== "";
+
+    try {
+      const response = await fetch(isEdit ? `/edit-address/${plainData.addressId}` : '/check-out', {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(plainData)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast(data.message || (isEdit ? "Address updated!" : "Address added!"), "success");
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        showToast(data.message || "Something went wrong", "error");
+      }
+
+    } catch (err) {
+      console.error("Submit error:", err);
+      showToast("Server error!", "error");
+    }
+  });
+
+  function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+    toast.classList.remove("hidden");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.classList.add("hidden"), 300);
+    }, 3000);
+  }
+});
+ function deleteAddress(id){
+    fetch (`/delete-check-address/${id}`,{
+        method:'DELETE',
+        headers:{
+            'content-type':'application/json'
+        },
+    }).then((response)=>response.json())
+    .then((result)=>{
+        if(result.success){
+            showToast(result.message ||"",'success');
+            setTimeout(()=>{
+                window.location.reload();
+            },2000)
+        }
+    })
+  }
+</script>
+
+</body>
+</html>

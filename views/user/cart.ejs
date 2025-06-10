@@ -543,42 +543,37 @@
         </div>
 
         <div class="cart-items" id="cartItems">
-            <div class="cart-item" data-id="1">
-                <div class="item-image">
-                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&h=100&fit=crop&crop=center" alt="Fossil Automatic watch">
-                </div>
-                <div class="item-details">
-                    <div class="item-name">Fossil Automatic watch</div>
-                    <div class="item-price">
-                        <span class="current-price">₹2,036.00</span>
-                        <span class="original-price">₹2,136.00</span>
-                    </div>
-                </div>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="changeQuantity(1, -1)">−</button>
-                    <div class="quantity-display" id="qty-1">1</div>
-                    <button class="quantity-btn" onclick="changeQuantity(1, 1)">+</button>
-                </div>
-                <button class="remove-btn" onclick="removeItem(1)">Remove</button>
-            </div>
+            <% items.forEach((item, index) => { %>
+                <div class="cart-item" data-id="<%= item.product._id %>">
+                <div class="product-image">
+                    <% if (item.images && item.images.length > 0 && item.images[0].public_id) { %>
+                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= item.product.images[0].public_id %>.jpg" alt="<%= item.product.name %>" onerror="this.src='/images/placeholder.jpg'">
 
-            <div class="cart-item" data-id="2">
-                <div class="item-image">
-                    <img src="https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=100&h=100&fit=crop&crop=center" alt="Casio mechanical watch">
-                </div>
-                <div class="item-details">
-                    <div class="item-name">Casio mechanical watch</div>
-                    <div class="item-price">
-                        <span class="current-price">₹2,036.00</span>
+                    <% } else { %>
+                        <img src="/images/placeholder.jpg" alt="No image available">
+                    <% } %>
                     </div>
+                    <div class="item-details">
+                        <div class="item-name"><%= item.product.name %></div>
+                        <div class="item-price">
+                            <% 
+                                const price = item.product.variants[0].salePrice || item.product.variants[0].regularPrice;
+                                const originalPrice = item.product.variants[0].regularPrice;
+                            %>
+                            <span class="current-price">₹<%= price.toLocaleString() %></span>
+                            <% if (price !== originalPrice) { %>
+                                <span class="original-price">₹<%= originalPrice.toLocaleString() %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="updateCart('<%= item.product._id %>', 'decrease')">−</button>
+                        <div class="quantity-display" id="qty-<%= item.product._id %>"><%= item.quantity %></div>
+                        <button class="quantity-btn" onclick="updateCart('<%= item.product._id %>', 'increase')">+</button>
+                    </div>
+                    <button class="remove-btn" onclick="removeItem('<%= item.product._id %>')">Remove</button>
                 </div>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="changeQuantity(2, -1)">−</button>
-                    <div class="quantity-display" id="qty-2">2</div>
-                    <button class="quantity-btn" onclick="changeQuantity(2, 1)">+</button>
-                </div>
-                <button class="remove-btn" onclick="removeItem(2)">Remove</button>
-            </div>
+            <% }) %>
         </div>
 
         <div class="cart-summary">
@@ -589,8 +584,7 @@
             <div class="subtotal">
                 <span>SUBTOTAL</span>
                 <div>
-                    <span style="text-decoration: line-through; color: #999; margin-right: 10px;">INR 4172</span>
-                    <span id="subtotalAmount">INR 4072</span>
+                    <span id="subtotalAmount">INR <%= total.toLocaleString() %></span>
                 </div>
             </div>
 
@@ -599,142 +593,118 @@
             </div>
 
             <div class="cart-actions">
-                <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to checkout</button>
-                <button class="continue-btn" onclick="continueShopping()">Continue Shopping</button>
+                <a href="/check-out"><button class="checkout-btn">Proceed to checkout</button></a>
+                <a href="/shop"><button class="continue-btn">Continue Shopping</button></a>
             </div>
         </div>
     </div>
     <%-include("../partials/user/footer") %>
+
     <script>
-        let cartData = {
-            1: { name: "Fossil Automatic watch", price: 2036.00, originalPrice: 2136.00, quantity: 1 },
-            2: { name: "Casio mechanical watch", price: 2036.00, quantity: 2 }
-        };
-
-        function changeQuantity(itemId, change) {
-            const currentQty = cartData[itemId].quantity;
-            const newQty = Math.max(1, currentQty + change);
-            
-            cartData[itemId].quantity = newQty;
-            document.getElementById(`qty-${itemId}`).textContent = newQty;
-            
-            updateSubtotal();
-            
-            // Add a subtle animation
-            const qtyDisplay = document.getElementById(`qty-${itemId}`);
-            qtyDisplay.style.transform = 'scale(1.2)';
-            qtyDisplay.style.color = '#000000';
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => {
-                qtyDisplay.style.transform = 'scale(1)';
-                qtyDisplay.style.color = '';
-            }, 200);
+                toast.classList.remove('show');
+                toast.remove();
+            }, 3000);
         }
 
-        function removeItem(itemId) {
-            const item = document.querySelector(`[data-id="${itemId}"]`);
-            item.classList.add('removing');
-            
-            setTimeout(() => {
-                delete cartData[itemId];
-                item.remove();
-                updateSubtotal();
-                
-                // Check if cart is empty
-                if (Object.keys(cartData).length === 0) {
-                    showEmptyCart();
+        async function updateCart(productId, action) {
+            try {
+                const res = await fetch(`/cart/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId, action })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (data.quantity === 0) {
+                        document.querySelector(`[data-id="${productId}"]`).remove();
+                    } else {
+                        document.getElementById(`qty-${productId}`).innerText = data.quantity;
+                    }
+                    showToast(data.message || 'Cart updated');
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    showToast(data.message || 'Failed to update cart','error');
                 }
-            }, 500);
+            } catch (err) {
+                console.error(err);
+                showToast('Something went wrong');
+            }
         }
 
-        function updateSubtotal() {
-            let total = 0;
-            let originalTotal = 0;
-            
-            for (let itemId in cartData) {
-                const item = cartData[itemId];
-                total += item.price * item.quantity;
-                originalTotal += (item.originalPrice || item.price) * item.quantity;
+        async function removeItem(productId) {
+            try {
+                const res = await fetch(`/cart/remove/${productId}`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.querySelector(`[data-id="${productId}"]`).remove();
+                    showToast('Product removed from cart');
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    showToast(data.message || 'Failed to remove item');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Something went wrong');
             }
-            
-            document.getElementById('subtotalAmount').textContent = `INR ${total.toFixed(0)}`;
         }
 
         function emptyCart() {
             if (confirm('Are you sure you want to empty your cart?')) {
-                const items = document.querySelectorAll('.cart-item');
-                items.forEach((item, index) => {
-                    setTimeout(() => {
-                        item.classList.add('removing');
-                        setTimeout(() => item.remove(), 500);
-                    }, index * 100);
+                fetch('/cart/empty', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        showToast('Cart emptied');
+                        setTimeout(() => location.reload(), 500);
+                    } else {
+                        showToast('Failed to empty cart');
+                    }
                 });
-                
-                setTimeout(() => {
-                    cartData = {};
-                    showEmptyCart();
-                }, items.length * 100 + 500);
             }
         }
 
-        function showEmptyCart() {
-            const cartItems = document.getElementById('cartItems');
-            cartItems.innerHTML = `
-                <div style="text-align: center; padding: 60px 30px; color: #666;">
-                    <div style="font-size: 4rem; margin-bottom: 20px;">🛒</div>
-                    <h3 style="margin-bottom: 10px;">Your cart is empty</h3>
-                    <p>Add some amazing products to get started!</p>
-                    <button onclick="continueShopping()" style="margin-top: 20px; background: #000000; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: 600;">
-                        Start Shopping
-                    </button>
-                </div>
-            `;
-            document.getElementById('subtotalAmount').textContent = 'INR 0';
-        }
-
-        function proceedToCheckout() {
-            const btn = document.querySelector('.checkout-btn');
-            btn.classList.add('loading');
-            btn.textContent = 'Processing...';
-            
-            setTimeout(() => {
-                alert('Redirecting to checkout...');
-                btn.classList.remove('loading');
-                btn.textContent = 'Proceed to checkout';
-            }, 2000);
-        }
-
-        function continueShopping() {
-            alert('Redirecting to shop...');
-        }
-
-        // Initialize
-        updateSubtotal();
-
-        // Add some interactive effects
-        document.addEventListener('DOMContentLoaded', function() {
-            const cartItems = document.querySelectorAll('.cart-item');
-            cartItems.forEach((item, index) => {
-                item.style.animationDelay = `${index * 0.1}s`;
-                item.style.animation = 'slideIn 0.5s ease-out forwards';
-            });
-        });
-
-        // Add slideIn animation
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes slideIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+            .toast {
+                visibility: hidden;
+                min-width: 250px;
+                margin-left: -125px;
+                background-color: #333;
+                color: #fff;
+                text-align: center;
+                border-radius: 2px;
+                padding: 16px;
+                position: fixed;
+                z-index: 1;
+                left: 50%;
+                bottom: 30px;
+                font-size: 17px;
+                opacity: 0;
+                transition: opacity 0.5s, bottom 0.5s;
+            }
+
+            .toast.show {
+                visibility: visible;
+                opacity: 1;
+                bottom: 50px;
             }
         `;
         document.head.appendChild(style);
-        
     </script>
 </body>
+
 </html>

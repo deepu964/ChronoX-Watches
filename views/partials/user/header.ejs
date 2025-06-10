@@ -24,25 +24,26 @@
                     
                 </ul>
             </nav>
-            <div style="display: flex; gap: 20px; align-items: center;">
+            <!-- <div style="display: flex; gap: 20px; align-items: center;">
                 <div class="search-bar">
                 <form action="/search" method="GET">
                     <input type="text" name="query" placeholder="Search..." class="search-input">
                     <button type="submit" class="search-button"><i class="fas fa-search"></i></button>
                 </form>
-            </div>
+            </div> -->
             <div class="header-icons">
                 <a href="/wish-list" style="color:white;"><i class="fas fa-heart"></i></a>
                 <a href="/userProfile" class="icon-link"><i class="fas fa-user"></i></a>
                 <a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a>
-            </div>
+                </div>
             <% if (!user) { %>
-                <div style="margin-left: 80px;">
+                
+                <div style="margin-left: 50px;">
                    <a href="/login"><button style="padding: 7.5px;background-color: #3d3c3c; border: 1px solid transparent;color: white; border-radius: 5px;cursor: pointer;">Login</button></a>
                 </div>
             <% } %>
             <% if (user) { %>
-                <div style="margin-left: 80px;">
+                <div style="margin-left: 50px;">
                    <a href="/logout"><button style="padding: 7.5px;background-color: #3d3c3c; border: 1px solid transparent;color: white; border-radius: 5px;cursor: pointer;">Logout</button></a>
                 </div>
             <% } %>

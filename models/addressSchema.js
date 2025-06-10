@@ -11,9 +11,14 @@ const addressSchema = new mongoose.Schema({
     city: String,
     pinCode: String,
     landmark: String,
+    isDefault: {
+    type: Boolean,
+    default: false
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required:true
     }
 });
 

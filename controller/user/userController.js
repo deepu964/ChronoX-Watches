@@ -6,7 +6,7 @@ const categorySchema = require('../../models/categorySchema')
 const addressSchema = require('../../models/addressSchema');
 const productSchema = require('../../models/productSchema');
 const Cart = require('../../models/cartSchema');
-const WishList = require('../../models/wishlistSchema');
+const WishList = require('../../models/wishlistSchema')
 const generateOtp = require('../../utils/generateOtp');
 const sendOtpEmail = require('../../utils/sendOtpEmail');
 const sendResetPass = require('../../utils/sendResetPass');
@@ -842,62 +842,322 @@ const getWishList = async(req,res,next)=>{
 }
 
 
-const getCart =async (req,res,next) => {
-    try {
-       
-        res.render('user/cart',{
-             user: req.session.user,
-        });
-    } catch (error) {
-        next(error);
-    }
+const getCart = async (req, res, next) => {
+  try {
+    const userId = req.session.user._id;
+    const cart = await Cart.findOne({ user: userId }).populate('items.product').lean()
     
-}
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.render('user/cart', {
+        user: req.session.user,    
+        items: [],
+        total: 0
+      });
+    }
+
+    let total = 0;
+    cart.items.forEach(item => {
+        if (item.product.variants && item.product.variants.length > 0) {
+            const price = item.product.variants[0].salePrice || item.product.variants[0].regularPrice;
+            total += price * item.quantity;
+            }
+          
+    });
+    
+    res.render('user/cart', {
+      user: req.session.user,
+      items: cart.items,
+      total,
+      cloudName: process.env.CLOUD_NAME
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 const addToCart = async (req, res, next) => {
-    try {
-        const userId = req.session.user._id;
-        const productId = req.body.productId;
+  try {
+    const userId = req.session.user._id;
+    const productId = req.body.productId;
 
-        const product = await productSchema.findById(productId).populate('categoryId');
-        
-       
-        if (
-        !product || 
-        product.isActive || 
-        !product.categoryId.isListed || 
-        product.isDeleted
-        ) {
-        return res.status(404).json({ success: false, message: 'Product is unavailable or blocked.' });
-        }
-        
+    const product = await productSchema.findById(productId).populate('categoryId');
+
     
-        let cart = await Cart.findOne({ user: userId });
-        if(!cart){
-            cart = new Cart({ user: userId, items: [] });
-        }
+    if (
+      !product || 
+      product.isActive || 
+      !product.categoryId?.isListed || 
+      product.isDeleted
+    ) {
+      return res.status(404).json({ success: false, message: 'Product is unavailable or blocked.' });
+    }
 
-        const existsingItem = cart.items.find(item => item.product.toString() === productId);
+    const maxQuantityAllowed = 5; 
 
-        if (existsingItem) {
-            existsingItem.quantity += 1;
-        }else {
-            cart.items.push({ product: productId, quantity: 1 });
-        }
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      cart = new Cart({ user: userId, items: [] });
+    }
 
-        await WishList.updateOne(
-            {user: userId},
-            { $pull: { items: productId } },
-        )
+    const existingItem = cart.items.find(item => item.product.toString() === productId);
+
+    
+    const stockQty = product.variants[0]?.quantity || 0;
+
+    if (existingItem) {
+      if (existingItem.quantity >= stockQty) {
+        return res.status(400).json({ success: false, message: 'Cannot add more, stock limit reached.' });
+      }
+      if (existingItem.quantity >= maxQuantityAllowed) {
+        return res.status(400).json({ success: false, message: `Cannot add more than ${maxQuantityAllowed} items.` });
+      }
+      existingItem.quantity += 1;
+    } else {
+      if (stockQty <= 0) {
+        return res.status(400).json({ success: false, message: 'Product out of stock.' });
+      }
+      cart.items.push({ product: productId, quantity: 1 });
+    }
+
+    
+    await WishList.updateOne(
+      { user: userId },
+      { $pull: { items: { product: productId } } }
+    );
+
+    await cart.save();
+
+    return res.status(200).json({ success: true, message: 'Product added to cart successfully' });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const updateCartItem = async (req, res, next) => {
+  try {
+    const userId = req.session.user._id;
+    const { productId, action } = req.body;
+    console.log(req.body,'this is body ');
+
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) return res.status(404).json({ success: false, message: 'Cart not found' });
+
+    const item = cart.items.find(item => item.product.toString() === productId);
+    if (!item) return res.status(404).json({ success: false, message: 'Product not found in cart' });
+
+    const product = await productSchema.findById(productId).populate('categoryId');
+    if (!product || product.isActive || !product.categoryId.isListed || product.isDeleted) {
+      return res.status(400).json({ success: false, message: 'Product is unavailable or blocked' });
+    }
+
+    const totalStock = product.variants.reduce((sum, v) => sum + (v.quantity || 0), 0);
+    const MAX_QTY = 5;
+
+    if (action === 'increase') {
+      if (item.quantity >= MAX_QTY) {
+        return res.status(400).json({ success: false, message: `Max ${MAX_QTY} quantity allowed` });
+      }
+      if (item.quantity >= totalStock) {
+        return res.status(400).json({ success: false, message: 'Insufficient stock' });
+      }
+      item.quantity += 1;
+      await cart.save();
+      return res.json({ success: true, message: 'Quantity increased', quantity: item.quantity });
+    }
+
+    if (action === 'decrease') {
+      if (item.quantity <= 1) {
+        cart.items = cart.items.filter(i => i.product.toString() !== productId);
         await cart.save();
-        return res.status(200).json({ success: true, message: 'Product added to cart successfully' });
+        return res.json({ success: true, message: 'Item removed from cart', quantity: 0 });
+      } else {
+        item.quantity -= 1;
+        await cart.save();
+        return res.json({ success: true, message: 'Quantity decreased', quantity: item.quantity });
+      }
+    }
+
+    return res.status(400).json({ success: false, message: 'Invalid action' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+const removeFromCart = async (req, res, next) => {
+  try {
+    const userId = req.session.user._id;
+    const productId = req.params.productId;
+
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) return res.status(404).json({ success: false, message: 'Cart not found' });
+
+    cart.items = cart.items.filter(item => item.product.toString() !== productId);
+    await cart.save();
+
+    res.json({ success: true, message: 'Product removed from cart' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+const emptyCart = async (req, res, next) => {
+  try {
+    const userId = req.session.user._id;
+
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) return res.status(404).json({ success: false, message: 'Cart not found' });
+
+    cart.items = [];
+    await cart.save();
+
+    res.json({ success: true, message: 'Cart emptied' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const checkoutGetController = async (req, res, next) => {
+  try {
+    const userId = req.session.user._id;
+
+    const addresses = await addressSchema.find({ userId });
+    const defaultAddress = addresses.find(addr => addr.isDefault);
+
+    const cart = await Cart.findOne({ user: userId }).populate('items.product').lean();
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.redirect('/cart');
+    }
+
+    let subTotal = 0;
+
+    const cartItems = cart.items.map(item => {
+      const product = item.product;
+      
+
+      const variant = product.variants?.[0] || {};
+      const price = variant.salePrice || variant.regularPrice || 0;
+      
+      const total = price * item.quantity;
+      subTotal += total;
+
+      return {
+        _id: product._id,
+        name: product.name,
+        image: product.images?.[0]?.url || '/images/default-product.jpg',
+        quantity: item.quantity,
+        price,
+        total
+      };
+    });
+
+    // TAX Calculation: 18% GST
+    const taxRate = 0.18;
+    const tax = Math.round(subTotal * taxRate);
+
+    const shipping = 50;
+    const discount = 0;
+
+    const grandTotal = subTotal + tax + shipping - discount;
+
+    res.render('user/checkOut', {
+      user: req.session.user,
+      addresses,
+      defaultAddress,
+      cartItems,
+      subTotal,
+      tax,
+      shipping,
+      discount,
+      grandTotal
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+const addNewAddress = async (req, res, next) => {
+  try {
+    const userId = req.session.user._id;
+    console.log(req.body,"thi isn body");
+    const {
+      fullName,
+      phone,
+      pinCode,
+      city,
+      state,
+      district,
+      address,
+      landmark,
+      isDefault,
+    } = req.body;
+
+
+    
+    if (isDefault) {
+      await addressSchema.updateMany(
+        { userId },
+        { $set: { isDefault: false } }
+      );
+    }
+
+    const newAddress = new addressSchema({
+      userId,
+      fullName,
+      phone,
+      pinCode,
+      city,
+      state,
+      district,
+      address,
+      landmark,
+      isDefault: !!isDefault, 
+    });
+    
+    await newAddress.save();
+    console.log(newAddress, "tisksdk") 
+    res.status(200).json({
+      success: true,
+      message: "Address added successfully",
+    });
+
+   
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteCheckAddress = async (req,res,next) => {
+    try {
+
+       const addressId = req.params.id;
+       await addressSchema.findByIdAndDelete(addressId);
+       res.status(200).json({success:true,message:"Address deleted successfull"});
 
     } catch (error) {
         next(error);
     }
+    
 }
 
 
+const getPayment = async (req,res,next) => {
+    try {
+       res.render('user/placeOrder',{
+        user:req.session.user
+       });
+    } catch (error) {
+        next(error);
+    }
+    
+}
 
 module.exports = {
     getLoadHomePage,
@@ -931,6 +1191,13 @@ module.exports = {
     getWishList,
     getCart,
     addToCart,
+    updateCartItem,
+    removeFromCart,
+    emptyCart,
+    checkoutGetController,
+    addNewAddress,
+    deleteCheckAddress,
+    getPayment,
 
 
 };

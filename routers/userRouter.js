@@ -75,6 +75,13 @@ router.get('/wish-list',isAuth,userController.getWishList);
 
 router.get('/cart',isAuth,userController.getCart);
 router.post('/add-to-cart',isAuth,userController.addToCart);
+router.post('/cart/update', isAuth,userController.updateCartItem);
+router.post('/cart/remove/:productId',isAuth, userController.removeFromCart);
+router.post('/cart/empty',isAuth, userController.emptyCart);
 
+router.get('/check-out',isAuth,userController.checkoutGetController);
+router.post('/check-out',isAuth,userController.addNewAddress);
+router.delete('/delete-check-address/:id',isAuth,userController.deleteCheckAddress);
 
+router.get('/payment',isAuth,userController.getPayment);
 module.exports = router;

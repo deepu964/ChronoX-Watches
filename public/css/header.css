@@ -22,10 +22,12 @@ a{
 
 .main-nav ul {
     display: flex;
+    
 }
 
 .main-nav ul li {
     margin: 0 15px;
+    border: none;
 }
 
 .main-nav ul li a {
@@ -46,8 +48,8 @@ a{
 
 .search-input {
     padding: 8px 15px;
-    border: 1px solid #747373;
-    background-color: #3d3c3c;
+    border: 1px solid #ffffff;
+    background-color: #dfdcdc;
     color: #fff;
     border-radius: 20px;
     outline: none;

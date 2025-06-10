@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - E-commerce</title>
+    <link rel="stylesheet" href="/css/payment.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+      <%-include("../partials/user/header")%>
+    <div class="container">
+        <main class="payment-main">
+            
+            <div class="payment-left">
+                
+                <div class="bank-offers">
+                    <div class="section-header">
+                        <i class="fas fa-university"></i>
+                        <h3>Bank Offers</h3>
+                    </div>
+                    <div class="offer-item">
+                        <p>10% Instant Discount on IDFC FIRST Bank Cards on a min spend of Rs 2,500.TCA</p>
+                    </div>
+                    <button class="show-more">Show More <i class="fas fa-chevron-down"></i></button>
+                </div>
+
+                
+                <div class="payment-methods">
+                    <h3>Choose Payment Mode</h3>
+                    
+                    <div class="payment-options">
+                        <!-- <div class="payment-option active" onclick="selectPaymentMethod('card')">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Credit/Debit Card</span>
+                        </div> -->
+                        <div class="payment-option" onclick="selectPaymentMethod('cod')">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Cash On Delivery (Cash/Card/UPI)</span>
+                        </div>
+                        <!-- <div class="payment-option" onclick="selectPaymentMethod('upi')">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>PhonePe/Google Pay/BHIM UPI</span>
+                        </div>
+                        <div class="payment-option" onclick="selectPaymentMethod('wallet')">
+                            <i class="fas fa-wallet"></i>
+                            <span>Paytm/Wallets</span>
+                        </div>
+                        <div class="payment-option" onclick="selectPaymentMethod('netbanking')">
+                            <i class="fas fa-university"></i>
+                            <span>Net Banking</span>
+                        </div> -->
+                        <!-- <div class="payment-option" onclick="selectPaymentMethod('emi')">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>EMI/Pay Later</span>
+                        </div> -->
+                    </div>
+                </div>
+
+                
+                <!-- <div class="card-form" id="cardForm">
+                    <h3>CREDIT/ DEBIT CARD</h3>
+                    <form id="paymentForm" onsubmit="processPayment(event)">
+                        <div class="form-group">
+                            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19" required>
+                            <span class="error-message" id="cardNumberError"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="cardName" placeholder="Name on card" required>
+                            <span class="error-message" id="cardNameError"></span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                                <span class="error-message" id="expiryError"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="cvv" placeholder="CVV" maxlength="4" required>
+                                <span class="error-message" id="cvvError"></span>
+                            </div>
+                        </div>
+                        <button type="submit" class="place-order-btn">PLACE ORDER</button>
+                    </form>
+                </div> -->
+
+                <!-- Gift Card -->
+                <!-- <div class="gift-card">
+                    <div class="gift-card-header">
+                        <i class="fas fa-gift"></i>
+                        <span>Have a Gift Card?</span>
+                    </div>
+                    <button class="apply-gift-card">APPLY GIFT CARD</button>
+                </div>
+            </div> -->
+
+            
+            <div class="payment-right">
+                
+                <div class="price-details">
+                    <h3>PRICE DETAILS (1 Items)</h3>
+                    <div class="price-row">
+                        <span>Total MRP</span>
+                        <span>₹7797</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Discount on MRP</span>
+                        <span class="discount-amount">-₹4287</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Convenience Fee</span>
+                        <span class="know-more">Know More</span>
+                        <span><span class="strikethrough">₹99</span> FREE</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total Amount</span>
+                        <span>₹3510</span>
+                    </div>
+                    <a href=""><button style="background-color: blue;" class="btn btn-primary btn-place-order">Place Order</button></a>
+                </div>
+            </div>
+        </main>
+    </div>
+  <%-include("../partials/user/footer")%>
+    <script src="js/script.js"></script>
+</body>
+</html>
