@@ -6,6 +6,7 @@ const categorySchema = require('../../models/categorySchema')
 const addressSchema = require('../../models/addressSchema');
 const productSchema = require('../../models/productSchema');
 const Cart = require('../../models/cartSchema');
+const Order = require('../../models/orderSchema')
 const WishList = require('../../models/wishlistSchema')
 const generateOtp = require('../../utils/generateOtp');
 const sendOtpEmail = require('../../utils/sendOtpEmail');
@@ -842,11 +843,13 @@ const getWishList = async(req,res,next)=>{
 }
 
 
+
+
+
 const getCart = async (req, res, next) => {
   try {
     const userId = req.session.user._id;
     const cart = await Cart.findOne({ user: userId }).populate('items.product').lean()
-    
 
     if (!cart || !cart.items || cart.items.length === 0) {
       return res.render('user/cart', {
@@ -857,20 +860,35 @@ const getCart = async (req, res, next) => {
     }
 
     let total = 0;
-    cart.items.forEach(item => {
-        if (item.product.variants && item.product.variants.length > 0) {
-            const price = item.product.variants[0].salePrice || item.product.variants[0].regularPrice;
-            total += price * item.quantity;
-            }
-          
-    });
-    
+let totalMRP = 0;
+// let platformFee = 20;
+let shippingFee = 50;
+
+cart.items.forEach(item => {
+  if (item.product.variants && item.product.variants.length > 0) {
+    const variant = item.product.variants[0];
+    const salePrice = variant.salePrice || variant.regularPrice;
+    const regularPrice = variant.regularPrice;
+
+    total += salePrice * item.quantity;
+    totalMRP += regularPrice * item.quantity;
+  }
+});
+
+const discount = totalMRP - total;
+const grandTotal = total  + shippingFee;
+
+    console.log(cart.items.map(item => item.product.images?.[0]?.public_id));
     res.render('user/cart', {
-      user: req.session.user,
-      items: cart.items,
-      total,
-      cloudName: process.env.CLOUD_NAME
-    });
+  user: req.session.user,
+  items: cart.items,
+  total,
+  totalMRP,
+  discount,
+  shippingFee,
+  grandTotal,
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME
+});
 
   } catch (error) {
     next(error);
@@ -906,6 +924,9 @@ const addToCart = async (req, res, next) => {
 
     
     const stockQty = product.variants[0]?.quantity || 0;
+    const itemPrice = product.variants[0]?.salePrice || product.variants[0]?.regularPrice
+    console.log(itemPrice,"price")
+
 
     if (existingItem) {
       if (existingItem.quantity >= stockQty) {
@@ -919,7 +940,7 @@ const addToCart = async (req, res, next) => {
       if (stockQty <= 0) {
         return res.status(400).json({ success: false, message: 'Product out of stock.' });
       }
-      cart.items.push({ product: productId, quantity: 1 });
+      cart.items.push({ product: productId, quantity:1,price:itemPrice });
     }
 
     
@@ -959,28 +980,26 @@ const updateCartItem = async (req, res, next) => {
     const MAX_QTY = 5;
 
     if (action === 'increase') {
-      if (item.quantity >= MAX_QTY) {
-        return res.status(400).json({ success: false, message: `Max ${MAX_QTY} quantity allowed` });
-      }
-      if (item.quantity >= totalStock) {
-        return res.status(400).json({ success: false, message: 'Insufficient stock' });
-      }
-      item.quantity += 1;
-      await cart.save();
-      return res.json({ success: true, message: 'Quantity increased', quantity: item.quantity });
-    }
+  if (item.quantity >= MAX_QTY) {
+    return res.status(400).json({ success: false, message: `Max ${MAX_QTY} quantity allowed` });
+  }
+  if (item.quantity >= totalStock) {
+    return res.status(400).json({ success: false, message: 'Insufficient stock' });
+  }
+  item.quantity += 1;
+  await cart.save();
+  return res.json({ success: true, message: 'Quantity increased', quantity: item.quantity });
+}
 
-    if (action === 'decrease') {
-      if (item.quantity <= 1) {
-        cart.items = cart.items.filter(i => i.product.toString() !== productId);
-        await cart.save();
-        return res.json({ success: true, message: 'Item removed from cart', quantity: 0 });
-      } else {
-        item.quantity -= 1;
-        await cart.save();
-        return res.json({ success: true, message: 'Quantity decreased', quantity: item.quantity });
-      }
-    }
+if (action === 'decrease') {
+  if (item.quantity <= 1) {
+    return res.status(400).json({ success: false, message: 'Minimum 1 quantity required' });
+  } else {
+    item.quantity -= 1;
+    await cart.save();
+    return res.json({ success: true, message: 'Quantity decreased', quantity: item.quantity });
+  }
+}
 
     return res.status(400).json({ success: false, message: 'Invalid action' });
   } catch (err) {
@@ -1050,21 +1069,18 @@ const checkoutGetController = async (req, res, next) => {
       return {
         _id: product._id,
         name: product.name,
-        image: product.images?.[0]?.url || '/images/default-product.jpg',
+        image: product.images?.[0]?.public_id  || '/images/default-product.jpg',
         quantity: item.quantity,
         price,
         total
       };
     });
 
-    // TAX Calculation: 18% GST
-    const taxRate = 0.18;
-    const tax = Math.round(subTotal * taxRate);
 
     const shipping = 50;
     const discount = 0;
 
-    const grandTotal = subTotal + tax + shipping - discount;
+    const grandTotal = subTotal  + shipping - discount;
 
     res.render('user/checkOut', {
       user: req.session.user,
@@ -1072,10 +1088,10 @@ const checkoutGetController = async (req, res, next) => {
       defaultAddress,
       cartItems,
       subTotal,
-      tax,
       shipping,
       discount,
-      grandTotal
+      grandTotal,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME
     });
 
   } catch (error) {
@@ -1098,7 +1114,6 @@ const addNewAddress = async (req, res, next) => {
       landmark,
       isDefault,
     } = req.body;
-
 
     
     if (isDefault) {
@@ -1148,11 +1163,144 @@ const deleteCheckAddress = async (req,res,next) => {
 }
 
 
-const getPayment = async (req,res,next) => {
+const getPayment = async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const addressId = req.query.addressId;
+
+    if (!addressId || addressId === 'undefined') {
+      return res.json({ success: false, message: "Please select a valid address" });
+    }
+
+    const cart = await Cart.findOne({ user: userId }).populate('items.product').lean();
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.redirect('/cart');
+    }
+
+    let subTotal = 0;
+    let totalDiscount = 0;
+
+    const cartItems = cart.items.map(item => {
+      const product = item.product;
+      const variant = product.variants?.[0] || {};
+
+      const regularPrice = variant.regularPrice || 0;
+      const salePrice = variant.salePrice || regularPrice;
+
+      const quantity = item.quantity;
+      const price = regularPrice;
+      const total = price * quantity;
+
+      const itemDiscount = (regularPrice - salePrice) * quantity;
+      totalDiscount += itemDiscount;
+
+      subTotal += total;
+
+      return {
+        _id: product._id,
+        name: product.name,
+        image: product.images?.[0]?.public_id || null,
+        quantity,
+        price,
+        total,
+        regularPrice,
+        salePrice,
+        itemDiscount
+      };
+    });
+
+    const shipping = 50;
+    const grandTotal = subTotal;
+    const lastAmount = (subTotal + shipping -totalDiscount)
+    return res.render('user/placeOrder', {
+      user: req.session.user,
+      addresses: addressId, 
+      cartItems,
+      subTotal,
+      shipping,
+      discount: totalDiscount,
+      grandTotal,
+      lastAmount
+    });
+
+  } catch (err) {
+    console.error('Error loading place order page:', err);
+    res.status(500).send('Something went wrong.');
+  }
+};
+
+const placeOrder = async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const { paymentMethod, addressId } = req.body;
+    console.log(addressId,"addrs id")
+    const cart = await Cart.findOne({ user: userId }).populate('items.product');
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ success: false, message: 'Cart is empty' });
+    }
+
+    const address = await addressSchema.findOne({ _id: addressId });
+    console.log(address)
+    if (!address) {
+      return res.status(400).json({ success: false, message: 'Invalid address' });
+    }
+
+    let total = 0;
+    const orderItems = [];
+
+    for (const item of cart.items) {
+      const product = item.product;
+      if (product.status === 'blocked' || product.stock < item.quantity) {
+        return res.status(400).json({ success: false, message: `${product.name} is out of stock or blocked` });
+      }
+
+      orderItems.push({
+        product: product._id,
+        quantity: item.quantity,
+        price: product.salesPrice || product.regularPrice
+      });
+
+      total += item.quantity * (product.salesPrice || product.regularPrice);
+
+      
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
+    const order = new Order({
+      user: userId,
+      items: orderItems,
+      address: {
+        fullName: address.fullName,
+        phone: address.phone,
+        addressLine: address.addressLine,
+        city: address.city,
+        pincode: address.pincode,
+        state: address.state
+      },
+      totalAmount: total,
+      paymentMethod: paymentMethod,
+      status: 'Placed'
+    });
+
+    await order.save();
+
+    
+    cart.items = [];
+    await cart.save();
+
+    res.json({ success: true, orderId: order._id });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Something went wrong' });
+  }
+};
+
+const getConfirm = async (req,res,next) => {
     try {
-       res.render('user/placeOrder',{
-        user:req.session.user
-       });
+        res.render('user/orderConfirm');
     } catch (error) {
         next(error);
     }
@@ -1198,6 +1346,7 @@ module.exports = {
     addNewAddress,
     deleteCheckAddress,
     getPayment,
-
+    placeOrder,
+    getConfirm
 
 };

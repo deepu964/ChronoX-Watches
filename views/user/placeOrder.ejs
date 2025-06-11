@@ -34,10 +34,11 @@
                             <i class="fas fa-credit-card"></i>
                             <span>Credit/Debit Card</span>
                         </div> -->
-                        <div class="payment-option" onclick="selectPaymentMethod('cod')">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <span>Cash On Delivery (Cash/Card/UPI)</span>
+                       <div class="payment-option selected" onclick="selectPaymentMethod()">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Cash On Delivery (Cash/Card/UPI)</span>
                         </div>
+                        <input type="hidden" id="payment-method-input" name="paymentMethod" value="cod">
                         <!-- <div class="payment-option" onclick="selectPaymentMethod('upi')">
                             <i class="fas fa-mobile-alt"></i>
                             <span>PhonePe/Google Pay/BHIM UPI</span>
@@ -100,27 +101,40 @@
                     <h3>PRICE DETAILS (1 Items)</h3>
                     <div class="price-row">
                         <span>Total MRP</span>
-                        <span>₹7797</span>
+                        <span>₹<%=grandTotal%></span>
                     </div>
                     <div class="price-row">
                         <span>Discount on MRP</span>
-                        <span class="discount-amount">-₹4287</span>
+                        <span class="discount-amount">-₹<%=discount%></span>
                     </div>
                     <div class="price-row">
                         <span>Convenience Fee</span>
                         <span class="know-more">Know More</span>
-                        <span><span class="strikethrough">₹99</span> FREE</span>
+                        <div class="summary-row"><span>Shipping: </span><span>₹<%= shipping %></span></div>
+                        <!-- <span><span class="strikethrough">₹99</span> FREE</span> -->
                     </div>
                     <div class="price-row total">
                         <span>Total Amount</span>
-                        <span>₹3510</span>
-                    </div>
-                    <a href=""><button style="background-color: blue;" class="btn btn-primary btn-place-order">Place Order</button></a>
-                </div>
+                        <span>₹<%= lastAmount %></span>
+                  <form id="place-order-form" method="GET" action="/confirm">
+                    <input type="hidden" name="addressId" value="<%= addresses %>">
+                    <input type="hidden" id="payment-method-input" name="paymentMethod" value="cod">
+
+                    <button type="submit" class="btn btn-primary">Confirm Order</button>
+                    </form>
             </div>
         </main>
     </div>
   <%-include("../partials/user/footer")%>
     <script src="js/script.js"></script>
+    <script>
+        function selectPaymentMethod() {
+        // Mark as selected visually
+        document.querySelector('.payment-option').classList.add('selected');
+        // Already set by default: but just to be sure
+        document.getElementById('payment-method-input').value = 'cod';
+        }
+
+</script>
 </body>
 </html>

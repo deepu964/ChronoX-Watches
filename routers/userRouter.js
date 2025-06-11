@@ -84,4 +84,10 @@ router.post('/check-out',isAuth,userController.addNewAddress);
 router.delete('/delete-check-address/:id',isAuth,userController.deleteCheckAddress);
 
 router.get('/payment',isAuth,userController.getPayment);
+router.post('/payment',isAuth,userController.placeOrder);
+
+router.get('/confirm',isAuth,userController.getConfirm);
+
+
+
 module.exports = router;

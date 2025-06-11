@@ -840,13 +840,8 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-2px);
+  background: blue;
+  color: rgb(253, 252, 253);
 }
 
 .btn-secondary {
@@ -856,7 +851,7 @@ body {
 }
 
 .btn-secondary:hover {
-  background-color: #e9ecef;
+  background-color: #fafbfc;
 }
 
 .btn-text {
@@ -876,3 +871,18 @@ body {
   font-size: 1rem;
   margin-top: 1rem;
 }
+
+.payment-option {
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.payment-option.selected {
+  border-color: green;
+  background-color: #e9ffe9;
+}
+
+

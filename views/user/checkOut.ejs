@@ -66,11 +66,11 @@
                                
                             </div>
 
-                            <div class="address-select">
-                                <input type="radio" name="selectedAddress" id="address<%= index %>"
-                                    value="<%= address._id %>" <%= address.isDefault ? 'checked' : '' %>>
-                                <label for="address<%= index %>">Ship to this address</label>
-                            </div>
+                                <div class="address-select">
+                                    <input type="radio" name="selectedAddress" id="address<%= index %>"
+                                        value="<%= address._id %>" <%= address.isDefault ? 'checked' : '' %>>
+                                    <label for="address<%= index %>">Ship to this address</label>
+                                </div>
                         </div>
                     <% }); %>
                 <% } else { %>
@@ -100,7 +100,7 @@
                         </div>
                         <div class="form-group"><label for="phone">Phone Number</label><input type="tel" id="phone" name="phone"></div>
                         <div class="form-group checkbox">
-                            <input type="checkbox" id="isDefault" name="isDefault">
+                            <input type="checkbox" id="isDefault" name="isDefault" >
                             <label for="isDefault">Set as default address</label>
                         </div>
                         <div class="form-actions">
@@ -123,8 +123,18 @@
                         subtotal += itemTotal;
                     %>
                         <div class="cart-item">
-                            <div class="item-image"><img src="<%= item.image %>" alt="<%= item.name %>"></div>
-                            <div class="item-details">
+                       <div class="item-image">
+                            <% if (item.image) { %>
+                                <img 
+                                src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_100,h_100,c_fill/<%= item.image %>.jpg" 
+                                alt="<%= item.name %>" 
+                                width="100" height="100"
+                                onerror="this.onerror=null; this.src='/images/placeholder.jpg';" />
+                            <% } else { %>
+                                <img src="/images/placeholder.jpg" alt="No image" width="100" height="100" />
+                            <% } %>
+                            </div>
+                            <div class="item-details" style="padding: 10px;">
                                 <h3><%= item.name %></h3>
                                 <p class="item-variant"><%= item.variant || '' %></p>
                                 <div class="item-quantity"><span>Qty: <%= item.quantity %></span></div>
@@ -144,12 +154,10 @@
                             <div class="summary-row discount"><span>Discount</span><span>-₹<%= discount.toFixed(2) %></span></div>
                         <% } %>
                         <div class="summary-row"><span>Shipping</span><span>₹<%= shipping.toFixed(2) %></span></div>
-                        <% if (tax && tax > 0) { %>
-                            <div class="summary-row"><span>Tax</span><span>₹<%= tax.toFixed(2) %></span></div>
-                        <% } %>
+                      
                         <div class="summary-row total">
                             <span>Total</span>
-                            <span>₹<%= (subtotal - (discount || 0) + shipping + (tax || 0)).toFixed(2) %></span>
+                            <span>₹<%= (subtotal - (discount || 0) + shipping ).toFixed(2) %></span>
                         </div>
                     </div>
 
@@ -157,7 +165,7 @@
                         <input type="text" placeholder="Promo code" id="promo-code">
                         <button class="btn btn-secondary" id="apply-promo">Apply</button>
                     </div> -->
-                    <a href="/payment"><button class="btn btn-primary btn-place-order">Place Order</button></a>
+                    <button class="btn btn-primary btn-place-order" onclick="setAddress()" >Place Order</button>
                     <p class="terms-notice">By placing your order, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy</a>.</p>
                 <% } else { %>
                     <div class="empty-cart">
@@ -173,9 +181,17 @@
 <%- include('../partials/user/footer') %>
 
 <script>
+    let selectAddress 
 document.addEventListener("DOMContentLoaded", () => {
   const addressForm = document.getElementById("address-form");
   const addressIdInput = document.getElementById("address-id");
+   const radios = document.querySelectorAll('input[name="selectedAddress"]');
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', () => {
+         selectAddress = radio.value
+      });
+    });
 
   // OPEN MODAL
   document.querySelectorAll('.open-modal-btn').forEach(button => {
@@ -266,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(isEdit ? `/edit-address/${plainData.addressId}` : '/check-out', {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(plainData)
+        body: JSON.stringify(plainData,selectAddress)
       });
 
       const data = await response.json();
@@ -311,6 +327,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     })
   }
+
+ function setAddress() {
+  const selectedRadio = document.querySelector('input[name="selectedAddress"]:checked');
+
+  if (!selectedRadio) {
+   showToast("Please select an address", "error")
+    return;
+  }
+
+  const addressId = selectedRadio.value;
+
+  window.location.href = `/payment?addressId=${addressId}`;
+}
+
 </script>
 
 </body>

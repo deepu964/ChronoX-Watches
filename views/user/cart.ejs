@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +20,7 @@
         }
 
         .cart-container {
-        
+
             max-width: 800px;
             margin-top: 30px;
             margin-left: auto;
@@ -37,7 +38,7 @@
         }
 
         .cart-header {
-            background: linear-gradient(135deg,  #667eea, #764ba2 );
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             padding: 30px;
             display: flex;
@@ -54,14 +55,21 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             transform: rotate(45deg);
             animation: shimmer 3s infinite;
         }
 
         @keyframes shimmer {
-            0%, 100% { transform: rotate(45deg) translateX(-100%); }
-            50% { transform: rotate(45deg) translateX(100%); }
+
+            0%,
+            100% {
+                transform: rotate(45deg) translateX(-100%);
+            }
+
+            50% {
+                transform: rotate(45deg) translateX(100%);
+            }
         }
 
         .cart-title {
@@ -346,7 +354,10 @@
 
         .cart-actions {
             display: flex;
-            gap: 15px;
+            gap: 39px;
+            align-items: center;
+            justify-content: center;
+            padding: 19px;
         }
 
         .cart-actions button {
@@ -391,7 +402,7 @@
         }
 
         .continue-btn {
-            background: white;
+            background: rgb(218, 213, 213);
             color: #000000;
             border: 2px solid #000000;
         }
@@ -494,10 +505,12 @@
                 opacity: 1;
                 max-height: 140px;
             }
+
             50% {
                 transform: translateX(-100%);
                 opacity: 0;
             }
+
             100% {
                 transform: translateX(-100%);
                 opacity: 0;
@@ -528,157 +541,298 @@
         }
 
         @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .price-summary {
+
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            background: #fff;
+            width: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            ;
+        }
+
+        .price-summary h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #212121;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .price-row span,
+        .price-row strong {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .price-row .green {
+            color: #388e3c;
+            font-weight: 500;
+        }
+
+        .price-row .red {
+            color: #d32f2f;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .price-row.total {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 12px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        hr {
+            margin: 12px 0;
+            border: none;
+            border-top: 1px solid #e0e0e0;
+        }
+
+
+        .subtotal h3 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #212121;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .price-row strong {
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        .price-row span {
+            font-size: 17px;
+        }
+
+        .price-row.total {
+            margin-top: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+        }
+
+        .price-row span:nth-child(2) {
+            font-weight: 500;
+        }
+
+        hr {
+            margin: 19px 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+
+        .price-row .green {
+            color: #388e3c;
+        }
+
+        .price-row .red {
+            color: #d32f2f;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-<%-include("../partials/user/header") %>
-    <div class="cart-container">
-        <div class="cart-header">
-            <h1 class="cart-title">CART</h1>
-            <button class="empty-cart-btn" onclick="emptyCart()">Empty My Cart</button>
-        </div>
+    <%-include(".. /partials/user/header") %>
+        <div class="cart-container">
+            <div class="cart-header">
+                <h1 class="cart-title">CART</h1>
+                <button class="empty-cart-btn" onclick="emptyCart()">Empty My Cart</button>
+            </div>
 
-        <div class="cart-items" id="cartItems">
-            <% items.forEach((item, index) => { %>
-                <div class="cart-item" data-id="<%= item.product._id %>">
-                <div class="product-image">
-                    <% if (item.images && item.images.length > 0 && item.images[0].public_id) { %>
-                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= item.product.images[0].public_id %>.jpg" alt="<%= item.product.name %>" onerror="this.src='/images/placeholder.jpg'">
-
-                    <% } else { %>
-                        <img src="/images/placeholder.jpg" alt="No image available">
-                    <% } %>
-                    </div>
-                    <div class="item-details">
-                        <div class="item-name"><%= item.product.name %></div>
-                        <div class="item-price">
-                            <% 
-                                const price = item.product.variants[0].salePrice || item.product.variants[0].regularPrice;
-                                const originalPrice = item.product.variants[0].regularPrice;
-                            %>
-                            <span class="current-price">₹<%= price.toLocaleString() %></span>
-                            <% if (price !== originalPrice) { %>
-                                <span class="original-price">₹<%= originalPrice.toLocaleString() %></span>
-                            <% } %>
+            <div class="cart-items" id="cartItems">
+                <% items.forEach((item, index)=> { %>
+                    <div class="cart-item" data-id="<%= item.product._id %>">
+                        <div class="product-image">
+                            <% const image=item.product.images?.[0]?.public_id; %>
+                                <% if (image) { %>
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_100,h_100,c_fill/<%= image %>"
+                                        alt="<%= item.product.name %>" width="100" height="100"
+                                        onerror="this.onerror=null; this.src='/images/placeholder.jpg';" />
+                                    <% } else { %>
+                                        <img src="/images/placeholder.jpg" alt="No image available" width="50"
+                                            height="50">
+                                        <% } %>
                         </div>
-                    </div>
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="updateCart('<%= item.product._id %>', 'decrease')">−</button>
-                        <div class="quantity-display" id="qty-<%= item.product._id %>"><%= item.quantity %></div>
-                        <button class="quantity-btn" onclick="updateCart('<%= item.product._id %>', 'increase')">+</button>
-                    </div>
-                    <button class="remove-btn" onclick="removeItem('<%= item.product._id %>')">Remove</button>
-                </div>
-            <% }) %>
-        </div>
 
-        <div class="cart-summary">
+                        <div class="item-details" style="padding: 2%;">
+                            <div class="item-name">
+                                <%= item.product.name %>
+                            </div>
+                            <div class="item-price">
+                                <% const price=item.product.variants[0].salePrice ||
+                                    item.product.variants[0].regularPrice; const
+                                    originalPrice=item.product.variants[0].regularPrice; %>
+                                    <span class="current-price">₹<%= price.toLocaleString() %></span>
+                                    <% if (price !==originalPrice) { %>
+                                        <span class="original-price">₹<%= originalPrice.toLocaleString() %></span>
+                                        <% } %>
+                            </div>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn"
+                                onclick="updateCart('<%= item.product._id %>', 'decrease')">−</button>
+                            <div class="quantity-display" id="qty-<%= item.product._id %>">
+                                <%= item.quantity %>
+                            </div>
+                            <button class="quantity-btn"
+                                onclick="updateCart('<%= item.product._id %>', 'increase')">+</button>
+                        </div>
+                        <button class="remove-btn" onclick="removeItem('<%= item.product._id %>')">Remove</button>
+                    </div>
+                    <% }) %>
+            </div>
+
+            <!-- <div class="cart-summary">
             <div class="promo-section">
                 <a href="#" class="promo-link">Save 10%</a>
-            </div>
+            </div> -->
+            <div class="price-summary">
+                <h3>PRICE DETAILS (<%= items.length %> Items)</h3>
 
-            <div class="subtotal">
-                <span>SUBTOTAL</span>
-                <div>
-                    <span id="subtotalAmount">INR <%= total.toLocaleString() %></span>
+                <div class="price-row">
+                    <span>Total MRP</span>
+                    <span>₹<%= totalMRP.toLocaleString() %></span>
+                </div>
+
+                <div class="price-row">
+                    <span>Discount on MRP</span>
+                    <span class="green">- ₹<%= discount.toLocaleString() %></span>
+                </div>
+
+                <div class="price-row">
+                    <span>Coupon Discount</span>
+                    <span class="red">Apply Coupon</span>
+                </div>
+
+                <div class="price-row">
+                    <span>Shipping Fee</span>
+                    <span class="green">₹<%= shippingFee.toLocaleString() %></span>
+                </div>
+
+                <hr />
+
+                <div class="price-row total">
+                    <strong>Total Amount</strong>
+                    <strong>₹<%= grandTotal.toLocaleString() %></strong>
                 </div>
             </div>
 
-            <div class="shipping-info">
+            <!-- <div class="shipping-info">
                 Shipping, taxes, and discount codes calculated at checkout.
-            </div>
+            </div> -->
 
             <div class="cart-actions">
                 <a href="/check-out"><button class="checkout-btn">Proceed to checkout</button></a>
                 <a href="/shop"><button class="continue-btn">Continue Shopping</button></a>
             </div>
         </div>
-    </div>
-    <%-include("../partials/user/footer") %>
+        </div>
+        <%-include(".. /partials/user/footer") %>
 
-    <script>
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                toast.remove();
-            }, 3000);
-        }
-
-        async function updateCart(productId, action) {
-            try {
-                const res = await fetch(`/cart/update`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ productId, action })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    if (data.quantity === 0) {
-                        document.querySelector(`[data-id="${productId}"]`).remove();
-                    } else {
-                        document.getElementById(`qty-${productId}`).innerText = data.quantity;
-                    }
-                    showToast(data.message || 'Cart updated');
-                    setTimeout(() => location.reload(), 500);
-                } else {
-                    showToast(data.message || 'Failed to update cart','error');
+            <script>
+                function showToast(message) {
+                    const toast = document.createElement('div');
+                    toast.className = 'toast';
+                    toast.textContent = message;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.classList.add('show'), 10);
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        toast.remove();
+                    }, 3000);
                 }
-            } catch (err) {
-                console.error(err);
-                showToast('Something went wrong');
-            }
-        }
 
-        async function removeItem(productId) {
-            try {
-                const res = await fetch(`/cart/remove/${productId}`, {
-                    method: 'POST'
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.querySelector(`[data-id="${productId}"]`).remove();
-                    showToast('Product removed from cart');
-                    setTimeout(() => location.reload(), 500);
-                } else {
-                    showToast(data.message || 'Failed to remove item');
+                async function updateCart(productId, action) {
+                    try {
+                        const res = await fetch(`/cart/update`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ productId, action })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            if (data.quantity === 0) {
+                                document.querySelector(`[data-id="${productId}"]`).remove();
+                            } else {
+                                document.getElementById(`qty-${productId}`).innerText = data.quantity;
+                            }
+                            showToast(data.message || 'Cart updated');
+                            setTimeout(() => location.reload(), 500);
+                        } else {
+                            showToast(data.message || 'Failed to update cart', 'error');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showToast('Something went wrong');
+                    }
                 }
-            } catch (err) {
-                console.error(err);
-                showToast('Something went wrong');
-            }
-        }
 
-        function emptyCart() {
-            if (confirm('Are you sure you want to empty your cart?')) {
-                fetch('/cart/empty', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                async function removeItem(productId) {
+                    try {
+                        const res = await fetch(`/cart/remove/${productId}`, {
+                            method: 'POST'
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            document.querySelector(`[data-id="${productId}"]`).remove();
+                            showToast('Product removed from cart');
+                            setTimeout(() => location.reload(), 500);
+                        } else {
+                            showToast(data.message || 'Failed to remove item');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showToast('Something went wrong');
                     }
-                }).then(response => {
-                    if (response.ok) {
-                        showToast('Cart emptied');
-                        setTimeout(() => location.reload(), 500);
-                    } else {
-                        showToast('Failed to empty cart');
-                    }
-                });
-            }
-        }
+                }
 
-        const style = document.createElement('style');
-        style.textContent = `
+                function emptyCart() {
+                    if (confirm('Are you sure you want to empty your cart?')) {
+                        fetch('/cart/empty', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                showToast('Cart emptied');
+                                setTimeout(() => location.reload(), 500);
+                            } else {
+                                showToast('Failed to empty cart');
+                            }
+                        });
+                    }
+                }
+
+                const style = document.createElement('style');
+                style.textContent = `
             .toast {
                 visibility: hidden;
                 min-width: 250px;
@@ -703,8 +857,8 @@
                 bottom: 50px;
             }
         `;
-        document.head.appendChild(style);
-    </script>
+                document.head.appendChild(style);
+            </script>
 </body>
 
 </html>

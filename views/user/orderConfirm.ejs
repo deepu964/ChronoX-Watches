@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - Thank You</title>
+    <link rel="stylesheet" href="/css/orderConfirm.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="confirmation-card">
+            <!-- Success Icon -->
+            <div class="success-icon">
+                <div class="icon-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+
+            <!-- Confirmation Message -->
+            <div class="confirmation-content">
+                <h1 class="confirmation-title">Order confirmed</h1>
+                <p class="confirmation-message">
+                    Your order is confirmed. You will receive an order confirmation email/SMS 
+                    shortly with the expected delivery date for your items.
+                </p>
+            </div>
+
+            <!-- Action Button -->
+            <div class="action-section">
+                <button class="continue-shopping-btn" onclick="continueShopping()">
+                    CONTINUE SHOPPING
+                </button>
+            </div>
+
+            <!-- Optional: Order Details (if you want to pass order info from EJS) -->
+            <% if (typeof orderDetails !== 'undefined' && orderDetails) { %>
+            <div class="order-details">
+                <div class="order-info">
+                    <span class="order-label">Order ID:</span>
+                    <span class="order-value">#<%= orderDetails.orderId %></span>
+                </div>
+                <div class="order-info">
+                    <span class="order-label">Total Amount:</span>
+                    <span class="order-value">₹<%= orderDetails.totalAmount %></span>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <!-- Additional Actions -->
+        <div class="additional-actions">
+            <a href="/orders" class="link-button">
+                <i class="fas fa-list"></i>
+                View My Orders
+            </a>
+            <a href="/support" class="link-button">
+                <i class="fas fa-headset"></i>
+                Need Help?
+            </a>
+        </div>
+    </div>
+
+    <!-- Floating Animation Elements -->
+    <div class="floating-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+    </div>
+
+    <script>
+        // Continue Shopping Function
+        function continueShopping() {
+            // Add a small delay for better UX
+            const button = document.querySelector('.continue-shopping-btn');
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                window.location.href = '/shop';
+            }, 200);
+        }
+
+        // Add entrance animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.confirmation-card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+
+            // Animate success icon
+            setTimeout(() => {
+                const icon = document.querySelector('.success-icon');
+                icon.classList.add('animate');
+            }, 400);
+        });
+    </script>
+</body>
+</html>
