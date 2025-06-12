@@ -33,6 +33,9 @@
             </div> -->
             <div class="header-icons">
                 <a href="/wish-list" style="color:white;"><i class="fas fa-heart"></i></a>
+                <% if (user) { %>
+                    <a href="/my-orders" style="color:white;" title="My Orders"><i class="fas fa-shopping-bag"></i></a>
+                <% } %>
                 <a href="/userProfile" class="icon-link"><i class="fas fa-user"></i></a>
                 <a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a>
                 </div>

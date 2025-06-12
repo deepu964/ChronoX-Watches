@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - ChronoX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .order-title {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .order-status {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .status-placed {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .status-processing {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .status-shipped {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .status-delivered {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .items-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .order-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .total-section {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .total-row:last-child {
+            margin-bottom: 0;
+            padding-top: 15px;
+            border-top: 2px solid #667eea;
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .order-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .item-info {
+                justify-content: center;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include("../partials/user/header") %>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1 class="order-title">Order Details</h1>
+                    <p style="color: #666; margin-top: 5px;">Order #<%= order._id.toString().slice(-8).toUpperCase() %></p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span class="order-status status-<%= order.status.toLowerCase() %>">
+                        <%= order.status %>
+                    </span>
+                    <a href="/my-orders" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Details Grid -->
+        <div class="details-grid">
+            <!-- Order Information -->
+            <div class="detail-card">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Order Information
+                </h3>
+                <div class="detail-row">
+                    <span class="detail-label">Order Date:</span>
+                    <span class="detail-value"><%= new Date(order.createdAt).toLocaleDateString('en-IN', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Payment Method:</span>
+                    <span class="detail-value"><%= order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment' %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Order Status:</span>
+                    <span class="detail-value"><%= order.status %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Items:</span>
+                    <span class="detail-value"><%= order.items.length %> item(s)</span>
+                </div>
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="detail-card">
+                <h3 class="card-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Delivery Address
+                </h3>
+                <div class="detail-row">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value"><%= order.address.fullName %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value"><%= order.address.phone %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Address:</span>
+                    <span class="detail-value">
+                        <%= order.address.addressLine %><br>
+                        <%= order.address.city %>, <%= order.address.state %><br>
+                        PIN: <%= order.address.pincode %>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="items-card">
+            <h3 class="card-title">
+                <i class="fas fa-shopping-bag"></i>
+                Order Items (<%= order.items.length %>)
+            </h3>
+            
+            <% order.items.forEach(item => { %>
+                <div class="order-item">
+                    <div class="item-image">
+                        <% if (item.product.images && item.product.images.length > 0) { %>
+                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>" 
+                                 alt="<%= item.product.name %>" 
+                                 onerror="this.src='/images/placeholder.jpg'">
+                        <% } else { %>
+                            <img src="/images/placeholder.jpg" alt="No image">
+                        <% } %>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name"><%= item.product.name %></div>
+                        <div class="item-info">
+                            <span>Quantity: <%= item.quantity %></span>
+                            <span>Price: ₹<%= item.price.toLocaleString() %></span>
+                        </div>
+                    </div>
+                    <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
+                </div>
+            <% }) %>
+
+            <!-- Order Total -->
+            <div class="total-section">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>₹<%= order.totalAmount.toLocaleString() %></span>
+                </div>
+                <div class="total-row">
+                    <span>Shipping:</span>
+                    <span>₹50</span>
+                </div>
+                <div class="total-row">
+                    <span>Total Amount:</span>
+                    <span>₹<%= (order.totalAmount + 50).toLocaleString() %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/shop" class="btn btn-primary">
+                <i class="fas fa-shopping-bag"></i>
+                Continue Shopping
+            </a>
+            <a href="/my-orders" class="btn btn-secondary">
+                <i class="fas fa-list"></i>
+                View All Orders
+            </a>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+</body>
+</html>

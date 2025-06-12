@@ -345,6 +345,20 @@
             font-weight: bold;
             color: #667eea;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-price {
+            color: #667eea;
+        }
+
+        .original-price {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+            font-weight: normal;
         }
 
         .product-discount {
@@ -646,102 +660,272 @@
             <div class="content-header">
                 <div class="wishlist-title-section">
                     <h1 class="wishlist-title">My Wishlist</h1>
-                    <span class="wishlist-count">4</span>
+                    <span class="wishlist-count" id="wishlistCount"><%= wishlistCount %></span>
                 </div>
                 <div class="header-actions">
-                    <a href="#" class="btn btn-outline">Move All To Bag</a>
-                    <a href="#" class="btn btn-primary">Empty My Wishlist</a>
+                    <% if (wishlistProducts.length > 0) { %>
+                        <button class="btn btn-outline" id="moveAllToBag">Move All To Bag</button>
+                        <button class="btn btn-primary" id="emptyWishlist">Empty My Wishlist</button>
+                    <% } %>
                 </div>
             </div>
 
             <div class="products-section">
-                <div class="products-grid">
-                    <div class="product-card">
-                        <div class="wishlist-heart">❤️</div>
-                        <div class="product-image">
-                            <img src="https://via.placeholder.com/120x120/667eea/ffffff?text=⌚" alt="Casio Watch">
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name">Casio Digital Watch</h3>
-                            <div class="product-price">₹29,999</div>
-                            <div class="product-discount">13% off</div>
-                            <div class="product-actions">
-                                <button class="product-btn btn-add-cart">Add To Cart</button>
-                                <button class="product-btn btn-remove">Remove</button>
-                            </div>
-                        </div>
+                <% if (wishlistProducts.length === 0) { %>
+                    <div class="empty-wishlist">
+                        <div class="empty-icon">💔</div>
+                        <h2>Your wishlist is empty!</h2>
+                        <p>Discover amazing products and add them to your wishlist.</p>
+                        <a href="/shop" class="btn btn-primary">Start Shopping</a>
                     </div>
-                </div>
+                <% } else { %>
+                    <div class="products-grid">
+                        <% wishlistProducts.forEach(product => { %>
+                            <div class="product-card" data-product-id="<%= product._id %>">
+                                <div class="wishlist-heart">❤️</div>
+                                <div class="product-image">
+                                    <% if (product.images && product.images.length > 0) { %>
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_120,h_120,c_fill/<%= product.images[0].public_id %>"
+                                             alt="<%= product.name %>"
+                                             onerror="this.src='/images/placeholder.jpg'">
+                                    <% } else { %>
+                                        <img src="/images/placeholder.jpg" alt="No image available">
+                                    <% } %>
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-name"><%= product.name %></h3>
+                                    <div class="product-price">
+                                        <% if (product.variants && product.variants.length > 0) { %>
+                                            <% const variant = product.variants[0]; %>
+                                            <% const salePrice = variant.salePrice || variant.regularPrice; %>
+                                            <% const regularPrice = variant.regularPrice; %>
+                                            <span class="current-price">₹<%= salePrice.toLocaleString() %></span>
+                                            <% if (salePrice !== regularPrice) { %>
+                                                <span class="original-price">₹<%= regularPrice.toLocaleString() %></span>
+                                            <% } %>
+                                        <% } %>
+                                    </div>
+                                    <% if (product.variants && product.variants.length > 0 && product.variants[0].salePrice && product.variants[0].salePrice < product.variants[0].regularPrice) { %>
+                                        <div class="product-discount">
+                                            <%= Math.round(((product.variants[0].regularPrice - product.variants[0].salePrice) / product.variants[0].regularPrice) * 100) %>% off
+                                        </div>
+                                    <% } %>
+                                    <div class="product-actions">
+                                        <button class="product-btn btn-add-cart" data-product-id="<%= product._id %>">Add To Cart</button>
+                                        <button class="product-btn btn-remove" data-product-id="<%= product._id %>">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>
  <%- include("../partials/user/footer") %>
-    <script>
-        // Add interactive functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle button clicks
-            const addToCartBtns = document.querySelectorAll('.btn-add-cart');
-            const removeBtns = document.querySelectorAll('.btn-remove');
-            const wishlistCount = document.querySelector('.wishlist-count');
-            const wishlistBadge = document.querySelector('.wishlist-badge');
-            
-            addToCartBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
-                    this.textContent = 'Added!';
-                    setTimeout(() => {
-                        this.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
-                        this.textContent = 'Add To Cart';
-                    }, 2000);
-                });
-            });
-            
-            removeBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const card = this.closest('.product-card');
-                    card.style.transform = 'scale(0.8)';
-                    card.style.opacity = '0';
-                    setTimeout(() => {
-                        card.remove();
-                        updateWishlistCount();
-                    }, 300);
-                });
-            });
-            
-            function updateWishlistCount() {
-                const currentCount = parseInt(wishlistCount.textContent);
-                const newCount = Math.max(0, currentCount - 1);
-                wishlistCount.textContent = newCount;
-                wishlistBadge.textContent = newCount;
-                
-                if (newCount === 0) {
-                    document.querySelector('.products-section').innerHTML = 
-                        '<div class="empty-wishlist">' +
-                        '<div class="empty-icon">💔</div>' +
-                        '<h2>Your wishlist is empty!</h2>' +
-                        '<p>Discover amazing products and add them to your wishlist.</p>' +
-                        '<a href="#" class="btn btn-primary">Start Shopping</a>' +
-                        '</div>';
-                }
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const removeBtns = document.querySelectorAll('.btn-remove');
+    const addToCartBtns = document.querySelectorAll('.btn-add-cart');
+    const wishlistCount = document.querySelector('#wishlistCount');
+    const emptyWishlistBtn = document.querySelector('#emptyWishlist');
+    const moveAllToBagBtn = document.querySelector('#moveAllToBag');
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+        color: white;
+        padding: 12px 24px;
+        border-radius: 4px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s;
+      `;
+
+      document.body.appendChild(toast);
+
+      // Show toast
+      setTimeout(() => toast.style.opacity = '1', 100);
+
+      // Hide and remove toast
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 3000);
+    }
+
+    // Remove item from wishlist
+    removeBtns.forEach(btn => {
+      btn.addEventListener('click', async function () {
+        const productId = this.dataset.productId;
+        const card = this.closest('.product-card');
+
+        try {
+          const response = await fetch('/wishlist-remove', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            card.style.transform = 'scale(0.9)';
+            card.style.opacity = '0';
+            setTimeout(() => {
+              card.remove();
+              updateWishlistCount(-1);
+              showToast(data.message);
+            }, 300);
+          } else {
+            showToast(data.message || 'Failed to remove item', 'error');
+          }
+        } catch (err) {
+          console.error('Remove wishlist error:', err);
+          showToast('Something went wrong', 'error');
+        }
+      });
+    });
+
+    // Add to cart from wishlist
+    addToCartBtns.forEach(btn => {
+      btn.addEventListener('click', async function () {
+        const productId = this.dataset.productId;
+        const card = this.closest('.product-card');
+
+        try {
+          const response = await fetch('/add-to-cart', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Remove from wishlist UI since it's automatically removed from backend
+            card.style.transform = 'scale(0.9)';
+            card.style.opacity = '0';
+            setTimeout(() => {
+              card.remove();
+              updateWishlistCount(-1);
+              showToast('Product added to cart and removed from wishlist');
+            }, 300);
+          } else {
+            showToast(data.message || 'Failed to add to cart', 'error');
+          }
+        } catch (err) {
+          console.error('Add to cart error:', err);
+          showToast('Something went wrong', 'error');
+        }
+      });
+    });
+
+    // Empty entire wishlist
+    if (emptyWishlistBtn) {
+      emptyWishlistBtn.addEventListener('click', async function () {
+        if (!confirm('Are you sure you want to empty your wishlist?')) {
+          return;
+        }
+
+        try {
+          const response = await fetch('/wishlist-clear', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
             }
-            
-            // Empty wishlist functionality
-            document.querySelector('.btn-primary').addEventListener('click', function(e) {
-                e.preventDefault();
-                if (confirm('Are you sure you want to empty your wishlist?')) {
-                    document.querySelector('.products-grid').innerHTML = '';
-                    wishlistCount.textContent = '0';
-                    wishlistBadge.textContent = '0';
-                    document.querySelector('.products-section').innerHTML = 
-                        '<div class="empty-wishlist">' +
-                        '<div class="empty-icon">💔</div>' +
-                        '<h2>Your wishlist is empty!</h2>' +
-                        '<p>Discover amazing products and add them to your wishlist.</p>' +
-                        '<a href="#" class="btn btn-primary">Start Shopping</a>' +
-                        '</div>';
-                }
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            location.reload();
+          } else {
+            showToast(data.message || 'Failed to clear wishlist', 'error');
+          }
+        } catch (err) {
+          console.error('Clear wishlist error:', err);
+          showToast('Something went wrong', 'error');
+        }
+      });
+    }
+
+    // Move all to bag
+    if (moveAllToBagBtn) {
+      moveAllToBagBtn.addEventListener('click', async function () {
+        const productCards = document.querySelectorAll('.product-card');
+        let successCount = 0;
+        let totalCount = productCards.length;
+
+        for (const card of productCards) {
+          const productId = card.dataset.productId;
+
+          try {
+            const response = await fetch('/add-to-cart', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ productId })
             });
-        });
-    </script>
+
+            const data = await response.json();
+            if (data.success) {
+              successCount++;
+            }
+          } catch (err) {
+            console.error('Add to cart error:', err);
+          }
+        }
+
+        if (successCount > 0) {
+          showToast(`${successCount} items moved to cart`);
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showToast('Failed to move items to cart', 'error');
+        }
+      });
+    }
+
+    // Update wishlist count
+    function updateWishlistCount(change) {
+      const currentCount = parseInt(wishlistCount.textContent);
+      const newCount = Math.max(0, currentCount + change);
+      wishlistCount.textContent = newCount;
+
+      if (newCount === 0) {
+        setTimeout(() => {
+          document.querySelector('.products-section').innerHTML = `
+            <div class="empty-wishlist">
+              <div class="empty-icon">💔</div>
+              <h2>Your wishlist is empty!</h2>
+              <p>Discover amazing products and add them to your wishlist.</p>
+              <a href="/shop" class="btn btn-primary">Start Shopping</a>
+            </div>`;
+
+          // Hide header actions
+          const headerActions = document.querySelector('.header-actions');
+          if (headerActions) {
+            headerActions.style.display = 'none';
+          }
+        }, 300);
+      }
+    }
+  });
+</script>
+
+
 </body>
 </html>

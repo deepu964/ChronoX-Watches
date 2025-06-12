@@ -116,11 +116,11 @@
                     <div class="price-row total">
                         <span>Total Amount</span>
                         <span>₹<%= lastAmount %></span>
-                  <form id="place-order-form" method="GET" action="/confirm">
+                  <form id="place-order-form" method="POST" action="/payment">
                     <input type="hidden" name="addressId" value="<%= addresses %>">
-                    <input type="hidden" id="payment-method-input" name="paymentMethod" value="cod">
+                    <input type="hidden" id="payment-method-input" name="paymentMethod" value="COD">
 
-                    <button type="submit" class="btn btn-primary">Confirm Order</button>
+                    <button type="submit" class="btn btn-primary" id="confirm-order-btn">Confirm Order</button>
                     </form>
             </div>
         </main>
@@ -129,12 +129,53 @@
     <script src="js/script.js"></script>
     <script>
         function selectPaymentMethod() {
-        // Mark as selected visually
-        document.querySelector('.payment-option').classList.add('selected');
-        // Already set by default: but just to be sure
-        document.getElementById('payment-method-input').value = 'cod';
+            // Mark as selected visually
+            document.querySelector('.payment-option').classList.add('selected');
+            // Already set by default: but just to be sure
+            document.getElementById('payment-method-input').value = 'COD';
         }
 
-</script>
+        // Handle form submission
+        document.getElementById('place-order-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('confirm-order-btn');
+            const originalText = submitBtn.textContent;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('/payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        addressId: formData.get('addressId'),
+                        paymentMethod: formData.get('paymentMethod')
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Redirect to success page
+                    window.location.href = data.redirectUrl || `/order-success?orderId=${data.orderId}`;
+                } else {
+                    alert(data.message || 'Failed to place order');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                alert('Something went wrong. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+    </script>
 </body>
 </html>

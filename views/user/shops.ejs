@@ -1,246 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chronox | Luxury Watches</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/css/shops.css">
 </head>
+
 <body>
-<%-include("../partials/user/header") %>
+    <%-include("../partials/user/header") %>
 
-<section class="hero-banner">
-    <div class="hero-content">
-        <p class="hero-subtitle">Summer Collection 2025</p>
-        <h1 class="hero-title">Timeless Elegance<br>For Every Wrist</h1>
-        <p class="hero-description">Discover our exclusive collection of premium watches crafted with precision and designed for those who appreciate the finer things in life.</p>
-        <a href="#" class="hero-btn">EXPLORE COLLECTION</a>
-    </div>
-    <div class="hero-image">
-        <img src="/images/banner/Precision-PN15-large.jpg" alt="Luxury Watch">
-    </div>
-    <div class="discount-badge">
-        <span class="discount-text">UP TO</span>
-        <span class="discount-value">50% OFF</span>
-    </div>
-</section>
+        <section class="hero-banner">
+            <div class="hero-content">
+                <p class="hero-subtitle">Summer Collection 2025</p>
+                <h1 class="hero-title">Timeless Elegance<br>For Every Wrist</h1>
+                <p class="hero-description">Discover our exclusive collection of premium watches crafted with precision
+                    and designed for those who appreciate the finer things in life.</p>
+                <a href="#" class="hero-btn">EXPLORE COLLECTION</a>
+            </div>
+            <div class="hero-image">
+                <img src="/images/banner/Precision-PN15-large.jpg" alt="Luxury Watch">
+            </div>
+            <div class="discount-badge">
+                <span class="discount-text">UP TO</span>
+                <span class="discount-value">50% OFF</span>
+            </div>
+        </section>
 
-<section class="product-section">
-    <div class="product-container">
-        <div class="filter-sidebar">
-            <h3 class="filter-title">Refine Selection</h3>
+        <section class="product-section">
+            <div class="product-container">
+                <div class="filter-sidebar">
+                    <h3 class="filter-title">Refine Selection</h3>
 
-            <!-- Search box -->
-            <form method="GET" action="/shop">
-                <input type="text" name="search" value="<%= query.search || '' %>" placeholder="Search product...">
-                <% if (query.search) { %>
-                    <a href="/shop"><i class="fas fa-times"></i></a>
-                <% } else { %>
-                    <button type="submit"><i class="fas fa-search"></i></button>
-                <% } %>
-            </form>
-
-            <!-- Category Filter -->
-            <form id="filterForm" method="GET" action="/shop">
-                <% if (query.search) { %>
-                    <input type="hidden" name="search" value="<%= query.search %>">
-                <% } %>
-                <div class="filter-group">
-                    <h4 class="filter-group-title">Category</h4>
-                    <% categories.forEach(cat => { %>
-                        <div class="filter-option active" >
-                            <input 
-                                type="checkbox" 
-                                name="categoryId" 
-                                value="<%= cat._id %>" 
-                                <%= categoryFilter.includes(cat._id.toString()) ? 'checked' : '' %>
-                                onchange="document.getElementById('filterForm').submit()"
-                            >
-                            <label><%= cat.name %></label>
-                        </div>
-                    <% }) %>
-                </div>
-            </form>
-
-            <!-- Sort Dropdown -->
-            <form method="GET" action="/shop">
-                <% if (query.search) { %>
-                    <input type="hidden" name="search" value="<%= query.search %>">
-                <% } %>
-                <% categoryFilter.forEach(catId => { %>
-                    <input type="hidden" name="categoryId" value="<%= catId %>">
-                <% }) %>
-                <select name="sortBy" onchange="this.form.submit()">
-                    <option value="">Sort By</option>
-                    <option value="price-asc" <%= query.sortBy === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
-                    <option value="price-desc" <%= query.sortBy === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
-                    <option value="name-asc" <%= query.sortBy === 'name-asc' ? 'selected' : '' %>>Name: A-Z</option>
-                    <option value="name-desc" <%= query.sortBy === 'name-desc' ? 'selected' : '' %>>Name: Z-A</option>
-                </select>
-            </form>
-        </div>
-
-        <div class="product-grid">
-            <% products.forEach(product => { %>
-                <div class="product-card">
-                    <div class="product-image">
-                        <% if (product.images && product.images.length > 0) { %>
-                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>" alt="<%= product.name %>">
-                        <% } else { %>
-                            <img src="/images/placeholder.jpg" alt="No image">
-                        <% } %>
-                        <div class="product-overlay">
-                            <a href="/productdetails/<%= product._id %>">
-                                <button class="quick-view-btn">Quick View</button>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="product-details">
-                        <h3 class="product-name"><%= product.name %></h3>
-                        
-                      <div class="product-price">
-                            <% if (product.variants && product.variants.length > 0 && product.variants[0]) { %>
-                                <span class="current-price">
-                                    ₹<%= product.variants[0].salePrice || product.variants[0].regularPrice %>
-                                </span>
-                                <% if (product.variants[0].salePrice && product.variants[0].regularPrice) { %>
-                                    <span class="old-price">
-                                        ₹<%= product.variants[0].regularPrice %>
-                                    </span>
-                                <% } %>
+                    <!-- Search box -->
+                    <form method="GET" action="/shop">
+                        <input type="text" name="search" value="<%= query.search || '' %>"
+                            placeholder="Search product...">
+                        <% if (query.search) { %>
+                            <a href="/shop"><i class="fas fa-times"></i></a>
                             <% } else { %>
-                                <span class="current-price">Price not available</span>
-                            <% } %>
-                        </div>
+                                <button type="submit"><i class="fas fa-search"></i></button>
+                                <% } %>
+                    </form>
 
-                        <div class="product-rating">
-                            <% for (let i = 0; i < Math.floor(product.rating || 0); i++) { %>
-                                <i class="fas fa-star"></i>
+                    <!-- Category Filter -->
+                    <form id="filterForm" method="GET" action="/shop">
+                        <% if (query.search) { %>
+                            <input type="hidden" name="search" value="<%= query.search %>">
                             <% } %>
-                            <% if ((product.rating || 0) % 1 !== 0) { %>
-                                <i class="fas fa-star-half-alt"></i>
-                            <% } %>
-                            <% for (let i = Math.ceil(product.rating || 0); i < 5; i++) { %>
-                                <i class="far fa-star"></i>
-                            <% } %>
-                            <span class="rating-count">(<%= product.ratingCount || 4.5 %>)</span>
-                        </div>
+                                <div class="filter-group">
+                                    <h4 class="filter-group-title">Category</h4>
+                                    <% categories.forEach(cat=> { %>
+                                        <div class="filter-option active">
+                                            <input type="checkbox" name="categoryId" value="<%= cat._id %>"
+                                                <%=categoryFilter.includes(cat._id.toString()) ? 'checked' : '' %>
+                                            onchange="document.getElementById('filterForm').submit()"
+                                            >
+                                            <label>
+                                                <%= cat.name %>
+                                            </label>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                    </form>
 
-                        <div class="product-card">
-                        <p><%= product.name %></p>
-                        <div class="add-to-cart">
-                            <button class="cart-btn" onclick="addToCart('<%= product._id %>', this)">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                            <button class="wishlist-btn"><i class="far fa-heart"></i></button>
-                        </div>
-                        </div>
-                    </div>
+                    <!-- Sort Dropdown -->
+                    <form method="GET" action="/shop">
+                        <% if (query.search) { %>
+                            <input type="hidden" name="search" value="<%= query.search %>">
+                            <% } %>
+                                <% categoryFilter.forEach(catId=> { %>
+                                    <input type="hidden" name="categoryId" value="<%= catId %>">
+                                    <% }) %>
+                                        <select name="sortBy" onchange="this.form.submit()">
+                                            <option value="">Sort By</option>
+                                            <option value="price-asc" <%=query.sortBy==='price-asc' ? 'selected' : '' %>
+                                                >Price: Low to High</option>
+                                            <option value="price-desc" <%=query.sortBy==='price-desc' ? 'selected' : ''
+                                                %>>Price: High to Low</option>
+                                            <option value="name-asc" <%=query.sortBy==='name-asc' ? 'selected' : '' %>
+                                                >Name: A-Z</option>
+                                            <option value="name-desc" <%=query.sortBy==='name-desc' ? 'selected' : '' %>
+                                                >Name: Z-A</option>
+                                        </select>
+                    </form>
                 </div>
-            <% }) %>
-        </div>
-    </div>
 
-    <div class="page-controls">
-        <% if (currentPage > 1) { %>
-            <a href="/shop?page=<%= currentPage - 1 %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>" class="page-btn">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-        <% } %>
-        <% for (let i = 1; i <= totalPage; i++) { %>
-            <a href="/shop?page=<%= i %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
-                <%= i %>
-            </a>
-        <% } %>
-        <% if (currentPage < totalPage) { %>
-            <a href="/shop?page=<%= currentPage + 1 %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>" class="page-btn">
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        <% } %>
-    </div>
-</section>
+                <div class="product-grid">
+                    <% products.forEach(product=> { %>
+                        <div class="product-card">
+                            <div class="product-image">
+                                <% if (product.images && product.images.length> 0) { %>
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>"
+                                        alt="<%= product.name %>">
+                                    <% } else { %>
+                                        <img src="/images/placeholder.jpg" alt="No image">
+                                        <% } %>
+                                            <div class="product-overlay">
+                                                <a href="/productdetails/<%= product._id %>">
+                                                    <button class="quick-view-btn">Quick View</button>
+                                                </a>
+                                            </div>
+                            </div>
+                            <div class="product-details">
+                                <h3 class="product-name">
+                                    <%= product.name %>
+                                </h3>
 
-<script>
+                                <div class="product-price">
+                                    <% if (product.variants && product.variants.length> 0 && product.variants[0]) { %>
+                                        <span class="current-price">
+                                            ₹<%= product.variants[0].salePrice || product.variants[0].regularPrice %>
+                                        </span>
+                                        <% if (product.variants[0].salePrice && product.variants[0].regularPrice) { %>
+                                            <span class="old-price">
+                                                ₹<%= product.variants[0].regularPrice %>
+                                            </span>
+                                            <% } %>
+                                                <% } else { %>
+                                                    <span class="current-price">Price not available</span>
+                                                    <% } %>
+                                </div>
 
-document.addEventListener('DOMContentLoaded', function() {
+                                <div class="product-rating">
+                                    <% for (let i=0; i < Math.floor(product.rating || 0); i++) { %>
+                                        <i class="fas fa-star"></i>
+                                        <% } %>
+                                            <% if ((product.rating || 0) % 1 !==0) { %>
+                                                <i class="fas fa-star-half-alt"></i>
+                                                <% } %>
+                                                    <% for (let i=Math.ceil(product.rating || 0); i < 5; i++) { %>
+                                                        <i class="far fa-star"></i>
+                                                        <% } %>
+                                                            <span class="rating-count">(<%= product.ratingCount || 4.5
+                                                                    %>)</span>
+                                </div>
+
+                                <div class="product-card">
+                                    <p>
+                                        <%= product.name %>
+                                    </p>
+                                    <div class="add-to-cart">
+                                        <button class="btn-add-cart" data-product-id="<%= product._id %>">Add to Cart</button>
+                                       <button class="wishlist-btn" data-product-id="<%= product._id %>">
+                                        <i class="<%= userWishlist.includes(product._id.toString()) ? 'fas' : 'far' %> fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+
+            <div class="page-controls">
+                <% if (currentPage> 1) { %>
+                    <a href="/shop?page=<%= currentPage - 1 %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>"
+                        class="page-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    <% } %>
+                        <% for (let i=1; i <=totalPage; i++) { %>
+                            <a href="/shop?page=<%= i %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>"
+                                class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                                <%= i %>
+                            </a>
+                            <% } %>
+                                <% if (currentPage < totalPage) { %>
+                                    <a href="/shop?page=<%= currentPage + 1 %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>"
+                                        class="page-btn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                    <% } %>
+            </div>
+        </section>
+
+        <!-- <script>
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const sortSelect = document.querySelector('select[name="sortBy"]');
+                if (sortSelect) {
+                    sortSelect.addEventListener('change', () => {
+                        sortSelect.form.submit();
+                    });
+                }
+
+                const checkboxes = document.querySelectorAll('#filterForm input[type="checkbox"]');
+                checkboxes.forEach(box => {
+                    box.addEventListener('change', () => {
+                        document.getElementById('filterForm').submit();
+                    });
+                });
+            });
+            function addToCart(productId, button) {
+                const originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = 'Adding...';
+
+                fetch('/add-to-cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Success Toast
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Product added to cart',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+
+                            button.innerHTML = '✓ Added';
+                            button.style.backgroundColor = '#28a745';
+
+                        } else {
+                            // Error Toast
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+
+                            button.innerHTML = originalText;
+                        }
+                    })
+                    .catch(() => {
+                        // Error case JSON parse issue etc
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Something went wrong',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+
+                        button.innerHTML = originalText;
+                    })
+                    .finally(() => {
+                        setTimeout(() => {
+                            button.disabled = false;
+                        }, 2000);
+                    });
+            
+
+             const wishlistButtons = document.querySelectorAll(".wishlist-btn");
+
+    wishlistButtons.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const productId = btn.dataset.productId;
+
+        try {
+          const response = await fetch("/wishlist-add", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Optional: show toast, change icon, etc.
+            showToast("Product added to wishlist");
+            btn.querySelector("i").classList.remove("far");
+            btn.querySelector("i").classList.add("fas"); // filled heart
+          } else {
+            showToast(data.message || "Something went wrong");
+          }
+        } catch (err) {
+          console.error("Error adding to wishlist:", err);
+        }
+      });
+    });
+}
+
+        </script> -->
+        <script>
+  document.addEventListener('DOMContentLoaded', function () {
     const sortSelect = document.querySelector('select[name="sortBy"]');
     if (sortSelect) {
-        sortSelect.addEventListener('change', () => {
-            sortSelect.form.submit();
-        });
+      sortSelect.addEventListener('change', () => {
+        sortSelect.form.submit();
+      });
     }
 
     const checkboxes = document.querySelectorAll('#filterForm input[type="checkbox"]');
     checkboxes.forEach(box => {
-        box.addEventListener('change', () => {
-            document.getElementById('filterForm').submit();
-        });
+      box.addEventListener('change', () => {
+        document.getElementById('filterForm').submit();
+      });
     });
-});
-    function addToCart(productId, button) {
+
+    // ===== Wishlist Button Toggle =====
+    const wishlistButtons = document.querySelectorAll(".wishlist-btn");
+    wishlistButtons.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const productId = btn.dataset.productId;
+        const icon = btn.querySelector("i");
+        const isInWishlist = icon.classList.contains("fas");
+
+        try {
+          const response = await fetch(isInWishlist ? "/wishlist-remove" : "/wishlist-add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showToast(isInWishlist ? "Removed from wishlist" : "Added to wishlist");
+
+            // Toggle icon style
+            icon.classList.toggle("far");
+            icon.classList.toggle("fas");
+          } else {
+            showToast(data.message || "Something went wrong");
+          }
+        } catch (err) {
+          console.error("Wishlist error:", err);
+        }
+      });
+    });
+
+    // ===== Cart Buttons (require addToCart() to be called via HTML onclick or listener) =====
+    const cartButtons = document.querySelectorAll(".btn-add-cart");
+    cartButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const productId = button.dataset.productId;
+        addToCart(productId, button);
+      });
+    });
+  });
+
+  // ✅ Add to Cart function (reusable)
+  function addToCart(productId, button) {
     const originalText = button.innerHTML;
     button.disabled = true;
     button.innerHTML = 'Adding...';
 
     fetch('/add-to-cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId })
     })
-    .then(res => res.json())
-    .then(data => {
+      .then(res => res.json())
+      .then(data => {
         if (data.success) {
-        // Success Toast
-        Swal.fire({
+          Swal.fire({
             toast: true,
             position: 'top-end',
             icon: 'success',
             title: 'Product added to cart',
             showConfirmButton: false,
             timer: 2000
-        });
+          });
 
-        button.innerHTML = '✓ Added';
-        button.style.backgroundColor = '#28a745';
+          button.innerHTML = '✓ Added';
+          button.style.backgroundColor = '#28a745';
 
+          // Remove from wishlist UI if it was in wishlist
+          const wishlistBtn = document.querySelector(`[data-product-id="${productId}"].wishlist-btn`);
+          if (wishlistBtn) {
+            const icon = wishlistBtn.querySelector('i');
+            if (icon && icon.classList.contains('fas')) {
+              icon.classList.remove('fas');
+              icon.classList.add('far');
+            }
+          }
         } else {
-        // Error Toast
-        Swal.fire({
+          Swal.fire({
             toast: true,
             position: 'top-end',
             icon: 'error',
             title: data.message,
             showConfirmButton: false,
             timer: 3000
-        });
+          });
 
-        button.innerHTML = originalText;
+          button.innerHTML = originalText;
         }
-    })
-    .catch(() => {
-        // Error case JSON parse issue etc
+      })
+      .catch(() => {
         Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'error',
-        title: 'Something went wrong',
-        showConfirmButton: false,
-        timer: 3000
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Something went wrong',
+          showConfirmButton: false,
+          timer: 3000
         });
 
         button.innerHTML = originalText;
-    })
-    .finally(() => {
+      })
+      .finally(() => {
         setTimeout(() => {
-        button.disabled = false;
+          button.disabled = false;
         }, 2000);
-    });
-    }
+      });
+  }
 
+  // ✅ Toast helper
+  function showToast(message) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'info',
+      title: message,
+      showConfirmButton: false,
+      timer: 2000
+    });
+  }
 </script>
 
-<%- include("../../views/partials/user/footer") %>
+
+        <%- include("../../views/partials/user/footer") %>
 </body>
+
 </html>

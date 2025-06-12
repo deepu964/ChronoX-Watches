@@ -72,6 +72,9 @@ router.delete('/delete-address/:id', isAuth, userController.deleteAddress);
 
 
 router.get('/wish-list',isAuth,userController.getWishList);
+router.post('/wishlist-add',isAuth,userController.addWishlist);
+router.post('/wishlist-remove',isAuth,userController.removeFromWishlist);
+router.post('/wishlist-clear',isAuth,userController.clearWishlist);
 
 router.get('/cart',isAuth,userController.getCart);
 router.post('/add-to-cart',isAuth,userController.addToCart);
@@ -86,7 +89,9 @@ router.delete('/delete-check-address/:id',isAuth,userController.deleteCheckAddre
 router.get('/payment',isAuth,userController.getPayment);
 router.post('/payment',isAuth,userController.placeOrder);
 
-router.get('/confirm',isAuth,userController.getConfirm);
+router.get('/order-success',isAuth,userController.getOrderSuccess);
+router.get('/order-details/:orderId',isAuth,userController.getOrderDetails);
+router.get('/my-orders',isAuth,userController.getMyOrders);
 
 
 

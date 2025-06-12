@@ -15,6 +15,8 @@ const mongoose = require('mongoose')
 const errorMiddleware = require('../../middlewares/errorMiddleware');
 const crypto = require('crypto');
 const path = require('path');
+const { session } = require('passport');
+const wishlistSchema = require('../../models/wishlistSchema');
 
 
 const getLoadHomePage = async (req, res) => {
@@ -485,6 +487,15 @@ const getShopPage = async (req, res) => {
                 .lean();
         }
 
+        // Get user's wishlist for displaying wishlist status
+        let userWishlist = [];
+        if (req.session.user) {
+            const wishlist = await wishlistSchema.findOne({ user: req.session.user._id });
+            if (wishlist && wishlist.products.length > 0) {
+                userWishlist = wishlist.products.map(p => p.toString());
+            }
+        }
+
         res.render('user/shops', {
             user: req.session.user,
             products,
@@ -493,7 +504,8 @@ const getShopPage = async (req, res) => {
             categories,
             categoryFilter: categoryIds,
             currentPage: page,
-            totalPage
+            totalPage,
+            userWishlist
         });
 
     } catch (error) {
@@ -832,16 +844,121 @@ const deleteAddress = async (req, res, next) => {
     }
 }
 
-const getWishList = async(req,res,next)=>{
+const getWishList = async (req, res, next) => {
+  try {
+    const userId = req.session.user?._id;
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    // Get user's wishlist with populated products
+    const wishlist = await wishlistSchema.findOne({ user: userId })
+      .populate({
+        path: 'products',
+        match: { isActive: false, isDeleted: false } // Only active, non-deleted products
+      });
+
+    let wishlistProducts = [];
+    if (wishlist && wishlist.products) {
+      // Filter out null products (in case some products were deleted)
+      wishlistProducts = wishlist.products.filter(product => product !== null);
+    }
+
+    res.render('user/wishList', {
+      user: req.session.user,
+      wishlistProducts,
+      cloudName,
+      wishlistCount: wishlistProducts.length
+    });
+
+  } catch (error) {
+    console.error("Wishlist page error:", error);
+    next(error);
+  }
+};
+
+const addWishlist = async (req,res,next) => {
     try {
-        res.render('user/wishlist',{
-            user: req.session.user,
-        });
+        const userId = req.session.user._id;
+        const {productId} = req.body;
+
+        let wishlist = await wishlistSchema.findOne({user:userId});
+
+        if (!wishlist) {
+            wishlist = new wishlistSchema({
+                user: userId,
+                products: [productId]
+            });
+            await wishlist.save();
+
+            await User.findByIdAndUpdate(userId, { wishlist: wishlist._id });
+            return res.status(200).json({ success: true, message: "Product added to wishlist" });
+        }
+
+        if (wishlist.products.includes(productId)) {
+            return res.status(400).json({ success: false, message: "Already in wishlist" });
+        }
+
+        wishlist.products.push(productId);
+        await wishlist.save();
+
+        res.status(200).json({ success: true, message: "Product added to wishlist" });
+
     } catch (error) {
+        console.error("Add to wishlist error:", error);
         next(error);
     }
-}
+};
 
+const removeFromWishlist = async (req, res, next) => {
+    try {
+        const userId = req.session.user._id;
+        const { productId } = req.body;
+
+        const wishlist = await wishlistSchema.findOne({ user: userId });
+
+        if (!wishlist) {
+            return res.status(404).json({ success: false, message: "Wishlist not found" });
+        }
+
+        const productIndex = wishlist.products.indexOf(productId);
+        if (productIndex === -1) {
+            return res.status(404).json({ success: false, message: "Product not in wishlist" });
+        }
+
+        wishlist.products.splice(productIndex, 1);
+        await wishlist.save();
+
+        res.status(200).json({ success: true, message: "Product removed from wishlist" });
+
+    } catch (error) {
+        console.error("Remove from wishlist error:", error);
+        next(error);
+    }
+};
+
+const clearWishlist = async (req, res, next) => {
+    try {
+        const userId = req.session.user._id;
+
+        const wishlist = await wishlistSchema.findOne({ user: userId });
+
+        if (!wishlist) {
+            return res.status(404).json({ success: false, message: "Wishlist not found" });
+        }
+
+        wishlist.products = [];
+        await wishlist.save();
+
+        res.status(200).json({ success: true, message: "Wishlist cleared successfully" });
+
+    } catch (error) {
+        console.error("Clear wishlist error:", error);
+        next(error);
+    }
+};
 
 
 
@@ -943,10 +1060,11 @@ const addToCart = async (req, res, next) => {
       cart.items.push({ product: productId, quantity:1,price:itemPrice });
     }
 
-    
-    await WishList.updateOne(
+
+    // Remove from wishlist when added to cart
+    await wishlistSchema.updateOne(
       { user: userId },
-      { $pull: { items: { product: productId } } }
+      { $pull: { products: productId } }
     );
 
     await cart.save();
@@ -1251,20 +1369,39 @@ const placeOrder = async (req, res) => {
 
     for (const item of cart.items) {
       const product = item.product;
-      if (product.status === 'blocked' || product.stock < item.quantity) {
-        return res.status(400).json({ success: false, message: `${product.name} is out of stock or blocked` });
+
+      // Check if product is blocked or deleted (isActive: false means available, true means blocked)
+      if (product.isActive === true || product.isDeleted === true) {
+        return res.status(400).json({ success: false, message: `${product.name} is not available` });
+      }
+
+      // Get price from variants
+      const variant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
+      if (!variant) {
+        return res.status(400).json({ success: false, message: `${product.name} has no pricing information` });
+      }
+
+      const itemPrice = variant.salePrice || variant.regularPrice;
+
+      if (!itemPrice || itemPrice <= 0 || isNaN(itemPrice)) {
+        return res.status(400).json({ success: false, message: `${product.name} has invalid pricing` });
+      }
+
+      // Check stock availability
+      if (variant.quantity < item.quantity) {
+        return res.status(400).json({ success: false, message: `${product.name} is out of stock` });
       }
 
       orderItems.push({
         product: product._id,
         quantity: item.quantity,
-        price: product.salesPrice || product.regularPrice
+        price: itemPrice
       });
 
-      total += item.quantity * (product.salesPrice || product.regularPrice);
+      total += item.quantity * itemPrice;
 
-      
-      product.stock -= item.quantity;
+      // Update stock
+      variant.quantity -= item.quantity;
       await product.save();
     }
 
@@ -1274,9 +1411,9 @@ const placeOrder = async (req, res) => {
       address: {
         fullName: address.fullName,
         phone: address.phone,
-        addressLine: address.addressLine,
+        addressLine: address.address,
         city: address.city,
-        pincode: address.pincode,
+        pincode: address.pinCode,
         state: address.state
       },
       totalAmount: total,
@@ -1290,7 +1427,7 @@ const placeOrder = async (req, res) => {
     cart.items = [];
     await cart.save();
 
-    res.json({ success: true, orderId: order._id });
+    res.json({ success: true, orderId: order._id, redirectUrl: `/order-success?orderId=${order._id}` });
 
   } catch (err) {
     console.error(err);
@@ -1298,14 +1435,93 @@ const placeOrder = async (req, res) => {
   }
 };
 
-const getConfirm = async (req,res,next) => {
+const getOrderSuccess = async (req, res, next) => {
     try {
-        res.render('user/orderConfirm');
+        const orderId = req.query.orderId;
+
+        if (!orderId) {
+            return res.redirect('/shop');
+        }
+
+        // Get order details
+        const order = await Order.findById(orderId)
+            .populate('items.product')
+            .populate('user');
+
+        if (!order || order.user._id.toString() !== req.session.user._id.toString()) {
+            return res.redirect('/shop');
+        }
+
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+        res.render('user/orderSuccess', {
+            user: req.session.user,
+            order,
+            cloudName
+        });
     } catch (error) {
+        console.error("Order success page error:", error);
         next(error);
     }
-    
-}
+};
+
+const getOrderDetails = async (req, res, next) => {
+    try {
+        const orderId = req.params.orderId;
+        const userId = req.session.user._id;
+
+        const order = await Order.findById(orderId)
+            .populate('items.product')
+            .populate('user');
+
+        if (!order || order.user._id.toString() !== userId.toString()) {
+            return res.status(404).render('user/404');
+        }
+
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+        res.render('user/orderDetails', {
+            user: req.session.user,
+            order,
+            cloudName
+        });
+    } catch (error) {
+        console.error("Order details page error:", error);
+        next(error);
+    }
+};
+
+const getMyOrders = async (req, res, next) => {
+    try {
+        const userId = req.session.user._id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        const totalOrders = await Order.countDocuments({ user: userId });
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        const orders = await Order.find({ user: userId })
+            .populate('items.product')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+        res.render('user/myOrders', {
+            user: req.session.user,
+            orders,
+            cloudName,
+            currentPage: page,
+            totalPages,
+            totalOrders
+        });
+    } catch (error) {
+        console.error("My orders page error:", error);
+        next(error);
+    }
+};
 
 module.exports = {
     getLoadHomePage,
@@ -1337,6 +1553,9 @@ module.exports = {
     editAddress,
     deleteAddress,
     getWishList,
+    addWishlist,
+    removeFromWishlist,
+    clearWishlist,
     getCart,
     addToCart,
     updateCartItem,
@@ -1347,6 +1566,7 @@ module.exports = {
     deleteCheckAddress,
     getPayment,
     placeOrder,
-    getConfirm
-
+    getOrderSuccess,
+    getOrderDetails,
+    getMyOrders
 };

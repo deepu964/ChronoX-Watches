@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful - ChronoX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: bounce 0.8s ease 0.3s both;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .success-icon i {
+            font-size: 40px;
+            color: white;
+        }
+
+        .success-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .order-summary {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .order-info:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .order-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .order-value {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .order-total {
+            font-size: 18px;
+            color: #4CAF50;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .order-items {
+            margin-top: 20px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+            text-align: left;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-quantity {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .delivery-info {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .delivery-info h4 {
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .delivery-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .order-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <!-- Success Icon -->
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <!-- Success Message -->
+        <h1 class="success-title">Order Placed Successfully!</h1>
+        <p class="success-message">
+            Thank you for your order! We've received your order and will process it shortly. 
+            You'll receive a confirmation email with tracking details.
+        </p>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <div class="order-info">
+                <span class="order-label">Order ID:</span>
+                <span class="order-value">#<%= order._id.toString().slice(-8).toUpperCase() %></span>
+            </div>
+            <div class="order-info">
+                <span class="order-label">Order Date:</span>
+                <span class="order-value"><%= new Date(order.createdAt).toLocaleDateString('en-IN') %></span>
+            </div>
+            <div class="order-info">
+                <span class="order-label">Payment Method:</span>
+                <span class="order-value"><%= order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment' %></span>
+            </div>
+            <div class="order-info">
+                <span class="order-label">Total Amount:</span>
+                <span class="order-value order-total">₹<%= order.totalAmount.toLocaleString() %></span>
+            </div>
+        </div>
+
+        <!-- Delivery Information -->
+        <div class="delivery-info">
+            <h4><i class="fas fa-truck"></i> Estimated Delivery</h4>
+            <p>Your order will be delivered within 5-7 business days to:</p>
+            <p><strong><%= order.address.fullName %></strong></p>
+            <p><%= order.address.addressLine %>, <%= order.address.city %>, <%= order.address.state %> - <%= order.address.pincode %></p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/shop" class="btn btn-primary">
+                <i class="fas fa-shopping-bag"></i>
+                Continue Shopping
+            </a>
+            <a href="/order-details/<%= order._id %>" class="btn btn-secondary">
+                <i class="fas fa-receipt"></i>
+                View Order Details
+            </a>
+        </div>
+
+        <!-- Order Items Preview -->
+        <div class="order-items">
+            <h4 style="margin-bottom: 15px; color: #333;">Items Ordered (<%= order.items.length %>)</h4>
+            <% order.items.slice(0, 3).forEach(item => { %>
+                <div class="order-item">
+                    <div class="item-image">
+                        <% if (item.product.images && item.product.images.length > 0) { %>
+                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_60,h_60,c_fill/<%= item.product.images[0].public_id %>" 
+                                 alt="<%= item.product.name %>" 
+                                 onerror="this.src='/images/placeholder.jpg'">
+                        <% } else { %>
+                            <img src="/images/placeholder.jpg" alt="No image">
+                        <% } %>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name"><%= item.product.name %></div>
+                        <div class="item-quantity">Quantity: <%= item.quantity %></div>
+                    </div>
+                    <div class="item-price">₹<%= item.price.toLocaleString() %></div>
+                </div>
+            <% }) %>
+            <% if (order.items.length > 3) { %>
+                <p style="text-align: center; color: #666; margin-top: 10px;">
+                    and <%= order.items.length - 3 %> more item(s)...
+                </p>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Add entrance animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate order items
+            const orderItems = document.querySelectorAll('.order-item');
+            orderItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    item.style.transition = 'all 0.4s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateX(0)';
+                }, 800 + (index * 100));
+            });
+        });
+    </script>
+</body>
+</html>
