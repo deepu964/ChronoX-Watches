@@ -31,13 +31,9 @@
                 <i class="fas fa-box"></i>
                 <span>Products</span>
             </a>
-            <a href="orders" class="nav-item">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Orders</span>
-            </a>
-            <a href="return-requests" class="nav-item">
-                <i class="fas fa-undo"></i>
-                <span>Return Requests</span>
+            <a href="#" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Order List</span>
             </a>
             <a href="userlist" class="nav-item">
                 <i class="fas fa-user"></i>
@@ -88,38 +84,39 @@
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value"><%= stats ? stats.totalCustomers : 0 %></div>
+                    <div class="stat-value">5,423</div>
                     <div class="stat-label">Total Customers</div>
+                    <div class="stat-label">+10% this month</div>
                 </div>
             </div>
-
+            
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value"><%= stats ? stats.totalOrders : 0 %></div>
+                    <div class="stat-value">1,893</div>
                     <div class="stat-label">Total Orders</div>
                 </div>
             </div>
-
+            
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-rupee-sign"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value">₹<%= stats ? stats.totalSales.toLocaleString() : 0 %></div>
+                    <div class="stat-value">₹65,805</div>
                     <div class="stat-label">Total Sales</div>
                 </div>
             </div>
-
+            
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value"><%= stats ? stats.pendingOrders : 0 %></div>
-                    <div class="stat-label">Pending Orders</div>
+                    <div class="stat-value">189</div>
+                    <div class="stat-label">Total Pending</div>
                 </div>
             </div>
         </div>

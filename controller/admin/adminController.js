@@ -1,10 +1,7 @@
 const errorMiddleware = require('../../middlewares/errorMiddleware');
 const Admin = require('../../models/adminSchema')
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Order = require('../../models/orderSchema');
-const User = require('../../models/userSchema');
-const productSchema = require('../../models/productSchema');
+const jwt = require('jsonwebtoken')
 
 
 const getAdminLogin =async (req,res,next) => {
@@ -29,34 +26,11 @@ const getDashBoard = async (req,res,next) => {
         if(!req.session.admin){
             return res.redirect('/admin')
         }
-
-        // Get dashboard statistics
-        const totalCustomers = await User.countDocuments();
-        const totalOrders = await Order.countDocuments();
-        const totalProducts = await productSchema.countDocuments();
-        const pendingOrders = await Order.countDocuments({ status: 'Placed' });
-
-        // Calculate total sales
-        const salesResult = await Order.aggregate([
-            { $match: { status: { $ne: 'Cancelled' } } },
-            { $group: { _id: null, totalSales: { $sum: '$totalAmount' } } }
-        ]);
-        const totalSales = salesResult.length > 0 ? salesResult[0].totalSales : 0;
-
-        const stats = {
-            totalCustomers,
-            totalOrders,
-            totalProducts,
-            totalSales,
-            pendingOrders
-        };
-
-        res.render('admin/dashboard', { stats })
+        res.render('admin/dashboard')
     } catch (error) {
-        console.error("Dashboard error:", error);
         next(error)
     }
-
+    
 }
 
 const adminLogin =async (req,res,next) => {

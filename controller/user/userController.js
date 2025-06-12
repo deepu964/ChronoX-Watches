@@ -39,7 +39,7 @@ const getLoadHomePage = async (req, res) => {
 
 const PageNotFound = (req, res) => {
     try {
-        res.status(404).render('user/page-404', { user: req.session.user });
+        res.status(404).render('user/404');
     } catch (error) {
         console.error("404 page error:", error);
         res.status(404).send("Page Not Found");
@@ -970,14 +970,13 @@ const getCart = async (req, res, next) => {
 
     if (!cart || !cart.items || cart.items.length === 0) {
       return res.render('user/cart', {
-        user: req.session.user,
+        user: req.session.user,    
         items: [],
-        total: 0,
         totalMRP: 0,
         discount: 0,
-        shippingFee: 50,
-        grandTotal: 50,
-        cloudName: process.env.CLOUDINARY_CLOUD_NAME
+        shippingFee: 0,
+        grandTotal: 0,
+        total: 0
       });
     }
 
@@ -996,7 +995,7 @@ cart.items.forEach(item => {
     totalMRP += regularPrice * item.quantity;
   }
 });
-
+console.log(totalMRP,"totalMRP")
 const discount = totalMRP - total;
 const grandTotal = total  + shippingFee;
 
@@ -1480,10 +1479,7 @@ const getOrderDetails = async (req, res, next) => {
             .populate('user');
 
         if (!order || order.user._id.toString() !== userId.toString()) {
-            return res.status(404).render('user/page-404', {
-                user: req.session.user,
-                message: 'Order not found'
-            });
+            return res.status(404).render('user/404');
         }
 
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
