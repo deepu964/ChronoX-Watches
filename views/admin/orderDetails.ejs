@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - ChronoX Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .nav-items {
+            list-style: none;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: #fff;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .detail-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-placed { background: #fff3cd; color: #856404; }
+        .status-processing { background: #cce5ff; color: #004085; }
+        .status-shipped { background: #b3d9ff; color: #003d82; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .items-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .items-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .total-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .total-row:last-child {
+            margin-bottom: 0;
+            padding-top: 15px;
+            border-top: 2px solid #667eea;
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .status-update {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 25px;
+        }
+
+        .status-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .update-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .update-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .update-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .order-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .item-info {
+                justify-content: center;
+            }
+            
+            .status-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-clock"></i> ChronoX Admin
+            </div>
+            <div class="nav-items">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/orders" class="nav-item active">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/userlist" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/logout" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1>Order Details</h1>
+                    <p>Order #<%= order._id.toString().slice(-8).toUpperCase() %></p>
+                </div>
+                <a href="/admin/orders" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Orders
+                </a>
+            </div>
+
+            <!-- Order Details Grid -->
+            <div class="details-grid">
+                <!-- Order Information -->
+                <div class="detail-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Order Information
+                    </h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Order Date:</span>
+                        <span class="detail-value"><%= new Date(order.createdAt).toLocaleDateString('en-IN', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Method:</span>
+                        <span class="detail-value"><%= order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment' %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Order Status:</span>
+                        <span class="status-badge status-<%= order.status.toLowerCase() %>">
+                            <%= order.status %>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Items:</span>
+                        <span class="detail-value"><%= order.items.length %> item(s)</span>
+                    </div>
+                </div>
+
+                <!-- Customer Information -->
+                <div class="detail-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-user"></i>
+                        Customer Information
+                    </h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value"><%= order.address.fullName %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value"><%= order.user.email %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone:</span>
+                        <span class="detail-value"><%= order.address.phone %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span class="detail-value">
+                            <%= order.address.addressLine %><br>
+                            <%= order.address.city %>, <%= order.address.state %><br>
+                            PIN: <%= order.address.pincode %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="items-card">
+                <div class="items-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-shopping-bag"></i>
+                        Order Items (<%= order.items.length %>)
+                    </h3>
+                </div>
+                
+                <% order.items.forEach(item => { %>
+                    <div class="order-item">
+                        <div class="item-image">
+                            <% if (item.product.images && item.product.images.length > 0) { %>
+                                <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>" 
+                                     alt="<%= item.product.name %>" 
+                                     onerror="this.src='/images/placeholder.jpg'">
+                            <% } else { %>
+                                <img src="/images/placeholder.jpg" alt="No image">
+                            <% } %>
+                        </div>
+                        <div class="item-details">
+                            <div class="item-name"><%= item.product.name %></div>
+                            <div class="item-info">
+                                <span><strong>Brand:</strong> <%= item.product.brand || 'N/A' %></span>
+                                <span><strong>Model:</strong> <%= item.product.model || 'N/A' %></span>
+                                <span><strong>Quantity:</strong> <%= item.quantity %></span>
+                                <span><strong>Unit Price:</strong> ₹<%= item.price.toLocaleString() %></span>
+                            </div>
+                        </div>
+                        <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
+                    </div>
+                <% }) %>
+
+                <!-- Order Total -->
+                <div class="total-section">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span>₹<%= order.totalAmount.toLocaleString() %></span>
+                    </div>
+                    <div class="total-row">
+                        <span>Shipping:</span>
+                        <span>₹50</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Total Amount:</span>
+                        <span>₹<%= (order.totalAmount + 50).toLocaleString() %></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Update -->
+            <% if (order.status !== 'Delivered' && order.status !== 'Cancelled') { %>
+                <div class="status-update">
+                    <h3 class="card-title">
+                        <i class="fas fa-edit"></i>
+                        Update Order Status
+                    </h3>
+                    <form class="status-form" onsubmit="updateOrderStatus(event)">
+                        <div class="form-group">
+                            <label class="form-label">Current Status: <%= order.status %></label>
+                            <select id="newStatus" class="form-select" required>
+                                <option value="">Select New Status</option>
+                                <% if (order.status !== 'Placed') { %><option value="Placed">Placed</option><% } %>
+                                <% if (order.status !== 'Processing') { %><option value="Processing">Processing</option><% } %>
+                                <% if (order.status !== 'Shipped') { %><option value="Shipped">Shipped</option><% } %>
+                                <% if (order.status !== 'Delivered') { %><option value="Delivered">Delivered</option><% } %>
+                                <% if (order.status !== 'Cancelled') { %><option value="Cancelled">Cancelled</option><% } %>
+                            </select>
+                        </div>
+                        <button type="submit" class="update-btn" id="updateBtn">
+                            <i class="fas fa-save"></i> Update Status
+                        </button>
+                    </form>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        function updateOrderStatus(event) {
+            event.preventDefault();
+            
+            const newStatus = document.getElementById('newStatus').value;
+            const updateBtn = document.getElementById('updateBtn');
+            
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+            
+            // Disable button and show loading
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            
+            fetch(`/admin/orders/<%= order._id %>/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Order status updated successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                    updateBtn.disabled = false;
+                    updateBtn.innerHTML = '<i class="fas fa-save"></i> Update Status';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update order status');
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = '<i class="fas fa-save"></i> Update Status';
+            });
+        }
+    </script>
+</body>
+</html>

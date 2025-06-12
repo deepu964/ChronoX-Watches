@@ -6,6 +6,7 @@ const userListController = require('../controller/admin/userListController');
 const productController = require('../controller/admin/productController');
 const categoryController = require('../controller/admin/categoryController')
 const couponController = require('../controller/admin/couponController');
+const orderController = require('../controller/admin/orderController');
 // const isAdmin = require('../middlewares/adminAuth');
 const {authMiddleware,adminAuth} = require('../middlewares/adminAuth')
 
@@ -62,7 +63,11 @@ router.post('/coupon/addCoupon',couponController.addCoupon);
 
 router.delete('/coupon/delete/:id',couponController.deleteCoupon)
 
-
+// Order Management Routes
+router.get('/orders',authMiddleware,adminAuth,orderController.getOrderList);
+router.get('/orders/:orderId',authMiddleware,adminAuth,orderController.getOrderDetails);
+router.put('/orders/:orderId/status',authMiddleware,adminAuth,orderController.updateOrderStatus);
+router.get('/orders/export/csv',authMiddleware,adminAuth,orderController.exportOrdersCSV);
 
 module.exports = router;
 
