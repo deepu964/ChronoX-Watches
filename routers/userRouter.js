@@ -93,6 +93,11 @@ router.get('/order-success',isAuth,userController.getOrderSuccess);
 router.get('/order-details/:orderId',isAuth,userController.getOrderDetails);
 router.get('/my-orders',isAuth,userController.getMyOrders);
 
+// Return and wallet routes
+router.post('/request-return',isAuth,userController.requestReturn);
+router.get('/my-returns',isAuth,userController.getMyReturns);
+router.get('/wallet',isAuth,userController.getWallet);
+
 
 
 module.exports = router;

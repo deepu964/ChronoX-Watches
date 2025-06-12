@@ -6,6 +6,7 @@ const userListController = require('../controller/admin/userListController');
 const productController = require('../controller/admin/productController');
 const categoryController = require('../controller/admin/categoryController')
 const couponController = require('../controller/admin/couponController');
+const orderController = require('../controller/admin/orderController');
 // const isAdmin = require('../middlewares/adminAuth');
 const {authMiddleware,adminAuth} = require('../middlewares/adminAuth')
 
@@ -62,6 +63,14 @@ router.post('/coupon/addCoupon',couponController.addCoupon);
 
 router.delete('/coupon/delete/:id',couponController.deleteCoupon)
 
+// Order routes
+router.get('/orders', authMiddleware, adminAuth, orderController.getOrders);
+router.get('/orders/:id', authMiddleware, adminAuth, orderController.getOrderDetails);
+router.put('/orders/:id/status', authMiddleware, adminAuth, orderController.updateOrderStatus);
+
+// Return routes
+router.get('/returns', authMiddleware, adminAuth, orderController.getReturns);
+router.put('/returns/:id/process', authMiddleware, adminAuth, orderController.processReturn);
 
 
 module.exports = router;

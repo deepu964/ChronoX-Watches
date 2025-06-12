@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX - Return Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/userlist.css">
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-text">ChronoX</span>
+            </div>
+        </div>
+        
+        <div class="nav-items">
+            <a href="/admin/dashboard" class="nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin/product" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+            <a href="/admin/orders" class="nav-item">
+                <i class="fas fa-list"></i>
+                <span>Order List</span>
+            </a>
+            <a href="/admin/returns" class="nav-item active">
+                <i class="fas fa-undo"></i>
+                <span>Returns</span>
+            </a>
+            <a href="/admin/userlist" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Sales</span>
+            </a>
+            <a href="/admin/category" class="nav-item">
+                <i class="fas fa-tags"></i>
+                <span>Category</span>
+            </a>
+            <a href="/admin/coupon" class="nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Coupons</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-qrcode"></i>
+                <span>Banner</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="account-btn">Account</button>
+            <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1 class="page-title">RETURN MANAGEMENT</h1>
+                <div class="breadcrumb">
+                    <a href="dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="returns" style="text-decoration: none; color: gray;">Returns</a>
+                </div>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Deepak</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+        
+        <form action="returns" method="get">
+            <div class="search-filter">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" value="<%= search %>" name="search" placeholder="Search returns...">
+                    <a href="returns"><i class="fas fa-close" style="margin-left: 90%;"></i></a>
+                </div>
+            </div>
+        </form>
+        
+        <div class="customer-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Return ID</th>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Reason</th>
+                        <th>Refund Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% returns.forEach(returnReq => { %>
+                        <tr>
+                            <td>
+                                <span class="order-id">#<%= returnReq._id.toString().slice(-8) %></span>
+                            </td>
+                            <td>
+                                <span class="order-id">#<%= returnReq.order._id.toString().slice(-8) %></span>
+                            </td>
+                            <td>
+                                <div class="customer-info">
+                                    <span class="customer-name"><%= returnReq.user.fullname %></span>
+                                    <span class="customer-email"><%= returnReq.user.email %></span>
+                                </div>
+                            </td>
+                            <td><%= returnReq.reason %></td>
+                            <td>₹<%= returnReq.totalRefundAmount.toLocaleString('en-IN') %></td>
+                            <td>
+                                <span class="status-badge status-<%= returnReq.status.toLowerCase().replace(/\s+/g, '-') %>">
+                                    <%= returnReq.status %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= new Date(returnReq.requestedAt).toLocaleDateString('en-IN') %>
+                            </td>
+                            <td>
+                                <a href="orders/<%= returnReq.order._id %>" class="action-btn view">
+                                    <i class="fas fa-eye"></i> View Order
+                                </a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+            <div class="page-info">
+                Showing <%= (currentPage - 1) * limit + 1 %> -
+                <%= Math.min(currentPage * limit, total) %> from <%= total %>
+            </div>
+
+            <div class="page-controls">
+                <!-- Previous Button -->
+                <% if (currentPage > 1) { %>
+                <a href="returns?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <% } else { %>
+                <button class="page-btn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <% } %>
+
+                <!-- Page Numbers -->
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="returns?page=<%= i %>&search=<%= search %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                    <%= i %>
+                </a>
+                <% } %>
+
+                <!-- Next Button -->
+                <% if (currentPage < totalPages) { %>
+                <a href="returns?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <% } else { %>
+                <button class="page-btn" disabled>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Menu Toggle for Mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+        
+        // Hover effects for nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

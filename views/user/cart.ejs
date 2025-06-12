@@ -653,103 +653,319 @@
             color: #d32f2f;
             cursor: pointer;
         }
+
+        /* Empty Cart Styles */
+        .empty-cart {
+            text-align: center;
+            padding: 80px 40px;
+            background: white;
+            border-radius: 20px;
+            margin: 20px;
+        }
+
+        .empty-cart-icon {
+            font-size: 120px;
+            color: #e0e0e0;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-cart h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .empty-cart p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .empty-cart-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .empty-cart-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shop-now-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .shop-now-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .wishlist-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .wishlist-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .empty-cart-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+            padding: 40px 0;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Hide cart summary when empty */
+        .cart-container.empty .price-summary,
+        .cart-container.empty .cart-actions {
+            display: none;
+        }
+
+        /* Responsive for empty cart */
+        @media (max-width: 768px) {
+            .empty-cart {
+                padding: 60px 20px;
+                margin: 10px;
+            }
+
+            .empty-cart-icon {
+                font-size: 80px;
+            }
+
+            .empty-cart h2 {
+                font-size: 2rem;
+            }
+
+            .empty-cart p {
+                font-size: 1rem;
+            }
+
+            .empty-cart-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .empty-cart-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .empty-cart-features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin-top: 40px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <%-include("../partials/user/header") %>
-        <div class="cart-container">
-            <div class="cart-header">
-                <h1 class="cart-title">CART</h1>
-                <button class="empty-cart-btn" onclick="emptyCart()">Empty My Cart</button>
-            </div>
-
-            <div class="cart-items" id="cartItems">
-                <% items.forEach((item, index)=> { %>
-                    <div class="cart-item" data-id="<%= item.product._id %>">
-                        <div class="product-image">
-                            <% const image=item.product.images?.[0]?.public_id; %>
-                                <% if (image) { %>
-                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_100,h_100,c_fill/<%= image %>"
-                                        alt="<%= item.product.name %>" width="100" height="100"
-                                        onerror="this.onerror=null; this.src='/images/placeholder.jpg';" />
-                                    <% } else { %>
-                                        <img src="/images/placeholder.jpg" alt="No image available" width="50"
-                                            height="50">
-                                        <% } %>
-                        </div>
-
-                        <div class="item-details" style="padding: 2%;">
-                            <div class="item-name">
-                                <%= item.product.name %>
-                            </div>
-                            <div class="item-price">
-                                <% const price=item.product.variants[0].salePrice ||
-                                    item.product.variants[0].regularPrice; const
-                                    originalPrice=item.product.variants[0].regularPrice; %>
-                                    <span class="current-price">₹<%= price.toLocaleString() %></span>
-                                    <% if (price !==originalPrice) { %>
-                                        <span class="original-price">₹<%= originalPrice.toLocaleString() %></span>
-                                        <% } %>
-                            </div>
-                        </div>
-                        <div class="quantity-controls">
-                            <button class="quantity-btn"
-                                onclick="updateCart('<%= item.product._id %>', 'decrease')">−</button>
-                            <div class="quantity-display" id="qty-<%= item.product._id %>">
-                                <%= item.quantity %>
-                            </div>
-                            <button class="quantity-btn"
-                                onclick="updateCart('<%= item.product._id %>', 'increase')">+</button>
-                        </div>
-                        <button class="remove-btn" onclick="removeItem('<%= item.product._id %>')">Remove</button>
+        <div class="cart-container <%= items.length === 0 ? 'empty' : '' %>">
+            <% if (items.length === 0) { %>
+                <!-- Empty Cart Display -->
+                <div class="empty-cart">
+                    <div class="empty-cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
                     </div>
-                    <% }) %>
-            </div>
+                    <h2>Your Cart is Empty</h2>
+                    <p>Looks like you haven't added anything to your cart yet.<br>
+                       Start shopping to fill it up with amazing products!</p>
 
-            <!-- <div class="cart-summary">
-            <div class="promo-section">
-                <a href="#" class="promo-link">Save 10%</a>
-            </div> -->
-            <div class="price-summary">
-                <h3>PRICE DETAILS (<%= items.length %> Items)</h3>
+                    <div class="empty-cart-actions">
+                        <a href="/shop" class="empty-cart-btn shop-now-btn">
+                            <i class="fas fa-shopping-bag"></i>
+                            Start Shopping
+                        </a>
+                        <a href="/wish-list" class="empty-cart-btn wishlist-btn">
+                            <i class="fas fa-heart"></i>
+                            View Wishlist
+                        </a>
+                    </div>
 
-                <div class="price-row">
-                    <span>Total MRP</span>
-                    <span>₹<%= totalMRP.toLocaleString() %></span>
+                    <div class="empty-cart-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="feature-title">Free Shipping</div>
+                            <div class="feature-desc">Free delivery on orders above ₹500</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="feature-title">Secure Payment</div>
+                            <div class="feature-desc">100% secure payment methods</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-undo"></i>
+                            </div>
+                            <div class="feature-title">Easy Returns</div>
+                            <div class="feature-desc">Hassle-free returns within 7 days</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="feature-title">24/7 Support</div>
+                            <div class="feature-desc">Customer support available anytime</div>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <!-- Regular Cart Display -->
+                <div class="cart-header">
+                    <h1 class="cart-title">CART</h1>
+                    <button class="empty-cart-btn" onclick="emptyCart()">Empty My Cart</button>
                 </div>
 
-                <div class="price-row">
-                    <span>Discount on MRP</span>
-                    <span class="green">- ₹<%= discount.toLocaleString() %></span>
+                <div class="cart-items" id="cartItems">
+                    <% items.forEach((item, index)=> { %>
+                        <div class="cart-item" data-id="<%= item.product._id %>">
+                            <div class="product-image">
+                                <% const image=item.product.images?.[0]?.public_id; %>
+                                    <% if (image) { %>
+                                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_100,h_100,c_fill/<%= image %>"
+                                            alt="<%= item.product.name %>" width="100" height="100"
+                                            onerror="this.onerror=null; this.src='/images/placeholder.jpg';" />
+                                        <% } else { %>
+                                            <img src="/images/placeholder.jpg" alt="No image available" width="50"
+                                                height="50">
+                                            <% } %>
+                            </div>
+
+                            <div class="item-details" style="padding: 2%;">
+                                <div class="item-name">
+                                    <%= item.product.name %>
+                                </div>
+                                <div class="item-price">
+                                    <% const price=item.product.variants[0].salePrice ||
+                                        item.product.variants[0].regularPrice; const
+                                        originalPrice=item.product.variants[0].regularPrice; %>
+                                        <span class="current-price">₹<%= price.toLocaleString() %></span>
+                                        <% if (price !==originalPrice) { %>
+                                            <span class="original-price">₹<%= originalPrice.toLocaleString() %></span>
+                                            <% } %>
+                                </div>
+                            </div>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn"
+                                    onclick="updateCart('<%= item.product._id %>', 'decrease')">−</button>
+                                <div class="quantity-display" id="qty-<%= item.product._id %>">
+                                    <%= item.quantity %>
+                                </div>
+                                <button class="quantity-btn"
+                                    onclick="updateCart('<%= item.product._id %>', 'increase')">+</button>
+                            </div>
+                            <button class="remove-btn" onclick="removeItem('<%= item.product._id %>')">Remove</button>
+                        </div>
+                        <% }) %>
                 </div>
+            <% } %>
 
-                <div class="price-row">
-                    <span>Coupon Discount</span>
-                    <span class="red">Apply Coupon</span>
-                </div>
+                <!-- Price Summary and Actions (only show when cart has items) -->
+                <% if (items.length > 0) { %>
+                    <!-- <div class="cart-summary">
+                    <div class="promo-section">
+                        <a href="#" class="promo-link">Save 10%</a>
+                    </div> -->
+                    <div class="price-summary">
+                        <h3>PRICE DETAILS (<%= items.length %> Items)</h3>
 
-                <div class="price-row">
-                    <span>Shipping Fee</span>
-                    <span class="green">₹<%= shippingFee.toLocaleString() %></span>
-                </div>
+                        <div class="price-row">
+                            <span>Total MRP</span>
+                            <span>₹<%= totalMRP.toLocaleString() %></span>
+                        </div>
 
-                <hr />
+                        <div class="price-row">
+                            <span>Discount on MRP</span>
+                            <span class="green">- ₹<%= discount.toLocaleString() %></span>
+                        </div>
 
-                <div class="price-row total">
-                    <strong>Total Amount</strong>
-                    <strong>₹<%= grandTotal.toLocaleString() %></strong>
-                </div>
-            </div>
+                        <div class="price-row">
+                            <span>Coupon Discount</span>
+                            <span class="red">Apply Coupon</span>
+                        </div>
 
-            <!-- <div class="shipping-info">
-                Shipping, taxes, and discount codes calculated at checkout.
-            </div> -->
+                        <div class="price-row">
+                            <span>Shipping Fee</span>
+                            <span class="green">₹<%= shippingFee.toLocaleString() %></span>
+                        </div>
 
-            <div class="cart-actions">
-                <a href="/check-out"><button class="checkout-btn">Proceed to checkout</button></a>
-                <a href="/shop"><button class="continue-btn">Continue Shopping</button></a>
-            </div>
+                        <hr />
+
+                        <div class="price-row total">
+                            <strong>Total Amount</strong>
+                            <strong>₹<%= grandTotal.toLocaleString() %></strong>
+                        </div>
+                    </div>
+
+                    <!-- <div class="shipping-info">
+                        Shipping, taxes, and discount codes calculated at checkout.
+                    </div> -->
+
+                    <div class="cart-actions">
+                        <a href="/check-out"><button class="checkout-btn">Proceed to checkout</button></a>
+                        <a href="/shop"><button class="continue-btn">Continue Shopping</button></a>
+                    </div>
+                <% } %>
         </div>
         </div>
         <%-include("../partials/user/footer") %>
@@ -779,7 +995,18 @@
                         const data = await res.json();
                         if (data.success) {
                             if (data.quantity === 0) {
-                                document.querySelector(`[data-id="${productId}"]`).remove();
+                                const cartItem = document.querySelector(`[data-id="${productId}"]`);
+                                if (cartItem) {
+                                    cartItem.classList.add('removing');
+                                    setTimeout(() => {
+                                        cartItem.remove();
+                                        // Check if cart is now empty
+                                        const remainingItems = document.querySelectorAll('.cart-item').length;
+                                        if (remainingItems <= 1) { // <= 1 because we just removed one
+                                            location.reload(); // Reload to show empty cart
+                                        }
+                                    }, 500);
+                                }
                             } else {
                                 document.getElementById(`qty-${productId}`).innerText = data.quantity;
                             }
@@ -801,9 +1028,20 @@
                         });
                         const data = await res.json();
                         if (data.success) {
-                            document.querySelector(`[data-id="${productId}"]`).remove();
+                            const cartItem = document.querySelector(`[data-id="${productId}"]`);
+                            if (cartItem) {
+                                cartItem.classList.add('removing');
+                                setTimeout(() => {
+                                    cartItem.remove();
+                                    // Check if cart is now empty
+                                    const remainingItems = document.querySelectorAll('.cart-item').length;
+                                    if (remainingItems <= 1) { // <= 1 because we just removed one
+                                        location.reload(); // Reload to show empty cart
+                                    }
+                                }, 500);
+                            }
                             showToast('Product removed from cart');
-                            setTimeout(() => location.reload(), 500);
+                            setTimeout(() => location.reload(), 1000);
                         } else {
                             showToast(data.message || 'Failed to remove item');
                         }
@@ -814,7 +1052,13 @@
                 }
 
                 function emptyCart() {
-                    if (confirm('Are you sure you want to empty your cart?')) {
+                    if (confirm('Are you sure you want to empty your cart? This action cannot be undone.')) {
+                        // Add loading state
+                        const emptyBtn = document.querySelector('.empty-cart-btn');
+                        const originalText = emptyBtn.innerHTML;
+                        emptyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emptying...';
+                        emptyBtn.disabled = true;
+
                         fetch('/cart/empty', {
                             method: 'POST',
                             headers: {
@@ -822,11 +1066,25 @@
                             }
                         }).then(response => {
                             if (response.ok) {
-                                showToast('Cart emptied');
-                                setTimeout(() => location.reload(), 500);
+                                showToast('Cart emptied successfully');
+                                // Add fade out animation to all cart items
+                                const cartItems = document.querySelectorAll('.cart-item');
+                                cartItems.forEach((item, index) => {
+                                    setTimeout(() => {
+                                        item.classList.add('removing');
+                                    }, index * 100);
+                                });
+                                setTimeout(() => location.reload(), 1000);
                             } else {
                                 showToast('Failed to empty cart');
+                                emptyBtn.innerHTML = originalText;
+                                emptyBtn.disabled = false;
                             }
+                        }).catch(error => {
+                            console.error('Error:', error);
+                            showToast('Something went wrong');
+                            emptyBtn.innerHTML = originalText;
+                            emptyBtn.disabled = false;
                         });
                     }
                 }

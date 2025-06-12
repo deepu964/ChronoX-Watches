@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Placeholder Image Generator</title>
+</head>
+<body>
+    <canvas id="canvas" width="200" height="200" style="border: 1px solid #ccc;"></canvas>
+    <br><br>
+    <button onclick="downloadImage()">Download as placeholder.jpg</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Fill background
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, 200, 200);
+        
+        // Draw border
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, 198, 198);
+        
+        // Draw image icon
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(75, 75, 50, 50);
+        
+        // Draw circle (sun)
+        ctx.beginPath();
+        ctx.arc(85, 85, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ccc';
+        ctx.fill();
+        
+        // Draw mountains
+        ctx.beginPath();
+        ctx.moveTo(75, 110);
+        ctx.lineTo(85, 100);
+        ctx.lineTo(95, 110);
+        ctx.lineTo(105, 100);
+        ctx.lineTo(125, 120);
+        ctx.stroke();
+        
+        // Add text
+        ctx.fillStyle = '#999';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('No Image', 100, 140);
+        
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'placeholder.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.8);
+            link.click();
+        }
+    </script>
+</body>
+</html>

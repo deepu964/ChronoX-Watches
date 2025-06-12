@@ -17,7 +17,11 @@ const orderSchema = new mongoose.Schema({
   },
   totalAmount: Number,
   paymentMethod: { type: String, enum: ['COD', 'ONLINE'] },
-  status: { type: String, default: 'Placed' },
+  status: {
+    type: String,
+    enum: ['Placed', 'Pending', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+    default: 'Placed'
+  },
   createdAt: { type: Date, default: Date.now }
 });
 

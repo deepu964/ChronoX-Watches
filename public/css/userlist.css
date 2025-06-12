@@ -343,6 +343,81 @@
             background-color: rgba(239, 68, 68, 0.1);
             color: var(--red);
         }
+
+        /* Order Status Badges */
+        .status-placed {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .status-shipped {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+        }
+
+        .status-out-for-delivery {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-delivered {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .status-cancelled {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        /* Return Status Badges */
+        .status-requested {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .status-under-review {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .status-approved {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-rejected {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .status-refunded {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        /* Order specific styles */
+        .order-id {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .customer-email {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
         
         /* Toggle Switch */
         .switch {

@@ -8,6 +8,8 @@ const productSchema = require('../../models/productSchema');
 const Cart = require('../../models/cartSchema');
 const Order = require('../../models/orderSchema')
 const WishList = require('../../models/wishlistSchema')
+const Return = require('../../models/returnSchema')
+const Wallet = require('../../models/walletSchema')
 const generateOtp = require('../../utils/generateOtp');
 const sendOtpEmail = require('../../utils/sendOtpEmail');
 const sendResetPass = require('../../utils/sendResetPass');
@@ -961,8 +963,6 @@ const clearWishlist = async (req, res, next) => {
 };
 
 
-
-
 const getCart = async (req, res, next) => {
   try {
     const userId = req.session.user._id;
@@ -1482,11 +1482,16 @@ const getOrderDetails = async (req, res, next) => {
             return res.status(404).render('user/404');
         }
 
+        // Check for return request
+        const returnRequest = await Return.findOne({ order: orderId, user: userId })
+            .populate('items.product', 'name');
+
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
         res.render('user/orderDetails', {
             user: req.session.user,
             order,
+            returnRequest,
             cloudName
         });
     } catch (error) {
@@ -1526,6 +1531,138 @@ const getMyOrders = async (req, res, next) => {
         next(error);
     }
 };
+
+
+const requestReturn = async (req, res, next) => {
+    try {
+        const { orderId, reason, description, items } = req.body;
+        const userId = req.session.user._id;
+
+        // Validate order
+        const order = await Order.findById(orderId).populate('items.product');
+        if (!order || order.user.toString() !== userId.toString()) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        if (order.status !== 'Delivered') {
+            return res.status(400).json({ success: false, message: 'Returns are only allowed for delivered orders' });
+        }
+
+        // Check if return already exists
+        const existingReturn = await Return.findOne({ order: orderId });
+        if (existingReturn) {
+            return res.status(400).json({ success: false, message: 'Return request already exists for this order' });
+        }
+
+        // Calculate total refund amount
+        let totalRefundAmount = 0;
+        const returnItems = [];
+
+        for (const item of items) {
+            const orderItem = order.items.find(oi => oi.product._id.toString() === item.productId);
+            if (!orderItem) {
+                return res.status(400).json({ success: false, message: 'Invalid product in return request' });
+            }
+
+            if (item.quantity > orderItem.quantity) {
+                return res.status(400).json({ success: false, message: 'Return quantity cannot exceed ordered quantity' });
+            }
+
+            const refundAmount = orderItem.price * item.quantity;
+            totalRefundAmount += refundAmount;
+
+            returnItems.push({
+                product: item.productId,
+                quantity: item.quantity,
+                price: orderItem.price,
+                reason: item.reason || reason
+            });
+        }
+
+        // Create return request
+        const returnRequest = new Return({
+            user: userId,
+            order: orderId,
+            items: returnItems,
+            totalRefundAmount,
+            reason,
+            description
+        });
+
+        await returnRequest.save();
+
+        res.json({
+            success: true,
+            message: 'Return request submitted successfully. We will review it within 24-48 hours.',
+            returnId: returnRequest._id
+        });
+
+    } catch (error) {
+        console.error('Return request error:', error);
+        next(error);
+    }
+};
+
+
+const getMyReturns = async (req, res, next) => {
+    try {
+        const userId = req.session.user._id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        const totalReturns = await Return.countDocuments({ user: userId });
+        const totalPages = Math.ceil(totalReturns / limit);
+
+        const returns = await Return.find({ user: userId })
+            .populate('order')
+            .populate('items.product', 'name images')
+            .sort({ requestedAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+        res.render('user/myReturns', {
+            user: req.session.user,
+            returns,
+            cloudName,
+            currentPage: page,
+            totalPages,
+            totalReturns
+        });
+    } catch (error) {
+        console.error("My returns page error:", error);
+        next(error);
+    }
+};
+
+
+const getWallet = async (req, res, next) => {
+    try {
+        const userId = req.session.user._id;
+
+        let wallet = await Wallet.findOne({ user: userId });
+        if (!wallet) {
+            wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
+            await wallet.save();
+
+        
+            await User.findByIdAndUpdate(userId, { wallet: wallet._id });
+        }
+
+        res.render('user/wallet', {
+            user: req.session.user,
+            wallet
+        });
+
+    } catch (error) {
+        console.error('Wallet page error:', error);
+        next(error);
+    }
+};
+
+
 
 module.exports = {
     getLoadHomePage,
@@ -1572,5 +1709,8 @@ module.exports = {
     placeOrder,
     getOrderSuccess,
     getOrderDetails,
-    getMyOrders
+    getMyOrders,
+    requestReturn,
+    getMyReturns,
+    getWallet
 };
