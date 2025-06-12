@@ -7,6 +7,7 @@ const productController = require('../controller/admin/productController');
 const categoryController = require('../controller/admin/categoryController')
 const couponController = require('../controller/admin/couponController');
 const orderController = require('../controller/admin/orderController');
+const returnController = require('../controller/admin/returnController');
 // const isAdmin = require('../middlewares/adminAuth');
 const {authMiddleware,adminAuth} = require('../middlewares/adminAuth')
 
@@ -68,6 +69,21 @@ router.get('/orders',authMiddleware,adminAuth,orderController.getOrderList);
 router.get('/orders/:orderId',authMiddleware,adminAuth,orderController.getOrderDetails);
 router.put('/orders/:orderId/status',authMiddleware,adminAuth,orderController.updateOrderStatus);
 router.get('/orders/export/csv',authMiddleware,adminAuth,orderController.exportOrdersCSV);
+
+// Return Request Management Routes
+router.get('/return-requests',authMiddleware,adminAuth,returnController.getReturnRequests);
+router.get('/return-requests/:returnRequestId',authMiddleware,adminAuth,returnController.getReturnRequestDetails);
+router.put('/return-requests/:returnRequestId/status',authMiddleware,adminAuth,returnController.updateReturnStatus);
+router.post('/return-requests/bulk-approve',authMiddleware,adminAuth,returnController.bulkApproveReturns);
+
+// Debug route to check admin session
+router.get('/debug-session',authMiddleware,adminAuth, (req, res) => {
+    res.json({
+        session: req.session.admin,
+        adminId: req.session.admin?.id || req.session.admin?._id,
+        timestamp: new Date()
+    });
+});
 
 module.exports = router;
 

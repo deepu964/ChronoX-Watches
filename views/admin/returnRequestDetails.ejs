@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Request Details - ChronoX Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .nav-items {
+            list-style: none;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: #fff;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .detail-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-under-review { background: #cce5ff; color: #004085; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-product-received { background: #b3d9ff; color: #003d82; }
+        .status-refund-processed { background: #d1ecf1; color: #0c5460; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .items-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .items-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .return-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .return-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .item-reason {
+            background: rgba(255, 193, 7, 0.2);
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .status-update {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .status-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .update-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .update-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .update-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .return-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .item-info {
+                justify-content: center;
+            }
+            
+            .status-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-clock"></i> ChronoX Admin
+            </div>
+            <div class="nav-items">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/orders" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/return-requests" class="nav-item active">
+                    <i class="fas fa-undo"></i>
+                    <span>Return Requests</span>
+                </a>
+                <a href="/admin/userlist" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/logout" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1>Return Request Details</h1>
+                    <p>Request #<%= returnRequest._id.toString().slice(-8).toUpperCase() %></p>
+                </div>
+                <a href="/admin/return-requests" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Return Requests
+                </a>
+            </div>
+
+            <!-- Request Details Grid -->
+            <div class="details-grid">
+                <!-- Request Information -->
+                <div class="detail-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Request Information
+                    </h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Request Date:</span>
+                        <span class="detail-value"><%= new Date(returnRequest.createdAt).toLocaleDateString('en-IN', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Order ID:</span>
+                        <span class="detail-value">#<%= returnRequest.order._id.toString().slice(-8).toUpperCase() %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Current Status:</span>
+                        <span class="status-badge status-<%= returnRequest.status.toLowerCase().replace(/\s+/g, '-') %>">
+                            <%= returnRequest.status %>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Refund Amount:</span>
+                        <span class="detail-value">₹<%= returnRequest.totalRefundAmount.toLocaleString() %></span>
+                    </div>
+                    <% if (returnRequest.isRefunded) { %>
+                        <div class="detail-row">
+                            <span class="detail-label">Refund Status:</span>
+                            <span class="detail-value" style="color: #28a745; font-weight: bold;">
+                                ✅ Refunded on <%= new Date(returnRequest.refundedAt).toLocaleDateString('en-IN') %>
+                            </span>
+                        </div>
+                    <% } %>
+                </div>
+
+                <!-- Customer Information -->
+                <div class="detail-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-user"></i>
+                        Customer Information
+                    </h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value"><%= returnRequest.user.fullname %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value"><%= returnRequest.user.email %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone:</span>
+                        <span class="detail-value"><%= returnRequest.pickupAddress.phone %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Pickup Address:</span>
+                        <span class="detail-value">
+                            <%= returnRequest.pickupAddress.addressLine %><br>
+                            <%= returnRequest.pickupAddress.city %>, <%= returnRequest.pickupAddress.state %><br>
+                            PIN: <%= returnRequest.pickupAddress.pincode %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Return Items -->
+            <div class="items-card">
+                <div class="items-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-box"></i>
+                        Return Items (<%= returnRequest.items.length %>)
+                    </h3>
+                </div>
+                
+                <% returnRequest.items.forEach(item => { %>
+                    <div class="return-item">
+                        <div class="item-image">
+                            <% if (item.product.images && item.product.images.length > 0) { %>
+                                <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>" 
+                                     alt="<%= item.product.name %>" 
+                                     onerror="this.src='/images/placeholder.jpg'">
+                            <% } else { %>
+                                <img src="/images/placeholder.jpg" alt="No image">
+                            <% } %>
+                        </div>
+                        <div class="item-details">
+                            <div class="item-name"><%= item.product.name %></div>
+                            <div class="item-info">
+                                <span><strong>Quantity:</strong> <%= item.quantity %></span>
+                                <span><strong>Unit Price:</strong> ₹<%= item.price.toLocaleString() %></span>
+                                <span><strong>Condition:</strong> <%= item.condition %></span>
+                            </div>
+                            <div class="item-reason"><%= item.reason %></div>
+                        </div>
+                        <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
+                    </div>
+                <% }) %>
+            </div>
+
+            <!-- Request Reason -->
+            <div class="detail-card">
+                <h3 class="card-title">
+                    <i class="fas fa-comment"></i>
+                    Customer Request Reason
+                </h3>
+                <p style="color: #666; line-height: 1.6; margin-bottom: 20px;"><%= returnRequest.requestReason %></p>
+                
+                <% if (returnRequest.adminNotes) { %>
+                    <div style="border-top: 1px solid #e9ecef; padding-top: 20px;">
+                        <h4 style="color: #333; margin-bottom: 10px;">Admin Notes:</h4>
+                        <p style="color: #666; line-height: 1.6;"><%= returnRequest.adminNotes %></p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Quick Actions -->
+            <% if (['Approved', 'Product Received'].includes(returnRequest.status) && !returnRequest.isRefunded) { %>
+                <div class="status-update">
+                    <h3 class="card-title">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Quick Refund Actions
+                    </h3>
+                    <div class="quick-actions" style="display: flex; gap: 15px; margin-bottom: 20px;">
+                        <% if (returnRequest.status === 'Approved') { %>
+                            <button class="update-btn" onclick="quickStatusUpdate('Product Received')" style="background: #17a2b8;">
+                                <i class="fas fa-box"></i> Mark Product Received
+                            </button>
+                        <% } %>
+                        <% if (['Approved', 'Product Received'].includes(returnRequest.status)) { %>
+                            <button class="update-btn" onclick="quickStatusUpdate('Refund Processed')" style="background: #28a745;">
+                                <i class="fas fa-wallet"></i> Process Refund (₹<%= returnRequest.totalRefundAmount.toLocaleString() %>)
+                            </button>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Status Update -->
+            <% if (!['Completed', 'Cancelled'].includes(returnRequest.status)) { %>
+                <div class="status-update">
+                    <h3 class="card-title">
+                        <i class="fas fa-edit"></i>
+                        Update Return Status
+                    </h3>
+                    <form class="status-form" onsubmit="updateReturnStatus(event)">
+                        <div class="form-group">
+                            <label class="form-label">New Status</label>
+                            <select id="newStatus" class="form-select" required>
+                                <option value="">Select Status</option>
+                                <% if (returnRequest.status !== 'Under Review') { %><option value="Under Review">Under Review</option><% } %>
+                                <% if (returnRequest.status !== 'Approved') { %><option value="Approved">Approved</option><% } %>
+                                <% if (returnRequest.status !== 'Rejected') { %><option value="Rejected">Rejected</option><% } %>
+                                <% if (returnRequest.status !== 'Product Received') { %><option value="Product Received">Product Received</option><% } %>
+                                <% if (returnRequest.status !== 'Refund Processed') { %><option value="Refund Processed">Refund Processed</option><% } %>
+                                <% if (returnRequest.status !== 'Completed') { %><option value="Completed">Completed</option><% } %>
+                            </select>
+                        </div>
+                        <button type="submit" class="update-btn" id="updateBtn">
+                            <i class="fas fa-save"></i> Update Status
+                        </button>
+                    </form>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label class="form-label">Admin Notes</label>
+                        <textarea id="adminNotes" class="form-textarea" placeholder="Add notes about this status update..."></textarea>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        function updateReturnStatus(event) {
+            event.preventDefault();
+
+            const newStatus = document.getElementById('newStatus').value;
+            const adminNotes = document.getElementById('adminNotes').value;
+            const updateBtn = document.getElementById('updateBtn');
+
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+
+            // Disable button and show loading
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+            updateStatus(newStatus, adminNotes, updateBtn);
+        }
+
+        function quickStatusUpdate(status) {
+            let message = '';
+            let notes = '';
+
+            if (status === 'Product Received') {
+                message = 'Mark this return request as "Product Received"?';
+                notes = 'Product received and verified by admin';
+            } else if (status === 'Refund Processed') {
+                message = `Process refund of ₹<%= returnRequest.totalRefundAmount.toLocaleString() %> to user's wallet?`;
+                notes = 'Refund processed to user wallet';
+            }
+
+            if (confirm(message)) {
+                updateStatus(status, notes);
+            }
+        }
+
+        function updateStatus(newStatus, adminNotes = '', button = null) {
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            }
+
+            fetch(`/admin/return-requests/<%= returnRequest._id %>/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: newStatus, adminNotes: adminNotes })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let successMessage = 'Return request status updated successfully!';
+                    if (newStatus === 'Refund Processed') {
+                        successMessage = `Refund of ₹<%= returnRequest.totalRefundAmount.toLocaleString() %> has been processed to user's wallet!`;
+                    }
+                    alert(successMessage);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                    if (button) {
+                        button.disabled = false;
+                        button.innerHTML = button.getAttribute('data-original-text') || 'Update Status';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update return request status');
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = button.getAttribute('data-original-text') || 'Update Status';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

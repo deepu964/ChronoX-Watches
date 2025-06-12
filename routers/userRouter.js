@@ -2,6 +2,8 @@
 
 const express = require('express');
 const userController = require('../controller/user/userController');
+const returnController = require('../controller/user/returnController');
+const walletController = require('../controller/user/walletController');
 const passport = require('passport');
 const router = express.Router();
 const checkBlocked = require('../middlewares/checkBlocked');
@@ -92,6 +94,59 @@ router.post('/payment',isAuth,userController.placeOrder);
 router.get('/order-success',isAuth,userController.getOrderSuccess);
 router.get('/order-details/:orderId',isAuth,userController.getOrderDetails);
 router.get('/my-orders',isAuth,userController.getMyOrders);
+
+// Return Request Routes
+router.get('/return-request/:orderId',isAuth,returnController.getReturnRequestForm);
+router.post('/return-request/:orderId',isAuth,returnController.submitReturnRequest);
+router.get('/return-request-details/:returnRequestId',isAuth,returnController.getReturnRequestDetails);
+router.get('/my-return-requests',isAuth,returnController.getMyReturnRequests);
+router.post('/cancel-return-request/:returnRequestId',isAuth,returnController.cancelReturnRequest);
+
+// Debug route to check orders
+router.get('/debug-orders',isAuth, async (req, res) => {
+    try {
+        const Order = require('../models/orderSchema');
+        const orders = await Order.find({ user: req.session.user._id }).populate('items.product');
+        res.json({
+            user: req.session.user,
+            orders: orders.map(order => ({
+                id: order._id,
+                status: order.status,
+                createdAt: order.createdAt,
+                totalAmount: order.totalAmount,
+                itemCount: order.items.length
+            }))
+        });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+});
+
+// Debug route to mark order as delivered
+router.get('/debug-deliver/:orderId',isAuth, async (req, res) => {
+    try {
+        const Order = require('../models/orderSchema');
+        const order = await Order.findOneAndUpdate(
+            { _id: req.params.orderId, user: req.session.user._id },
+            { status: 'Delivered' },
+            { new: true }
+        );
+        if (order) {
+            res.json({ success: true, message: 'Order marked as delivered', order: { id: order._id, status: order.status } });
+        } else {
+            res.json({ success: false, message: 'Order not found' });
+        }
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+});
+
+// Wallet Routes
+router.get('/wallet',isAuth,walletController.getWallet);
+router.post('/wallet/add-money',isAuth,walletController.addMoneyToWallet);
+router.post('/wallet/use-for-payment',isAuth,walletController.useWalletForPayment);
+router.get('/wallet/balance',isAuth,walletController.getWalletBalance);
+router.get('/wallet/transactions',isAuth,walletController.getTransactionHistory);
 
 
 

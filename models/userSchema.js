@@ -38,6 +38,10 @@ const userSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Wishlist'
     },
+    wallet: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Wallet'
+    },
     resetToken: String,
     resetTokenExpr: Date,
     

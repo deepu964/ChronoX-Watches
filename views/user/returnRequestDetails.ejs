@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Request Details - ChronoX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-under-review { background: #cce5ff; color: #004085; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-product-received { background: #b3d9ff; color: #003d82; }
+        .status-refund-processed { background: #d1ecf1; color: #0c5460; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .status-description {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .items-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .return-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .item-reason {
+            background: rgba(255, 193, 7, 0.2);
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .refund-section {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .refund-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .refund-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .refund-status {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .return-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .item-info {
+                justify-content: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include("../partials/user/header") %>
+    
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <h1>Return Request Details</h1>
+                <p>Request #<%= returnRequest._id.toString().slice(-8).toUpperCase() %></p>
+            </div>
+            <a href="/my-return-requests" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Return Requests
+            </a>
+        </div>
+
+        <!-- Status Card -->
+        <div class="status-card">
+            <div class="status-badge status-<%= returnRequest.status.toLowerCase().replace(/\s+/g, '-') %>">
+                <%= returnRequest.status %>
+            </div>
+            <div class="status-description">
+                <% if (returnRequest.status === 'Pending') { %>
+                    Your return request is being reviewed by our team.
+                <% } else if (returnRequest.status === 'Under Review') { %>
+                    Our team is currently reviewing your return request.
+                <% } else if (returnRequest.status === 'Approved') { %>
+                    Your return request has been approved. Please ship the items back to us.
+                <% } else if (returnRequest.status === 'Rejected') { %>
+                    Your return request has been rejected.
+                <% } else if (returnRequest.status === 'Product Received') { %>
+                    We have received your returned items and are processing the refund.
+                <% } else if (returnRequest.status === 'Refund Processed') { %>
+                    Your refund has been processed and added to your wallet.
+                <% } else if (returnRequest.status === 'Completed') { %>
+                    Your return request has been completed successfully.
+                <% } else if (returnRequest.status === 'Cancelled') { %>
+                    This return request has been cancelled.
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Request Details Grid -->
+        <div class="details-grid">
+            <!-- Request Information -->
+            <div class="detail-card">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Request Information
+                </h3>
+                <div class="detail-row">
+                    <span class="detail-label">Request Date:</span>
+                    <span class="detail-value"><%= new Date(returnRequest.createdAt).toLocaleDateString('en-IN', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Order ID:</span>
+                    <span class="detail-value">#<%= returnRequest.order._id.toString().slice(-8).toUpperCase() %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Return Method:</span>
+                    <span class="detail-value"><%= returnRequest.refundMethod %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Items Count:</span>
+                    <span class="detail-value"><%= returnRequest.items.length %> item(s)</span>
+                </div>
+            </div>
+
+            <!-- Pickup Address -->
+            <div class="detail-card">
+                <h3 class="card-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Pickup Address
+                </h3>
+                <div class="detail-row">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value"><%= returnRequest.pickupAddress.fullName %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value"><%= returnRequest.pickupAddress.phone %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Address:</span>
+                    <span class="detail-value">
+                        <%= returnRequest.pickupAddress.addressLine %><br>
+                        <%= returnRequest.pickupAddress.city %>, <%= returnRequest.pickupAddress.state %><br>
+                        PIN: <%= returnRequest.pickupAddress.pincode %>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Return Items -->
+        <div class="items-card">
+            <h3 class="card-title">
+                <i class="fas fa-box"></i>
+                Return Items (<%= returnRequest.items.length %>)
+            </h3>
+            
+            <% returnRequest.items.forEach(item => { %>
+                <div class="return-item">
+                    <div class="item-image">
+                        <% if (item.product.images && item.product.images.length > 0) { %>
+                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>" 
+                                 alt="<%= item.product.name %>" 
+                                 onerror="this.src='/images/placeholder.jpg'">
+                        <% } else { %>
+                            <img src="/images/placeholder.jpg" alt="No image">
+                        <% } %>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name"><%= item.product.name %></div>
+                        <div class="item-info">
+                            <span><strong>Quantity:</strong> <%= item.quantity %></span>
+                            <span><strong>Unit Price:</strong> ₹<%= item.price.toLocaleString() %></span>
+                            <span><strong>Condition:</strong> <%= item.condition %></span>
+                        </div>
+                        <div class="item-reason"><%= item.reason %></div>
+                    </div>
+                    <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Refund Information -->
+        <div class="refund-section">
+            <h3 class="refund-title">Refund Information</h3>
+            <div class="refund-amount">₹<%= returnRequest.totalRefundAmount.toLocaleString() %></div>
+            <div class="refund-status">
+                <% if (returnRequest.isRefunded) { %>
+                    ✅ Refunded on <%= new Date(returnRequest.refundedAt).toLocaleDateString('en-IN') %>
+                <% } else { %>
+                    ⏳ Refund pending
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Request Reason -->
+        <div class="detail-card">
+            <h3 class="card-title">
+                <i class="fas fa-comment"></i>
+                Request Reason
+            </h3>
+            <p style="color: #666; line-height: 1.6;"><%= returnRequest.requestReason %></p>
+            
+            <% if (returnRequest.adminNotes) { %>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                    <h4 style="color: #333; margin-bottom: 10px;">Admin Notes:</h4>
+                    <p style="color: #666; line-height: 1.6;"><%= returnRequest.adminNotes %></p>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/my-return-requests" class="btn btn-secondary">
+                <i class="fas fa-list"></i>
+                View All Return Requests
+            </a>
+            <% if (['Pending', 'Under Review'].includes(returnRequest.status)) { %>
+                <button class="btn btn-danger" onclick="cancelReturnRequest()">
+                    <i class="fas fa-times"></i>
+                    Cancel Request
+                </button>
+            <% } %>
+            <a href="/wallet" class="btn btn-primary">
+                <i class="fas fa-wallet"></i>
+                View Wallet
+            </a>
+        </div>
+    </div>
+
+    <%- include("../partials/user/footer") %>
+
+    <script>
+        function cancelReturnRequest() {
+            if (confirm('Are you sure you want to cancel this return request? This action cannot be undone.')) {
+                fetch(`/cancel-return-request/<%= returnRequest._id %>`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Return request cancelled successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to cancel return request');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

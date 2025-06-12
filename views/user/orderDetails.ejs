@@ -454,6 +454,12 @@
                 <i class="fas fa-shopping-bag"></i>
                 Continue Shopping
             </a>
+            <% if (order.status === 'Delivered') { %>
+                <a href="/return-request/<%= order._id %>" class="btn btn-secondary">
+                    <i class="fas fa-undo"></i>
+                    Request Return
+                </a>
+            <% } %>
             <a href="/my-orders" class="btn btn-secondary">
                 <i class="fas fa-list"></i>
                 View All Orders
