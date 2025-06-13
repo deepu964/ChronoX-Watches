@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/userProfile.css">
     <style>
+       * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4c61b3 0%, #f2f1f3 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+
         .wallet-container {
             max-width: 800px;
             margin: 0 auto;
@@ -100,34 +114,32 @@
         }
         
         .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #6b7280;
             color: white;
-            text-decoration: none;
-            padding: 10px 20px;
+            background-color: black;
+            margin-top: 50px;
+            margin-left: 30px;
+            width: 150px;
+            height: 40px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            transition: background 0.3s;
         }
+         
         
         .back-btn:hover {
-            background: #4b5563;
+            background: #4f46e5;
         }
+
+
     </style>
 </head>
 <body>
-    <%- include("../partials/user/header") %>
-    
+<%- include("../partials/user/header") %>
     <div class="container">
-        <a href="/userProfile" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Back to Profile
+        <a href="/userProfile" class="back-bttn">
+            <button class="back-btn">Back to Profile</button>
         </a>
         
         <div class="wallet-container">
-            <!-- Wallet Balance Card -->
+            
             <div class="wallet-header">
                 <div class="wallet-label">My Wallet Balance</div>
                 <div class="wallet-balance">₹<%= wallet.balance.toLocaleString('en-IN') %></div>
@@ -184,6 +196,6 @@
         </div>
     </div>
     
-    <%- include("../partials/user/footer") %>
+<%- include("../partials/user/footer") %>
 </body>
 </html>

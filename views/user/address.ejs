@@ -739,8 +739,11 @@
         <aside class="sidebar">
             <div class="profile-section">
                 <div class="profile-info">
-                    <div class="profile-avatar"></div>
-                    <div class="profile-name"><%= %></div>
+                    <% addresses.forEach(element => { %>
+                     <div class="profile-avatar"></div>
+                    <div class="profile-name"><%=element.fullName%></div>
+                    <% }) %>
+                    
                 </div>
             </div>
             <ul class="menu-list">
@@ -761,7 +764,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#">
+                    <a href="/my-orders">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
                             <span>My Order</span>
@@ -774,11 +777,10 @@
                             <div class="menu-icon"><i class="fas fa-heart"></i></div>
                             <span>My Wishlist</span>
                         </div>
-                        <span class="wishlist-badge">4</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#">
+                    <a href="/wallet">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-wallet"></i></div>
                             <span>My Wallet</span>
@@ -786,21 +788,21 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="/coupon">
+                    <a href="#">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-ticket-alt"></i></div>
                             <span>My Coupon</span>
                         </div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <!-- <li class="menu-item">
                     <a href="#">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-lock"></i></div>
                             <span>Change Password</span>
                         </div>
                     </a>
-                </li>
+                </li> -->
                 <li class="menu-item">
                     <a href="/logout">
                         <div class="menu-left">

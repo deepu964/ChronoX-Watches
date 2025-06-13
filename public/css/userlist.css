@@ -263,7 +263,7 @@
         .customer-table table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;   /* ✅ Ensures equal width columns */
+            table-layout: fixed;   
         }
 
         .customer-table th,
@@ -300,17 +300,17 @@
         }
 
         
-        /* Customer Row */
+        
         .customer-avatar {
             width: 36px;
             height: 36px;
-            border-radius: 50%;
+            border-radius: 4px;
             background-color: #f3f4f6;
             display: inline-block;
             margin-right: 10px;
             vertical-align: middle;
             overflow: hidden;
-        }
+        } 
         
         .customer-avatar img {
             width: 100%;
@@ -414,9 +414,14 @@
         }
 
         .customer-email {
-            font-size: 12px;
+            font-size: 14px;                
             color: #6b7280;
             margin-top: 2px;
+            white-space: nowrap;          
+            overflow: hidden;              
+            text-overflow: ellipsis;     
+            max-width: 140px;              
+            display: inline-block;        
         }
         
         /* Toggle Switch */

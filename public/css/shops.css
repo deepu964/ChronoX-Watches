@@ -188,6 +188,13 @@
             transform: translateY(20px);
             animation: fadeUp 0.8s forwards 0.2s;
         }
+        .btn-add-cart{
+            width: fit-content;
+            padding: 8px;
+            color: black;
+            background-color: #007bff;
+            border-radius: 8px;
+        }
         
         .hero-title {
             font-size: 48px;
@@ -569,7 +576,7 @@
             border-radius: 50%;
             background-color: var(--bg-light);
             border: none;
-            color: var(--text-light);
+            color: red;
             display: flex;
             align-items: center;
             justify-content: center;

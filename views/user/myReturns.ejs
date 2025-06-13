@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/userProfile.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
         .returns-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -179,20 +191,18 @@
         }
         
         .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #6b7280;
             color: white;
-            text-decoration: none;
-            padding: 10px 20px;
+            background-color: black;
+            margin-top: 50px;
+            margin-left: 30px;
+            width: 150px;
+            height: 40px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            transition: background 0.3s;
         }
+         
         
         .back-btn:hover {
-            background: #4b5563;
+            background: #4f46e5;
         }
         
         .pagination {
@@ -221,9 +231,8 @@
     <%- include("../partials/user/header") %>
     
     <div class="container">
-        <a href="/userProfile" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Back to Profile
+         <a href="/userProfile" class="back-bttn">
+            <button class="back-btn">Back to Profile</button>
         </a>
         
         <div class="returns-container">
@@ -239,7 +248,11 @@
                             <div class="return-id">
                                 Return #<%= returnReq._id.toString().slice(-8) %>
                                 <div style="font-size: 12px; color: #666; font-weight: normal;">
-                                    Order #<%= returnReq.order._id.toString().slice(-8) %>
+                                    <% if (returnReq.order && returnReq.order._id) { %>  
+                                        Order #<%= returnReq.order._id.toString().slice(-8) %>
+                                    <% } else { %> 
+                                        Order ID not available
+                                    <% } %>
                                 </div>
                             </div>
                             <div class="return-status status-<%= returnReq.status.toLowerCase().replace(/\s+/g, '-') %>">
@@ -369,12 +382,12 @@
                 <% } %>
                 
             <% } else { %>
-                <div class="no-returns">
+                <div class="no-returns" style="color: rgb(178, 160, 160);">
                     <i class="fas fa-undo"></i>
                     <h3>No Return Requests</h3>
                     <p>You haven't made any return requests yet.</p>
                     <a href="/my-orders" style="color: #4f46e5; text-decoration: none; margin-top: 20px; display: inline-block;">
-                        <i class="fas fa-list"></i> View My Orders
+                       <button style="color: white; background-color: #5530cd; width: fit-content; font-size: 20px; border: none; padding: 10px; border-radius: 8px;">View My Orders </button>
                     </a>
                 </div>
             <% } %>

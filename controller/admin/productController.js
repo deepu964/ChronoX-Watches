@@ -13,9 +13,7 @@ const product = async (req, res, next) => {
         const limit = 3;
         const search = req.query.search ? req.query.search.trim() : "";
         const category = req.query.category || 'all';
-        // const priceOrder = req.query.price || 'none';
-
-
+        
         let query = {};
 
         if (search) {
@@ -23,11 +21,11 @@ const product = async (req, res, next) => {
         }
 
         if (category !== 'all') {
-            const categoryDoc = await categorySchema.findOne({ name: category });
+            const categoryDoc = await categorySchema.findOne({ name: category,isListed:true});
             if (categoryDoc) {
                 query.categoryId = categoryDoc._id;
             } else {
-                console.log("Category not found");
+                return res.redirect('/shop?category=all');
             }
         }
 
@@ -35,7 +33,10 @@ const product = async (req, res, next) => {
         const totalProducts = await productSchema.countDocuments(query);
 
         const products = await productSchema.find(query)
-            .populate('categoryId')
+            .populate({
+                path:'categoryId',
+                match:{isListed:true}
+            })
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit);
@@ -60,6 +61,7 @@ const product = async (req, res, next) => {
         });
 
     } catch (error) {
+        console.log("product list page error");
         next(error);
     }
 };
@@ -77,7 +79,7 @@ const getproductAdd = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        console.log("evd ethi")
+       
         const {
             name, description, category, brand, offer, stock,
             model, regularPrice, salePrice, additionalInfo
@@ -106,10 +108,7 @@ const addProduct = async (req, res) => {
                             console.error('Cloudinary upload error:', error);
                             reject(error);
                         } else {
-                            console.log('Cloudinary upload success:', {
-                                public_id: result.public_id,
-                                secure_url: result.secure_url
-                            });
+                            
                             resolve(result);
                         }
                     }
@@ -186,16 +185,26 @@ const addProduct = async (req, res) => {
     }
 };
 
-const getEditProduct = async (req, res) => {
+const getEditProduct = async (req, res,next) => {
 
     try {
         const productId = req.params.id;
 
         const product = await productSchema.findOne({ _id: productId }).populate("categoryId");
+
+         if (!product) {
+            return res.status(404).render("admin/404", { message: "Product not found" });
+        }
+
+        if (!product.categoryId) {
+            console.warn("⚠️ Category for product is missing or deleted");
+        }
+
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
         const categories = await categorySchema.find()
         res.render('admin/editproduct', { product, categories, cloudName });
     } catch (error) {
+        console.log('get edit product page error');
         next(error);
     }
 }
@@ -282,12 +291,13 @@ const editProduct = async (req, res, next) => {
     res.json({ success: true, message: "Product updated successfully" });
 
   } catch (err) {
+    console.log("edit product page error");
     next(err);
   }
 };
 
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res,next) => {
     try {
         const id = req.params.id;
         const product = await productSchema.findByIdAndDelete(id);
@@ -297,6 +307,7 @@ const deleteProduct = async (req, res) => {
             return res.json({ success: true, message: "product Delete Successfull" });
         }
     } catch (error) {
+        console.log("delete product error");
         next(error);
 
     }
@@ -317,6 +328,7 @@ const blockedProduct = async (req, res, next) => {
             res.json({ success: false, message: "Product unblocked" });
         }
     } catch (error) {
+        console.log("block porduct error")
         next(error);
     }
 
@@ -329,6 +341,7 @@ const getProductDetails = async (req, res, next) => {
         const product = await Product.findById(productId).populate('reviews.user', 'name');
         res.render('productDetails', { product });
     } catch (error) {
+        console.log("details get error");
         next(error);
     }
 };
@@ -336,7 +349,6 @@ const getProductDetails = async (req, res, next) => {
 const addReview = async (req, res, next) => {
     const productId = req.params.id;
     const userId = req.session.user;
-
 
     const { rating, comment } = req.body;
 
@@ -352,6 +364,7 @@ const addReview = async (req, res, next) => {
         await product.save();
         res.status(200).json({ message: 'Review saved' });
     } catch (error) {
+        console.log("review add error")
         next(error);
     }
 };

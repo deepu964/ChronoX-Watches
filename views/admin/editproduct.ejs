@@ -225,16 +225,21 @@
                     <div class="form-group">
                         <label class="form-label" for="category">Category</label>
                         <select name="category" id="category" class="form-control">
-                            <option value="<%= product.categoryId._id %>">
-                                <%= product.categoryId.name %>
-                            </option>
-                            <% categories.forEach(element=> { %>
-                                <% if(product.categoryId._id.toString() !==element._id.toString()){ %>
-                                    <option value="<%= element._id %>" <%=element.category &&
-                                        element.category.toString()===element._id.toString() ? 'selected' : '' %>>
+                            <% if (product.categoryId) { %>
+                                <option value="<%= product.categoryId._id %>" selected>
+                                    <%= product.categoryId.name %>
+                                </option>
+                            <% } else { %>
+                                <option disabled selected>[Deleted Category]</option>
+                            <% } %>
+
+                            <% categories.forEach(element => { %>
+                                <% if (!product.categoryId || product.categoryId._id.toString() !== element._id.toString()) { %>
+                                    <option value="<%= element._id %>">
                                         <%= element.name %>
                                     </option>
-                                    <% }}) %>
+                                <% } %>
+                            <% }) %>
                         </select>
                         <div class="error-message" id="categoryError"></div>
                     </div>

@@ -4,7 +4,7 @@ const Product = require('../../models/productSchema');
 const Return = require('../../models/returnSchema');
 const Wallet = require('../../models/walletSchema');
 
-// Get all orders with pagination and search
+
 const getOrders = async (req, res, next) => {
     try {
         const search = req.query.search || "";
@@ -12,10 +12,10 @@ const getOrders = async (req, res, next) => {
         const limit = 10;
         const skip = (page - 1) * limit;
 
-        // Build search query
+        
         let searchQuery = {};
         if (search) {
-            // Search by order ID or user details
+           
             const users = await User.find({
                 $or: [
                     { fullname: { $regex: search, $options: 'i' } },
@@ -27,18 +27,17 @@ const getOrders = async (req, res, next) => {
             
             searchQuery = {
                 $or: [
-                    { _id: { $regex: search, $options: 'i' } },
                     { user: { $in: userIds } },
                     { status: { $regex: search, $options: 'i' } }
                 ]
             };
         }
 
-        // Get total count for pagination
+        
         const total = await Order.countDocuments(searchQuery);
         const totalPages = Math.ceil(total / limit);
 
-        // Get orders with user details
+        
         const orders = await Order.find(searchQuery)
             .populate('user', 'fullname email mobile')
             .populate('items.product', 'name images')
@@ -64,7 +63,7 @@ const getOrders = async (req, res, next) => {
     }
 };
 
-// Get single order details
+
 const getOrderDetails = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -73,7 +72,7 @@ const getOrderDetails = async (req, res, next) => {
             .populate('user', 'fullname email mobile')
             .populate('items.product', 'name images brand model');
 
-        // Check for return requests
+        
         const returnRequest = await Return.findOne({ order: orderId })
             .populate('items.product', 'name');
 
@@ -91,7 +90,7 @@ const getOrderDetails = async (req, res, next) => {
     }
 };
 
-// Update order status
+
 const updateOrderStatus = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -127,20 +126,17 @@ const updateOrderStatus = async (req, res, next) => {
 
     } catch (error) {
         console.error('Error updating order status:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to update order status' 
-        });
+        next(error);
     }
 };
 
-// Process return request (approve/reject)
+
 const processReturn = async (req, res, next) => {
     try {
         const returnId = req.params.id;
-        const { action, adminNotes } = req.body; // action: 'approve' or 'reject'
+        const { action, adminNotes } = req.body; 
 
-        const returnRequest = await Return.findById(returnId)
+        const returnRequest = await Return.findOne({_id:returnId,order:{$ne:null}})
             .populate('user')
             .populate('order')
             .populate('items.product');
@@ -159,14 +155,15 @@ const processReturn = async (req, res, next) => {
             });
         }
 
+
         if (action === 'approve') {
-            // Update return status to approved
+            
             returnRequest.status = 'Approved';
             returnRequest.reviewedAt = new Date();
             returnRequest.adminNotes = adminNotes;
             await returnRequest.save();
 
-            // Process refund to wallet
+            
             let wallet = await Wallet.findOne({ user: returnRequest.user._id });
             if (!wallet) {
                 wallet = new Wallet({
@@ -183,12 +180,12 @@ const processReturn = async (req, res, next) => {
                 returnRequest._id
             );
 
-            // Update user with wallet reference if not exists
+            
             await User.findByIdAndUpdate(returnRequest.user._id, {
                 $setOnInsert: { wallet: wallet._id }
             }, { upsert: false });
 
-            // Update return status to refunded
+            
             returnRequest.status = 'Refunded';
             returnRequest.refundedAt = new Date();
             await returnRequest.save();
@@ -223,14 +220,11 @@ const processReturn = async (req, res, next) => {
 
     } catch (error) {
         console.error('Process return error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to process return request'
-        });
+        next(error);
     }
 };
 
-// Get all return requests
+
 const getReturns = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -248,17 +242,18 @@ const getReturns = async (req, res, next) => {
             };
         }
 
+        const fullQuery = { ...searchQuery, order: { $ne: null } };
         const total = await Return.countDocuments(searchQuery);
         const totalPages = Math.ceil(total / limit);
 
-        const returns = await Return.find(searchQuery)
+        const returns = await Return.find(fullQuery)
             .populate('user', 'fullname email')
             .populate('order')
             .populate('items.product', 'name')
             .sort({ requestedAt: -1 })
             .skip(skip)
             .limit(limit);
-
+        
         res.render('admin/returns', {
             returns,
             currentPage: page,

@@ -26,7 +26,7 @@ router.get('/logout',adminController.logout);
 
 
 router.get('/dashboard',preventBackHistory,authMiddleware,adminController.getDashBoard);
-// router.post('/dashboard',adminController.dashboard);
+
 
 router.get('/userlist',authMiddleware,userListController.userList);
 router.put('/userlist/block/:id',authMiddleware,userListController.blockUser);
@@ -63,12 +63,12 @@ router.post('/coupon/addCoupon',couponController.addCoupon);
 
 router.delete('/coupon/delete/:id',couponController.deleteCoupon)
 
-// Order routes
+
 router.get('/orders', authMiddleware, adminAuth, orderController.getOrders);
 router.get('/orders/:id', authMiddleware, adminAuth, orderController.getOrderDetails);
 router.put('/orders/:id/status', authMiddleware, adminAuth, orderController.updateOrderStatus);
 
-// Return routes
+
 router.get('/returns', authMiddleware, adminAuth, orderController.getReturns);
 router.put('/returns/:id/process', authMiddleware, adminAuth, orderController.processReturn);
 

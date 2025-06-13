@@ -30,7 +30,7 @@ const listCategories = async (req,res,next) => {
 
     });
     } catch (error) {
-       
+       console.log("category list error");
         next(error)
     
 }
@@ -40,6 +40,7 @@ const getAddCategory = async (req,res,next) => {
     try {
         res.render('admin/addcategory');
     } catch (error) {
+      console.log(" get category error")
         next(error)
     }
     
@@ -69,12 +70,11 @@ const addCategory = async (req,res,next) => {
       
       return res.json({ success:true, message:"Category added successfully"});
     } catch (error) {
+      console.log("add category error")
         next(error);
     }
     
 }
-
-
 
 const toggleCategoryStatus = async (req, res,next) => {
   try {
@@ -141,26 +141,27 @@ const editCategory = async (req, res, next) => {
 
     return res.json({ success: true, message: "Updated Successfully" });
   } catch (error) {
+    console.log(" edit category error")
     next(error);
   }
 };
 
-
-
-
 const deleteCategory = async (req,res,next) => {
     try {
         const id = req.params.id;
-        const category = await categorySchema.findByIdAndDelete(id);
+        const category = await categorySchema.findById(id);
+        if(category.isListed){
+          await categorySchema.findByIdAndUpdate(id,{isListed:false})
+        }else{
+          await categorySchema.findByIdAndUpdate(id,{isListed:true})
+        }
         
-        
-    
-
         if(!category){
             return res.json({success:false,message:"Category not found"})
         }
         return res.json({success:true,message:"Successfully Deleted"})
     } catch (error) {
+      console.log(" delete category error")
         next(error);
     }
     

@@ -62,10 +62,8 @@ router.post("/email-verify-otp", isAuth, userController.verifyChangeEmailOtp);
 router.post('/profile-change-pass',isAuth,userController.changePassword);
 
 router.get('/address',isAuth,userController.getAddress);
-
 router.get('/add-address',isAuth,userController.getAddAddress);
 router.post('/add-address',isAuth,userController.addAddress);
-
 router.get('/edit-address/:id',isAuth,userController.getEditAddress);
 router.put('/edit-address/:id',isAuth,userController.editAddress);
 router.delete('/delete-address/:id', isAuth, userController.deleteAddress);
@@ -92,8 +90,8 @@ router.post('/payment',isAuth,userController.placeOrder);
 router.get('/order-success',isAuth,userController.getOrderSuccess);
 router.get('/order-details/:orderId',isAuth,userController.getOrderDetails);
 router.get('/my-orders',isAuth,userController.getMyOrders);
+router.put('/cancel-order/:orderId',isAuth,userController.cancelOrder);
 
-// Return and wallet routes
 router.post('/request-return',isAuth,userController.requestReturn);
 router.get('/my-returns',isAuth,userController.getMyReturns);
 router.get('/wallet',isAuth,userController.getWallet);

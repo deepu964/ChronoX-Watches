@@ -31,17 +31,17 @@ const getCoupon = async (req,res,next) => {
 
     });
     } catch (error) {
-       
+       console.log("get coupon error")
         next(error)
     
 }
 } 
 
-
 const getAddCoupon = async (req,res,next) => {
     try {
         res.render('admin/addCoupon');
     } catch (error) {
+        console.log(" add coupon error")
         next(error)
     }
     
@@ -50,7 +50,7 @@ const getAddCoupon = async (req,res,next) => {
 const addCoupon = async (req,res,next) => {
    try {
     const {name,discount,expiryDate,minPurchase} = req.body;
-    console.log(req.body,'this is couponnnnn')
+    
 
     const existsCoupon = await couponSchema.findOne({name:name});
     if(existsCoupon ){
@@ -69,6 +69,7 @@ const addCoupon = async (req,res,next) => {
     res.status(200).json({success:true, message:"Coupon Add Successfull"})
    
    } catch (error) {
+    console.log("add coupon error")
     next(error)
    } 
 }
@@ -87,6 +88,7 @@ const deleteCoupon = async (req,res,next) => {
         res.status(200).json({success:true,message:"Coupon deleted successfull"});
 
     } catch (error) {
+        console.log(" delete coupon error")
        next(error); 
     }
     

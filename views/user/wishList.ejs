@@ -447,7 +447,7 @@
         }
 
         .empty-icon {
-            font-size: 80px;
+            font-size: 50px;
             color: #ddd;
             margin-bottom: 30px;
         }
@@ -592,7 +592,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#">
+                    <a href="/my-orders">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
                             <span>My Order</span>
@@ -600,16 +600,16 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#">
+                    <a href="/wish-list">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-heart"></i></div>
                             <span>My Wishlist</span>
                         </div>
-                        <span class="wishlist-badge">4</span>
+                        <span class="wishlist-badge"><%= wishlistProducts.length %></span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="/wish-list">
+                    <a href="/wallet">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-wallet"></i></div>
                             <span>My Wallet</span>
@@ -617,21 +617,21 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="/coupon">
+                    <a href="#">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-ticket-alt"></i></div>
                             <span>My Coupon</span>
                         </div>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="#" id="changePasswordBtn">
+                <!-- <li class="menu-item">
+                    <a href="" id="changePasswordBtn">
                         <div class="menu-left">
                             <div class="menu-icon"><i class="fas fa-key"></i></div>
                             <span>Change password</span>
                         </div>
                     </a>
-                </li>
+                </li> -->
                 <li class="menu-item">
                     <a href="/logout">
                         <div class="menu-left">
@@ -651,7 +651,7 @@
             </ul>
         </aside>
 
-        <!-- Main Content -->
+        
         <div class="main-content">
             <div class="breadcrumb">
                 Home > My Account > Wishlist

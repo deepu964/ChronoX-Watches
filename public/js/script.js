@@ -1,8 +1,8 @@
-// Global variables
+
 let selectedPaymentMethod = 'card';
 let appliedCoupon = null;
 
-// Navigation functions
+
 function goToPayment() {
     window.location.href = 'payment.html';
 }
@@ -11,7 +11,7 @@ function continueShopping() {
     window.location.href = 'index.html';
 }
 
-// Coupon modal functions
+
 function openCouponModal() {
     document.getElementById('couponModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -33,7 +33,7 @@ function checkCoupon() {
         return;
     }
     
-    // Simulate coupon validation
+    
     const validCoupons = {
         'MYNTRA300': {
             code: 'MYNTRA 300',
@@ -86,14 +86,14 @@ function applyCoupon(couponCode = null) {
     appliedCoupon = couponCode;
     closeCouponModal();
     
-    // Update UI to show applied coupon
+    
     const couponDiscountElements = document.querySelectorAll('.apply-coupon-link');
     couponDiscountElements.forEach(element => {
         element.textContent = `-₹${getCouponDiscount(couponCode)}`;
         element.style.color = '#4caf50';
     });
     
-    // Update total amount
+    
     updateTotalAmount();
     
     alert('Coupon applied successfully!');
@@ -119,25 +119,24 @@ function updateTotalAmount() {
     });
 }
 
-// Payment method selection
+
 function selectPaymentMethod(method) {
     selectedPaymentMethod = method;
     
-    // Update active state
+    
     document.querySelectorAll('.payment-option').forEach(option => {
         option.classList.remove('active');
     });
     
     event.target.closest('.payment-option').classList.add('active');
     
-    // Show/hide card form
     const cardForm = document.getElementById('cardForm');
     if (cardForm) {
         cardForm.style.display = method === 'card' ? 'block' : 'none';
     }
 }
 
-// Form validation functions
+
 function validateCardNumber(cardNumber) {
     const cleaned = cardNumber.replace(/\s/g, '');
     return /^\d{13,19}$/.test(cleaned);
@@ -170,7 +169,7 @@ function validateCardName(name) {
     return /^[a-zA-Z\s]{2,}$/.test(name.trim());
 }
 
-// Input formatting
+
 function formatCardNumber(input) {
     let value = input.value.replace(/\s/g, '');
     let formattedValue = value.replace(/(.{4})/g, '$1 ');
@@ -188,7 +187,7 @@ function formatExpiryDate(input) {
     input.value = value;
 }
 
-// Payment processing
+
 function processPayment(event) {
     event.preventDefault();
     
@@ -197,7 +196,7 @@ function processPayment(event) {
     const expiryDate = document.getElementById('expiryDate').value;
     const cvv = document.getElementById('cvv').value;
     
-    // Clear previous errors
+   
     document.querySelectorAll('.error-message').forEach(error => {
         error.textContent = '';
     });
@@ -207,28 +206,28 @@ function processPayment(event) {
     
     let isValid = true;
     
-    // Validate card number
+    
     if (!validateCardNumber(cardNumber)) {
         document.getElementById('cardNumberError').textContent = 'Please enter a valid card number';
         document.getElementById('cardNumber').classList.add('error');
         isValid = false;
     }
     
-    // Validate card name
+    
     if (!validateCardName(cardName)) {
         document.getElementById('cardNameError').textContent = 'Please enter a valid name';
         document.getElementById('cardName').classList.add('error');
         isValid = false;
     }
     
-    // Validate expiry date
+    
     if (!validateExpiryDate(expiryDate)) {
         document.getElementById('expiryError').textContent = 'Please enter a valid expiry date';
         document.getElementById('expiryDate').classList.add('error');
         isValid = false;
     }
     
-    // Validate CVV
+    
     if (!validateCVV(cvv)) {
         document.getElementById('cvvError').textContent = 'Please enter a valid CVV';
         document.getElementById('cvv').classList.add('error');
@@ -236,7 +235,7 @@ function processPayment(event) {
     }
     
     if (isValid) {
-        // Simulate payment processing
+        
         const submitButton = event.target.querySelector('button[type="submit"]');
         submitButton.textContent = 'PROCESSING...';
         submitButton.disabled = true;
@@ -247,9 +246,9 @@ function processPayment(event) {
     }
 }
 
-// Event listeners
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Card number formatting
+    
     const cardNumberInput = document.getElementById('cardNumber');
     if (cardNumberInput) {
         cardNumberInput.addEventListener('input', function() {
@@ -257,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Expiry date formatting
+    
     const expiryInput = document.getElementById('expiryDate');
     if (expiryInput) {
         expiryInput.addEventListener('input', function() {
@@ -265,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // CVV input restriction
+    
     const cvvInput = document.getElementById('cvv');
     if (cvvInput) {
         cvvInput.addEventListener('input', function() {
@@ -273,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Close modal when clicking outside
+    
     const modal = document.getElementById('couponModal');
     if (modal) {
         modal.addEventListener('click', function(event) {
@@ -283,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Keyboard navigation for modal
+    
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeCouponModal();
@@ -291,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Utility functions
+
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = notification `${type}`;
@@ -315,7 +314,7 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Add some interactive features
+
 function addToWishlist(itemId) {
     showNotification('Item added to wishlist!');
 }
@@ -323,19 +322,19 @@ function addToWishlist(itemId) {
 function removeItem(itemId) {
     if (confirm('Are you sure you want to remove this item?')) {
         showNotification('Item removed from cart!');
-        // Here you would typically update the cart
+        
     }
 }
 
-// Simulate real-time price updates
+
 function updatePrices() {
-    // This could be connected to a real API
+    
     console.log('Prices updated');
 }
 
-// Initialize page
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Add smooth scrolling
+   
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
@@ -348,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Add loading states to buttons
+    
     document.querySelectorAll('button').forEach(button => {
         button.addEventListener('click', function() {
             if (!this.disabled) {

@@ -16,19 +16,22 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            padding: 20px;
+            
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
+
         }
+        
 
         .page-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 15px;
             padding: 30px;
+            margin-top: 30px;
             margin-bottom: 30px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -249,11 +252,13 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+           
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            
         }
 
         .btn-secondary {
@@ -269,14 +274,14 @@
 
         .empty-orders {
             text-align: center;
-            padding: 60px 20px;
             color: #666;
+            
         }
 
         .empty-orders i {
-            font-size: 80px;
+            font-size: 20px;
             color: #ddd;
-            margin-bottom: 20px;
+            padding: 8px;
         }
 
         .empty-orders h3 {
@@ -354,13 +359,13 @@
     <%- include("../partials/user/header") %>
     
     <div class="container">
-        <!-- Page Header -->
+        
         <div class="page-header">
             <h1 class="page-title">My Orders</h1>
             <p class="page-subtitle">Track and manage all your orders</p>
         </div>
 
-        <!-- Orders Container -->
+        
         <div class="orders-container">
             <div class="orders-header">
                 <div class="orders-count">
@@ -379,7 +384,7 @@
                 </div>
             </div>
 
-            <!-- Orders List -->
+            
             <% if (orders && orders.length > 0) { %>
                 <% orders.forEach(order => { %>
                     <div class="order-card" data-status="<%= order.status.toLowerCase() %>">
@@ -437,8 +442,7 @@
                                 </a>
                                 <% if (order.status === 'Placed') { %>
                                     <button class="btn btn-secondary" onclick="cancelOrder('<%= order._id %>')">
-                                        <i class="fas fa-times"></i>
-                                        Cancel
+                                        <i class="fas fa-times"></i> Cancel
                                     </button>
                                 <% } %>
                             </div>
@@ -508,12 +512,29 @@
 
         function cancelOrder(orderId) {
             if (confirm('Are you sure you want to cancel this order?')) {
-                // Add cancel order functionality here
-                alert('Order cancellation functionality will be implemented');
-            }
-        }
 
-        // Add entrance animations
+                     fetch(`/cancel-order/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => {
+                if (res.ok) {
+                    showToast('Order cancelled successfully.');
+                    window.location.reload(); 
+                } else {
+                    showToast('Failed to cancel order.','error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred.','error');
+            });
+        }
+    } 
+
+       
         document.addEventListener('DOMContentLoaded', function() {
             const orderCards = document.querySelectorAll('.order-card');
             orderCards.forEach((card, index) => {

@@ -14,9 +14,9 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            
         }
 
         .cart-container {
@@ -654,7 +654,7 @@
             cursor: pointer;
         }
 
-        /* Empty Cart Styles */
+        
         .empty-cart {
             text-align: center;
             padding: 80px 40px;
@@ -664,7 +664,7 @@
         }
 
         .empty-cart-icon {
-            font-size: 120px;
+            font-size: 50px;
             color: #e0e0e0;
             margin-bottom: 30px;
             animation: float 3s ease-in-out infinite;
@@ -738,7 +738,7 @@
 
         .empty-cart-features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(1px, 1fr));
             gap: 30px;
             margin-top: 60px;
             padding: 40px 0;
@@ -751,7 +751,7 @@
         }
 
         .feature-icon {
-            font-size: 48px;
+            font-size: 30px;
             color: #667eea;
             margin-bottom: 15px;
         }
@@ -939,10 +939,10 @@
                             <span class="green">- ₹<%= discount.toLocaleString() %></span>
                         </div>
 
-                        <div class="price-row">
+                        <!-- <div class="price-row">
                             <span>Coupon Discount</span>
                             <span class="red">Apply Coupon</span>
-                        </div>
+                        </div> -->
 
                         <div class="price-row">
                             <span>Shipping Fee</span>

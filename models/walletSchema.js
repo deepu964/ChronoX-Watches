@@ -46,7 +46,7 @@ const walletSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Method to add money to wallet
+
 walletSchema.methods.addMoney = function(amount, description, orderId = null, returnId = null) {
   this.balance += amount;
   this.transactions.push({
@@ -59,7 +59,7 @@ walletSchema.methods.addMoney = function(amount, description, orderId = null, re
   return this.save();
 };
 
-// Method to deduct money from wallet
+
 walletSchema.methods.deductMoney = function(amount, description, orderId = null) {
   if (this.balance < amount) {
     throw new Error('Insufficient wallet balance');

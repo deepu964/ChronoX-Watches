@@ -56,11 +56,12 @@
                                     <h4 class="filter-group-title">Category</h4>
                                     <% categories.forEach(cat=> { %>
                                         <div class="filter-option active">
-                                            <input type="checkbox" name="categoryId" value="<%= cat._id %>"
+                                          
+                                            <input type="checkbox" id="catId" name="categoryId" value="<%= cat._id %>"
                                                 <%=categoryFilter.includes(cat._id.toString()) ? 'checked' : '' %>
                                             onchange="document.getElementById('filterForm').submit()"
                                             >
-                                            <label>
+                                            <label for="catId">
                                                 <%= cat.name %>
                                             </label>
                                         </div>
@@ -164,7 +165,7 @@
                         <i class="fas fa-chevron-left"></i>
                     </a>
                     <% } %>
-                        <% for (let i=1; i <=totalPage; i++) { %>
+                        <% for (let i=1; i <totalPage; i++) { %>
                             <a href="/shop?page=<%= i %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>"
                                 class="page-btn <%= currentPage === i ? 'active' : '' %>">
                                 <%= i %>
