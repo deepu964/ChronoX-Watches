@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/userProfile.css">
     <style>
-       * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -20,13 +20,12 @@
             color: #333;
         }
 
-
         .wallet-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         .wallet-header {
             background: linear-gradient(135deg, #4f46e5, #7c3aed);
             color: white;
@@ -35,32 +34,32 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .wallet-balance {
             font-size: 48px;
             font-weight: bold;
             margin: 10px 0;
         }
-        
+
         .wallet-label {
             font-size: 18px;
             opacity: 0.9;
         }
-        
+
         .transactions-section {
             background: white;
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
+
         .section-title {
             font-size: 24px;
             font-weight: 600;
             margin-bottom: 20px;
             color: #333;
         }
-        
+
         .transaction-item {
             display: flex;
             justify-content: space-between;
@@ -68,51 +67,51 @@
             padding: 15px 0;
             border-bottom: 1px solid #f0f0f0;
         }
-        
+
         .transaction-item:last-child {
             border-bottom: none;
         }
-        
+
         .transaction-info {
             flex: 1;
         }
-        
+
         .transaction-description {
             font-weight: 600;
             color: #333;
             margin-bottom: 5px;
         }
-        
+
         .transaction-date {
             font-size: 12px;
             color: #666;
         }
-        
+
         .transaction-amount {
             font-weight: 600;
             font-size: 16px;
         }
-        
+
         .transaction-amount.credit {
             color: #16a34a;
         }
-        
+
         .transaction-amount.debit {
             color: #dc2626;
         }
-        
+
         .empty-transactions {
             text-align: center;
             padding: 40px;
             color: #666;
         }
-        
+
         .empty-transactions i {
             font-size: 48px;
             margin-bottom: 20px;
             color: #ddd;
         }
-        
+
         .back-btn {
             color: white;
             background-color: black;
@@ -122,80 +121,114 @@
             height: 40px;
             border-radius: 8px;
         }
-         
-        
+
         .back-btn:hover {
             background: #4f46e5;
         }
 
+        .pagination {
+            text-align: center;
+            margin-top: 30px;
+        }
 
+        .pagination a,
+        .pagination span {
+            display: inline-block;
+            padding: 8px 14px;
+            margin: 0 5px;
+            border-radius: 6px;
+            text-decoration: none;
+            background: #f0f0f0;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .pagination a:hover {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .pagination .active {
+            background-color: #4f46e5;
+            color: white;
+        }
     </style>
 </head>
 <body>
 <%- include("../partials/user/header") %>
-    <div class="container">
-        <a href="/userProfile" class="back-bttn">
-            <button class="back-btn">Back to Profile</button>
-        </a>
-        
-        <div class="wallet-container">
-            
-            <div class="wallet-header">
-                <div class="wallet-label">My Wallet Balance</div>
-                <div class="wallet-balance">₹<%= wallet.balance.toLocaleString('en-IN') %></div>
-                <div style="opacity: 0.8; margin-top: 10px;">
-                    <i class="fas fa-wallet"></i> Available for use
-                </div>
-            </div>
-            
-          
-            <div class="transactions-section">
-                <h2 class="section-title">
-                    <i class="fas fa-history"></i> Transaction History
-                </h2>
-                
-                <% if (wallet.transactions && wallet.transactions.length > 0) { %>
-                    <% wallet.transactions.slice().reverse().forEach(transaction => { %>
-                        <div class="transaction-item">
-                            <div class="transaction-info">
-                                <div class="transaction-description">
-                                    <% if (transaction.type === 'credit') { %>
-                                        <i class="fas fa-plus-circle" style="color: #16a34a; margin-right: 8px;"></i>
-                                    <% } else { %>
-                                        <i class="fas fa-minus-circle" style="color: #dc2626; margin-right: 8px;"></i>
-                                    <% } %>
-                                    <%= transaction.description %>
-                                </div>
-                                <div class="transaction-date">
-                                    <%= new Date(transaction.createdAt).toLocaleDateString('en-IN', { 
-                                        year: 'numeric', 
-                                        month: 'long', 
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    }) %>
-                                </div>
-                            </div>
-                            <div class="transaction-amount <%= transaction.type %>">
-                                <% if (transaction.type === 'credit') { %>
-                                    +₹<%= transaction.amount.toLocaleString('en-IN') %>
-                                <% } else { %>
-                                    -₹<%= transaction.amount.toLocaleString('en-IN') %>
-                                <% } %>
-                            </div>
-                        </div>
-                    <% }) %>
-                <% } else { %>
-                    <div class="empty-transactions">
-                        <i class="fas fa-receipt"></i>
-                        <h3>No Transactions Yet</h3>
-                        <p>Your transaction history will appear here when you make purchases or receive refunds.</p>
-                    </div>
-                <% } %>
+<div class="container">
+    <a href="/userProfile" class="back-bttn">
+        <button class="back-btn">Back to Profile</button>
+    </a>
+
+    <div class="wallet-container">
+
+        <div class="wallet-header">
+            <div class="wallet-label">My Wallet Balance</div>
+            <div class="wallet-balance">₹<%= wallet.balance.toLocaleString('en-IN') %></div>
+            <div style="opacity: 0.8; margin-top: 10px;">
+                <i class="fas fa-wallet"></i> Available for use
             </div>
         </div>
+
+        <div class="transactions-section">
+            <h2 class="section-title">
+                <i class="fas fa-history"></i> Transaction History
+            </h2>
+
+            <% if (transactions && transactions.length > 0) { %>
+                <% transactions.forEach(transaction => { %>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-description">
+                                <% if (transaction.type === 'credit') { %>
+                                    <i class="fas fa-plus-circle" style="color: #16a34a; margin-right: 8px;"></i>
+                                <% } else { %>
+                                    <i class="fas fa-minus-circle" style="color: #dc2626; margin-right: 8px;"></i>
+                                <% } %>
+                                <%= transaction.description %>
+                            </div>
+                            <div class="transaction-date">
+                                <%= new Date(transaction.createdAt).toLocaleDateString('en-IN', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </div>
+                        </div>
+                        <div class="transaction-amount <%= transaction.type %>">
+                            <% if (transaction.type === 'credit') { %>
+                                +₹<%= transaction.amount.toLocaleString('en-IN') %>
+                            <% } else { %>
+                                -₹<%= transaction.amount.toLocaleString('en-IN') %>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <% for (let i = 1; i <= totalPage; i++) { %>
+                        <% if (i === currentPage) { %>
+                            <span class="active"><%= i %></span>
+                        <% } else { %>
+                            <a href="?page=<%= i %>"><%= i %></a>
+                        <% } %>
+                    <% } %>
+                </div>
+
+            <% } else { %>
+                <div class="empty-transactions">
+                    <i class="fas fa-receipt"></i>
+                    <h3>No Transactions Yet</h3>
+                    <p>Your transaction history will appear here when you make purchases or receive refunds.</p>
+                </div>
+            <% } %>
+        </div>
     </div>
-    
+</div>
 <%- include("../partials/user/footer") %>
 </body>
 </html>

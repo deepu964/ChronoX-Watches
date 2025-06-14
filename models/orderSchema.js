@@ -5,7 +5,9 @@ const orderSchema = new mongoose.Schema({
   items: [{
     product: { type: mongoose.Schema.Types.ObjectId, ref: 'product' },
     quantity: Number,
+    variantIndex: Number,
     price: Number,
+    discount:Number
   }],
   address: {
     fullName: String,
@@ -26,3 +28,4 @@ const orderSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Order', orderSchema);
+

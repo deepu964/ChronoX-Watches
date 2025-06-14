@@ -186,7 +186,18 @@ const processReturn = async (req, res, next) => {
             }, { upsert: false });
 
             
-            returnRequest.status = 'Refunded';
+           for (const item of returnRequest.items) {
+                if (item.product && item.product._id) {
+                    const product = await Product.findById(item.product._id);
+                    if (product && product.variants[0].quantity) {
+                        product.variants[0].quantity += item.quantity;
+                        await product.save();
+                    }
+                }
+            }
+
+            
+            returnRequest.status = 'Approved';
             returnRequest.refundedAt = new Date();
             await returnRequest.save();
 

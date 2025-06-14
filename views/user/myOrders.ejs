@@ -436,6 +436,10 @@
                                 Total: ₹<%= order.totalAmount.toLocaleString() %>
                             </div>
                             <div class="order-actions">
+                                <a href="/download-invoice/<%= order.id %>" class="btn btn-primary">
+                                    <i class="fas fa-eye"></i>
+                                    Invoice
+                                </a>
                                 <a href="/order-details/<%= order._id %>" class="btn btn-primary">
                                     <i class="fas fa-eye"></i>
                                     View Details

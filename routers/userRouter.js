@@ -7,7 +7,7 @@ const router = express.Router();
 const checkBlocked = require('../middlewares/checkBlocked');
 const isAuth = require('../middlewares/userAuth');
 const productController = require('../controller/admin/productController');
-
+const invoice = require('../controller/user/invoiceController');
 
 router.get('/',checkBlocked, isAuth,userController.getLoadHomePage);
 
@@ -58,7 +58,6 @@ router.post("/user-email-change", isAuth, userController.changeEmail);
 router.get("/profile/otp-sent", isAuth, userController.getChangeEmailOtp);
 router.post("/email-verify-otp", isAuth, userController.verifyChangeEmailOtp);
 
-
 router.post('/profile-change-pass',isAuth,userController.changePassword);
 
 router.get('/address',isAuth,userController.getAddress);
@@ -96,6 +95,7 @@ router.post('/request-return',isAuth,userController.requestReturn);
 router.get('/my-returns',isAuth,userController.getMyReturns);
 router.get('/wallet',isAuth,userController.getWallet);
 
+router.get('/download-invoice/:orderId',isAuth,invoice.generateInvoice);
 
 
 module.exports = router;

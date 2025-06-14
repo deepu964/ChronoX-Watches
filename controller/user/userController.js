@@ -220,11 +220,6 @@ const signUp = async (req, res) => {
         }
 
 
-        const existingMobile = await User.findOne({ mobile });
-        if (existingMobile) {
-            return res.redirect('/signup?message=User already exists with this mobile number');
-        }
-
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const otp = generateOtp();
@@ -1368,7 +1363,6 @@ const placeOrder = async (req, res) => {
 
         let total = 0;
         const orderItems = [];
-
         for (const item of cart.items) {
             const product = item.product;
 
@@ -1383,6 +1377,8 @@ const placeOrder = async (req, res) => {
             }
 
             const itemPrice = variant.salePrice || variant.regularPrice;
+            const discount = variant.regularPrice - variant.salePrice
+            
 
             if (!itemPrice || itemPrice <= 0 || isNaN(itemPrice)) {
                 return res.status(400).json({ success: false, message: `${product.name} has invalid pricing` });
@@ -1396,7 +1392,8 @@ const placeOrder = async (req, res) => {
             orderItems.push({
                 product: product._id,
                 quantity: item.quantity,
-                price: itemPrice
+                price: itemPrice,
+                discount:discount
             });
 
             total += item.quantity * itemPrice;
@@ -1627,7 +1624,7 @@ const getMyReturns = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
+        const limit = 5;
         const skip = (page - 1) * limit;
 
         const totalReturns = await Return.countDocuments({ user: userId });
@@ -1662,19 +1659,31 @@ const getMyReturns = async (req, res, next) => {
 const getWallet = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
+        let page = parseInt(req.query.page) || 1;
+        const limit = 5;
 
         let wallet = await Wallet.findOne({ user: userId });
         if (!wallet) {
             wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
             await wallet.save();
-
-
             await User.findByIdAndUpdate(userId, { wallet: wallet._id });
         }
 
+        const totalTransactions = wallet.transactions.length;
+        const totalPage = Math.ceil(totalTransactions / limit);
+
+        
+        const transactions = wallet.transactions
+            .slice()
+            .reverse()
+            .slice((page - 1) * limit, page * limit);
+
         res.render('user/wallet', {
             user: req.session.user,
-            wallet
+            wallet,
+            transactions,
+            currentPage: page,
+            totalPage
         });
 
     } catch (error) {
@@ -1682,6 +1691,8 @@ const getWallet = async (req, res, next) => {
         next(error);
     }
 };
+
+
 
 
 
