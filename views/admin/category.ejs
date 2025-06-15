@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/category.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -259,8 +260,17 @@
        
         const addOfferButtons = document.querySelectorAll('.add-offer-btn');
         addOfferButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const offerType = prompt('Enter offer type (e.g., "20%Off" or "200rs Off"):');
+            btn.addEventListener('click', async function() {
+                const { value: offerType } = await Swal.fire({
+                    title: 'Add Offer',
+                    text: 'Enter offer type (e.g., "20%Off" or "200rs Off"):',
+                    input: 'text',
+                    inputPlaceholder: 'Enter offer type...',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Add Offer'
+                });
                 if (offerType) {
                     const td = this.parentNode;
                     
@@ -274,17 +284,35 @@
                     deleteBtn.className = 'action-btn delete';
                     deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
                     
-                   
-                    deleteBtn.addEventListener('click', function() {
-                        if (confirm('Are you sure you want to delete this offer?')) {
+
+                    deleteBtn.addEventListener('click', async function() {
+                        const result = await Swal.fire({
+                            title: 'Are you sure?',
+                            text: 'Do you want to delete this offer?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Yes, delete it!'
+                        });
+
+                        if (result.isConfirmed) {
                             td.innerHTML = '';
                             const addOfferBtn = document.createElement('button');
                             addOfferBtn.className = 'add-offer-btn';
                             addOfferBtn.textContent = 'Add Offer';
                             td.appendChild(addOfferBtn);
-                            
-                            
+
+
                             addOfferBtn.addEventListener('click', arguments.callee.caller);
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Offer has been deleted.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
                         }
                     });
                     

@@ -1,5 +1,5 @@
 
-
+// This file will be restructured - keeping as backup
 const bcrypt = require('bcrypt');
 const User = require('../../models/userSchema');
 const categorySchema = require('../../models/categorySchema')
@@ -1162,17 +1162,28 @@ const checkoutGetController = async (req, res, next) => {
         const addresses = await addressSchema.find({ userId });
         const defaultAddress = addresses.find(addr => addr.isDefault);
 
+
+
         const cart = await Cart.findOne({ user: userId }).populate('items.product').lean();
+        
+
         if (!cart || !cart.items || cart.items.length === 0) {
+
             return res.redirect('/cart');
         }
 
+        
+        
+    
         let subTotal = 0;
 
         const cartItems = cart.items.map(item => {
             const product = item.product;
+            
 
-
+            // if(product.isActive === true){
+            //     return res.status(500).json({success:false, message:"product blocked"});
+            // }
             const variant = product.variants?.[0] || {};
             const price = variant.salePrice || variant.regularPrice || 0;
 
@@ -1185,10 +1196,11 @@ const checkoutGetController = async (req, res, next) => {
                 image: product.images?.[0]?.public_id || '/images/default-product.jpg',
                 quantity: item.quantity,
                 price,
-                total
+                total,
+
             };
         });
-
+        
 
         const shipping = 50;
         const discount = 0;
@@ -1208,7 +1220,7 @@ const checkoutGetController = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.log(' get ckeck out page error')
+        console.log('get ckeck out page error')
         next(error);
     }
 };

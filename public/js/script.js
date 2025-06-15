@@ -29,7 +29,12 @@ function checkCoupon() {
     const couponDetails = document.getElementById('couponDetails');
     
     if (!couponCode) {
-        alert('Please enter a coupon code');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Missing Coupon Code',
+            text: 'Please enter a coupon code',
+            confirmButtonColor: '#3085d6'
+        });
         return;
     }
     
@@ -74,7 +79,12 @@ function checkCoupon() {
         `;
         couponDetails.style.display = 'block';
     } else {
-        alert('Invalid coupon code. Please try again.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Coupon',
+            text: 'Invalid coupon code. Please try again.',
+            confirmButtonColor: '#3085d6'
+        });
     }
 }
 
@@ -96,7 +106,15 @@ function applyCoupon(couponCode = null) {
     
     updateTotalAmount();
     
-    alert('Coupon applied successfully!');
+    Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Coupon applied successfully!',
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
 }
 
 function getCouponDiscount(couponCode) {
@@ -291,27 +309,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+// Use the standardized showToast function from notifications.js
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
-    notification.className = notification `${type}`;
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background:${type === 'success' ? '#4caf50' : '#f44336'};
-        color: white;
-        border-radius: 6px;
-        z-index: 1001;
-        animation: slideIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+    showToast(message, type);
 }
 
 
@@ -320,10 +320,20 @@ function addToWishlist(itemId) {
 }
 
 function removeItem(itemId) {
-    if (confirm('Are you sure you want to remove this item?')) {
-        showNotification('Item removed from cart!');
-        
-    }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to remove this item?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, remove it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showNotification('Item removed from cart!');
+            // Add your item removal logic here
+        }
+    });
 }
 
 

@@ -13,17 +13,8 @@ const placeOrderBtn = document.querySelector(".place-order-btn")
 const showMoreBtn = document.querySelector(".show-more")
 
 
-function showToast(message, type = "success") {
-  toastMessage.textContent = message
-  toast.className = "toast"
-  toast.classList.add(type)
-  toast.classList.add("show")
-
-  
-  setTimeout(() => {
-    toast.classList.remove("show")
-  }, 3000)
-}
+// Use the standardized showToast function from notifications.js
+// This function is now available globally
 
 
 applyCouponBtn.addEventListener("click", () => {

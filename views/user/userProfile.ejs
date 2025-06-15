@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronoX - User Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             margin: 0;
@@ -951,15 +952,8 @@
                     window.location.href = '/profile/otp-sent';
                 }
 
-                // const verifyRes = await fetch('/profile/verify-email-otp', {
-                // method: "POST",
-                // headers: {'Content-Type': 'application/json'},
-                // body: JSON.stringify({ otp })
-                // });
-
-                // const result = await verifyRes.json();
-                // alert(result.message);
-                // if (verifyRes.ok) location.reload();
+                // OTP verification is now handled on a separate page
+                // with proper SweetAlert notifications
             } else {
                 
                 const res = await fetch('/userProfile', {
@@ -1028,7 +1022,12 @@
         document.querySelector('.message-btn').addEventListener('click', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Messages...';
             setTimeout(() => {
-                alert('Messages feature coming soon!');
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Coming Soon!',
+                    text: 'Messages feature coming soon!',
+                    confirmButtonColor: '#3085d6'
+                });
                 this.innerHTML = '<i class="fas fa-envelope"></i> Your Messages';
             }, 1000);
         });
@@ -1055,7 +1054,12 @@
         document.querySelector('.search-icon').addEventListener('click', function() {
             const searchInput = document.querySelector('.search-box input');
             if (searchInput.value.trim()) {
-                alert(`Searching for: ${searchInput.value}`);
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Search',
+                    text: `Searching for: ${searchInput.value}`,
+                    confirmButtonColor: '#3085d6'
+                });
             }
         });
 
@@ -1063,11 +1067,26 @@
         document.querySelectorAll('.header-icons i').forEach(icon => {
             icon.addEventListener('click', function() {
                 if (this.classList.contains('fa-heart')) {
-                    alert('Wishlist feature coming soon!');
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Coming Soon!',
+                        text: 'Wishlist feature coming soon!',
+                        confirmButtonColor: '#3085d6'
+                    });
                 } else if (this.classList.contains('fa-shopping-cart')) {
-                    alert('Shopping cart feature coming soon!');
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Coming Soon!',
+                        text: 'Shopping cart feature coming soon!',
+                        confirmButtonColor: '#3085d6'
+                    });
                 } else if (this.classList.contains('fa-user')) {
-                    alert('User menu feature coming soon!');
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Coming Soon!',
+                        text: 'User menu feature coming soon!',
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
             });
         });

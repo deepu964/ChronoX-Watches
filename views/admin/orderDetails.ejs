@@ -6,6 +6,7 @@
     <title>ChronoX - Order Details</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/userlist.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .order-details-container {
             background: white;
@@ -384,20 +385,36 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Order status updated successfully!');
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Order status updated successfully!',
+                        confirmButtonColor: '#3085d6'
+                    }).then(() => {
+                        location.reload();
+                    });
                 } else {
-                    alert('Failed to update order status: ' + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
+                        text: 'Failed to update order status: ' + data.message,
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while updating the status');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while updating the status',
+                    confirmButtonColor: '#3085d6'
+                });
             });
         }
 
         <% if (returnRequest) { %>
-        function processReturn(action) {
+        async function processReturn(action) {
             const adminNotes = document.getElementById('adminNotes').value;
             const returnId = '<%= returnRequest._id %>';
 
@@ -405,7 +422,17 @@
                 ? 'Are you sure you want to approve this return? The refund will be automatically credited to the customer\'s wallet.'
                 : 'Are you sure you want to reject this return request?';
 
-            if (!confirm(confirmMessage)) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: confirmMessage,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: action === 'approve' ? '#28a745' : '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: action === 'approve' ? 'Yes, approve it!' : 'Yes, reject it!'
+            });
+
+            if (!result.isConfirmed) {
                 return;
             }
 
@@ -423,18 +450,38 @@
             .then(data => {
                 if (data.success) {
                     if (action === 'approve') {
-                        alert(`Return approved! ₹${data.refundAmount.toLocaleString('en-IN')} has been credited to ${data.customerInfo.name}'s wallet.`);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Return Approved!',
+                            text: `₹${data.refundAmount.toLocaleString('en-IN')} has been credited to ${data.customerInfo.name}'s wallet.`,
+                            confirmButtonColor: '#3085d6'
+                        });
                     } else {
-                        alert(data.message);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: data.message,
+                            confirmButtonColor: '#3085d6'
+                        });
                     }
                     location.reload();
                 } else {
-                    alert('Failed to process return: ' + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
+                        text: 'Failed to process return: ' + data.message,
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while processing the return');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while processing the return',
+                    confirmButtonColor: '#3085d6'
+                });
             });
         }
         <% } %>

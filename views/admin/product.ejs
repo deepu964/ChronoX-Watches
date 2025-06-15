@@ -6,6 +6,8 @@
     <title>ChronoX - Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/product.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <!-- Mobile Menu Toggle -->
@@ -280,19 +282,31 @@
             });
         });
         
-        // // Add Offer Button
-        // const addOfferButtons = document.querySelectorAll('.add-offer-btn');
-        // addOfferButtons.forEach(btn => {
-        //     btn.addEventListener('click', function() {
-        //         const offerType = prompt('Enter offer type (e.g., "20%Off" or "200rs Off"):');
-        //         if (offerType) {
-        //             const offerTag = document.createElement('div');
-        //             offerTag.className = 'offer-tag';
-        //             offerTag.textContent = offerType;
-        //             this.parentNode.replaceChild(offerTag, this);
-        //         }
-        //     });
-        // });
+        // Add Offer Button (converted to SweetAlert)
+        const addOfferButtons = document.querySelectorAll('.add-offer-btn');
+        addOfferButtons.forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const { value: offerType } = await Swal.fire({
+                    title: 'Add Offer',
+                    text: 'Enter offer type (e.g., "20%Off" or "200rs Off"):',
+                    input: 'text',
+                    inputPlaceholder: 'Enter offer type...',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Add Offer'
+                });
+
+                if (offerType) {
+                    const offerTag = document.createElement('div');
+                    offerTag.className = 'offer-tag';
+                    offerTag.textContent = offerType;
+                    this.parentNode.replaceChild(offerTag, this);
+
+                    showToast('Offer added successfully!', 'success');
+                }
+            });
+        });
 
         function editProduct(id){
             window.location.href=`/admin/editproduct/edit/${id}`

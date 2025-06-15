@@ -412,41 +412,91 @@
             </h3>
             
             <% order.items.forEach(item => { %>
-                <div class="order-item">
+                <div class="order-item <%= item.status === 'Cancelled' ? 'cancelled-item' : '' %>">
                     <div class="item-image">
                         <% if (item.product.images && item.product.images.length > 0) { %>
-                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>" 
-                                 alt="<%= item.product.name %>" 
+                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>"
+                                 alt="<%= item.product.name %>"
                                  onerror="this.src='/images/placeholder.jpg'">
                         <% } else { %>
                             <img src="/images/placeholder.jpg" alt="No image">
                         <% } %>
                     </div>
                     <div class="item-details">
-                        <div class="item-name"><%= item.product.name %></div>
+                        <div class="item-name">
+                            <%= item.product.name %>
+                            <span class="item-status status-<%= item.status.toLowerCase() %>">
+                                <%= item.status %>
+                            </span>
+                        </div>
                         <div class="item-info">
                             <span>Quantity: <%= item.quantity %></span>
                             <span>Price: ₹<%= item.price.toLocaleString() %></span>
                         </div>
+                        <% if (item.status === 'Cancelled' && item.cancelledAt) { %>
+                            <div class="cancel-info">
+                                <small style="color: #dc3545;">
+                                    <i class="fas fa-times-circle"></i>
+                                    Cancelled on <%= new Date(item.cancelledAt).toLocaleDateString('en-IN') %>
+                                    <% if (item.cancelReason) { %>
+                                        <br>Reason: <%= item.cancelReason %>
+                                    <% } %>
+                                </small>
+                            </div>
+                        <% } %>
                     </div>
-                    <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
+                    <div class="item-actions">
+                        <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
+                        <% if (item.status === 'Placed' && order.status !== 'Cancelled') { %>
+                            <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
+                                <i class="fas fa-times"></i>
+                                Cancel Item
+                            </button>
+                        <% } %>
+                    </div>
                 </div>
             <% }) %>
 
             <!-- Order Total -->
             <div class="total-section">
+                <%
+                    const activeItems = order.items.filter(item => item.status !== 'Cancelled');
+                    const cancelledItems = order.items.filter(item => item.status === 'Cancelled');
+                    const activeTotal = activeItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    const cancelledTotal = cancelledItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                %>
+
+                <% if (cancelledItems.length > 0) { %>
+                    <div class="total-row" style="color: #666;">
+                        <span>Original Subtotal:</span>
+                        <span>₹<%= (activeTotal + cancelledTotal).toLocaleString() %></span>
+                    </div>
+                    <div class="total-row" style="color: #dc3545;">
+                        <span>Cancelled Items:</span>
+                        <span>-₹<%= cancelledTotal.toLocaleString() %></span>
+                    </div>
+                <% } %>
+
                 <div class="total-row">
                     <span>Subtotal:</span>
-                    <span>₹<%= order.totalAmount.toLocaleString() %></span>
+                    <span>₹<%= activeTotal.toLocaleString() %></span>
                 </div>
-                <div class="total-row">
-                    <span>Shipping:</span>
-                    <span>₹50</span>
-                </div>
-                <div class="total-row">
-                    <span>Total Amount:</span>
-                    <span>₹<%= (order.totalAmount + 50).toLocaleString() %></span>
-                </div>
+
+                <% if (activeTotal > 0) { %>
+                    <div class="total-row">
+                        <span>Shipping:</span>
+                        <span>₹50</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Total Amount:</span>
+                        <span>₹<%= (activeTotal + 50).toLocaleString() %></span>
+                    </div>
+                <% } else { %>
+                    <div class="total-row" style="color: #dc3545;">
+                        <span>Total Amount:</span>
+                        <span>₹0 (All items cancelled)</span>
+                    </div>
+                <% } %>
             </div>
         </div>
 
@@ -731,7 +781,12 @@
             });
 
             if (selectedItems.length === 0) {
-                alert('Please select at least one item to return');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Items Selected',
+                    text: 'Please select at least one item to return',
+                    confirmButtonColor: '#3085d6'
+                });
                 return;
             }
 
@@ -752,16 +807,32 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
-                    closeReturnModal();
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        confirmButtonColor: '#3085d6'
+                    }).then(() => {
+                        closeReturnModal();
+                        location.reload();
+                    });
                 } else {
-                    alert(data.message || 'Failed to submit return request');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
+                        text: data.message || 'Failed to submit return request',
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while submitting the return request');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while submitting the return request',
+                    confirmButtonColor: '#3085d6'
+                });
             });
         });
 
@@ -770,6 +841,86 @@
             const modal = document.getElementById('returnModal');
             if (event.target === modal) {
                 closeReturnModal();
+            }
+        }
+
+        // Function to cancel individual order item
+        async function cancelOrderItem(orderId, itemId, productName) {
+            const { value: reason } = await Swal.fire({
+                title: 'Cancel Item',
+                text: `Are you sure you want to cancel "${productName}"?`,
+                input: 'select',
+                inputOptions: {
+                    'Changed my mind': 'Changed my mind',
+                    'Found better price': 'Found better price',
+                    'No longer needed': 'No longer needed',
+                    'Ordered by mistake': 'Ordered by mistake',
+                    'Other': 'Other reason'
+                },
+                inputPlaceholder: 'Select cancellation reason',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel item',
+                cancelButtonText: 'Keep item',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please select a reason for cancellation';
+                    }
+                }
+            });
+
+            if (reason) {
+                try {
+                    showLoadingDialog('Cancelling Item...', 'Please wait while we process your cancellation');
+
+                    const response = await fetch(`/cancel-order-item/${orderId}/${itemId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ reason })
+                    });
+
+                    const data = await response.json();
+                    closeLoadingDialog();
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Item Cancelled!',
+                            html: `
+                                <p>${data.message}</p>
+                                ${data.refundAmount > 0 ?
+                                    `<div style="background: #d4edda; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                                        <i class="fas fa-wallet" style="color: #28a745;"></i>
+                                        <strong>₹${data.refundAmount.toLocaleString()}</strong> has been credited to your wallet
+                                    </div>` : ''
+                                }
+                            `,
+                            confirmButtonColor: '#3085d6'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Cancellation Failed',
+                            text: data.message || 'Failed to cancel the item',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                } catch (error) {
+                    closeLoadingDialog();
+                    console.error('Error cancelling item:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while cancelling the item. Please try again.',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
             }
         }
     </script>
@@ -922,6 +1073,111 @@
         .btn.btn-warning:hover {
             background-color: #e67e22;
         }
+
+        /* Individual item cancellation styles */
+        .order-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .cancelled-item {
+            opacity: 0.6;
+            background-color: #f8f9fa;
+            border-left: 4px solid #dc3545;
+        }
+
+        .item-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-placed {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-shipped {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .status-delivered {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .item-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .btn-cancel-item {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-cancel-item:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .cancel-info {
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8d7da;
+            border-radius: 4px;
+            border-left: 3px solid #dc3545;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .order-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item-actions {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .btn-cancel-item {
+                font-size: 0.8rem;
+                padding: 5px 10px;
+            }
+        }
     </style>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

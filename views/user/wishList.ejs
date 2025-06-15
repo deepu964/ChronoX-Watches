@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Wishlist</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             margin: 0;
@@ -731,36 +732,7 @@
     const emptyWishlistBtn = document.querySelector('#emptyWishlist');
     const moveAllToBagBtn = document.querySelector('#moveAllToBag');
 
-    // Toast notification function
-    function showToast(message, type = 'success') {
-      // Create toast element
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#4CAF50' : '#f44336'};
-        color: white;
-        padding: 12px 24px;
-        border-radius: 4px;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.3s;
-      `;
-
-      document.body.appendChild(toast);
-
-      // Show toast
-      setTimeout(() => toast.style.opacity = '1', 100);
-
-      // Hide and remove toast
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => document.body.removeChild(toast), 300);
-      }, 3000);
-    }
+    // Toast function is now available globally from notifications.js
 
     // Remove item from wishlist
     removeBtns.forEach(btn => {
@@ -836,7 +808,17 @@
     // Empty entire wishlist
     if (emptyWishlistBtn) {
       emptyWishlistBtn.addEventListener('click', async function () {
-        if (!confirm('Are you sure you want to empty your wishlist?')) {
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'Do you want to empty your entire wishlist?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, empty it!'
+        });
+
+        if (!result.isConfirmed) {
           return;
         }
 

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoX - Notification System Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/notifications.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .section h3 {
+            color: #555;
+            margin-top: 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success { background: #28a745; }
+        .success:hover { background: #1e7e34; }
+        .error { background: #dc3545; }
+        .error:hover { background: #c82333; }
+        .warning { background: #ffc107; color: #212529; }
+        .warning:hover { background: #e0a800; }
+        .info { background: #17a2b8; }
+        .info:hover { background: #138496; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕰️ ChronoX Notification System Test</h1>
+        
+        <div class="section">
+            <h3>📢 Toast Notifications</h3>
+            <button onclick="showSuccessToast('Operation completed successfully!')">Success Toast</button>
+            <button class="error" onclick="showErrorToast('Something went wrong!')">Error Toast</button>
+            <button class="warning" onclick="showWarningToast('Please check your input!')">Warning Toast</button>
+            <button class="info" onclick="showInfoToast('Here is some information!')">Info Toast</button>
+        </div>
+
+        <div class="section">
+            <h3>💬 Dialog Boxes</h3>
+            <button onclick="testConfirmDialog()">Confirmation Dialog</button>
+            <button class="error" onclick="testDeleteConfirm()">Delete Confirmation</button>
+            <button class="success" onclick="showSuccessDialog('Success!', 'Your operation was completed successfully.')">Success Dialog</button>
+            <button class="error" onclick="showErrorDialog('Error!', 'Something went wrong with your request.')">Error Dialog</button>
+        </div>
+
+        <div class="section">
+            <h3>📝 Input Dialogs</h3>
+            <button onclick="testInputDialog()">Text Input</button>
+            <button onclick="testEmailInput()">Email Input</button>
+            <button onclick="testPasswordInput()">Password Input</button>
+        </div>
+
+        <div class="section">
+            <h3>⏳ Loading & Special</h3>
+            <button onclick="testLoadingDialog()">Loading Dialog</button>
+            <button class="success" onclick="testSuccessAndReload()">Success & Reload</button>
+            <button class="info" onclick="showComingSoon('Advanced Analytics')">Coming Soon</button>
+            <button class="warning" onclick="handleSessionExpired()">Session Expired</button>
+        </div>
+
+        <div class="section">
+            <h3>🔧 Utility Functions</h3>
+            <button onclick="testApiResponse(true)">API Success Response</button>
+            <button class="error" onclick="testApiResponse(false)">API Error Response</button>
+            <button class="warning" onclick="testValidationErrors()">Validation Errors</button>
+            <button onclick="testActionToast()">Action Toast</button>
+        </div>
+    </div>
+
+    <script>
+        // Test functions
+        function testConfirmDialog() {
+            showConfirmDialog('Are you sure?', 'Do you want to proceed with this action?')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessToast('Action confirmed!');
+                    } else {
+                        showInfoToast('Action cancelled');
+                    }
+                });
+        }
+
+        function testDeleteConfirm() {
+            showDeleteConfirm('product')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessToast('Product deleted successfully!');
+                    } else {
+                        showInfoToast('Delete cancelled');
+                    }
+                });
+        }
+
+        function testInputDialog() {
+            showInputDialog('Enter Product Name', 'Product name...')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessToast(`Product name: ${result.value}`);
+                    }
+                });
+        }
+
+        function testEmailInput() {
+            showInputDialog('Enter Email', 'your@email.com', 'email')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessToast(`Email: ${result.value}`);
+                    }
+                });
+        }
+
+        function testPasswordInput() {
+            showInputDialog('Enter Password', 'Password...', 'password')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessToast('Password entered successfully!');
+                    }
+                });
+        }
+
+        function testLoadingDialog() {
+            showLoadingDialog('Processing...', 'Please wait while we process your request');
+            setTimeout(() => {
+                closeLoadingDialog();
+                showSuccessToast('Processing completed!');
+            }, 3000);
+        }
+
+        function testSuccessAndReload() {
+            showSuccessAndReload('Changes saved successfully!', 3000);
+        }
+
+        function testApiResponse(success) {
+            const response = success 
+                ? { success: true, message: 'Data saved successfully!' }
+                : { success: false, message: 'Failed to save data' };
+            
+            handleApiResponse(response);
+        }
+
+        function testValidationErrors() {
+            const errors = [
+                'Name is required',
+                'Email must be valid',
+                'Password must be at least 8 characters'
+            ];
+            showValidationErrors(errors);
+        }
+
+        function testActionToast() {
+            showActionToast('Item added to cart', 'View Cart', () => {
+                showInfoToast('Redirecting to cart...');
+            });
+        }
+    </script>
+</body>
+</html>

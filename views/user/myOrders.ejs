@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - ChronoX</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/notifications.js"></script>
     <style>
         * {
             margin: 0;
@@ -164,6 +166,124 @@
         .status-delivered {
             background: linear-gradient(135deg, #4CAF50, #388E3C);
             color: white;
+        }
+
+        .order-status-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .partial-cancel-badge {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        }
+
+        .partial-cancel-badge i {
+            font-size: 8px;
+        }
+
+        /* Simple Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-form {
+            margin: 0;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .clear-btn {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 12px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-btn:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .search-input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .search-btn, .clear-btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         .order-items {
@@ -367,24 +487,44 @@
 
         
         <div class="orders-container">
+            <!-- Simple Search Section -->
+            <div class="search-section">
+                <form method="GET" action="/my-orders" class="search-form">
+                    <div class="search-input-group">
+                        <input type="text" name="search" placeholder="Search by Order ID (e.g., #C12DB731 or C12DB731)..."
+                               value="<%= searchParams?.search || '' %>" class="search-input">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <% if (searchParams?.search) { %>
+                            <a href="/my-orders" class="clear-btn">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        <% } %>
+                    </div>
+                </form>
+            </div>
+
             <div class="orders-header">
                 <div class="orders-count">
                     <% if (totalOrders > 0) { %>
-                        Showing <%= orders.length %> of <%= totalOrders %> orders
+                        <% if (searchParams?.search) { %>
+                            Found <%= totalOrders %> order(s) with ID containing "<%= searchParams.search %>"
+                        <% } else { %>
+                            Showing <%= orders.length %> of <%= totalOrders %> orders
+                        <% } %>
                     <% } else { %>
-                        No orders found
+                        <% if (searchParams?.search) { %>
+                            No orders found with ID containing "<%= searchParams.search %>"
+                        <% } else { %>
+                            No orders found
+                        <% } %>
                     <% } %>
-                </div>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterOrders('all')">All</button>
-                    <button class="filter-btn" onclick="filterOrders('placed')">Placed</button>
-                    <button class="filter-btn" onclick="filterOrders('processing')">Processing</button>
-                    <button class="filter-btn" onclick="filterOrders('shipped')">Shipped</button>
-                    <button class="filter-btn" onclick="filterOrders('delivered')">Delivered</button>
                 </div>
             </div>
 
-            
+
+            <!-- Orders List -->
             <% if (orders && orders.length > 0) { %>
                 <% orders.forEach(order => { %>
                     <div class="order-card" data-status="<%= order.status.toLowerCase() %>">
@@ -399,8 +539,20 @@
                                     }) %>
                                 </div>
                             </div>
-                            <div class="order-status status-<%= order.status.toLowerCase() %>">
-                                <%= order.status %>
+                            <div class="order-status-container">
+                                <div class="order-status status-<%= order.status.toLowerCase() %>">
+                                    <%= order.status %>
+                                </div>
+                                <%
+                                    const cancelledItems = order.items.filter(item => item.status === 'Cancelled');
+                                    const activeItems = order.items.filter(item => item.status !== 'Cancelled');
+                                %>
+                                <% if (cancelledItems.length > 0 && activeItems.length > 0) { %>
+                                    <div class="partial-cancel-badge">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <%= cancelledItems.length %> item(s) cancelled
+                                    </div>
+                                <% } %>
                             </div>
                         </div>
 
@@ -454,103 +606,98 @@
                     </div>
                 <% }) %>
 
-                <!-- Pagination -->
-                <% if (totalPages > 1) { %>
-                    <div class="pagination">
-                        <% if (currentPage > 1) { %>
-                            <a href="/my-orders?page=<%= currentPage - 1 %>">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                        <% } %>
-                        
-                        <% for (let i = 1; i <= totalPages; i++) { %>
-                            <% if (i === currentPage) { %>
-                                <span class="current"><%= i %></span>
-                            <% } else { %>
-                                <a href="/my-orders?page=<%= i %>"><%= i %></a>
-                            <% } %>
-                        <% } %>
-                        
-                        <% if (currentPage < totalPages) { %>
-                            <a href="/my-orders?page=<%= currentPage + 1 %>">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        <% } %>
-                    </div>
-                <% } %>
             <% } else { %>
                 <!-- Empty State -->
                 <div class="empty-orders">
-                    <i class="fas fa-shopping-bag"></i>
-                    <h3>No Orders Yet</h3>
-                    <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
-                    <a href="/shop" class="btn btn-primary">
-                        <i class="fas fa-shopping-cart"></i>
-                        Start Shopping
-                    </a>
+                    <% if (searchParams?.search) { %>
+                        <i class="fas fa-search"></i>
+                        <h3>No Orders Found</h3>
+                        <p>No orders found with ID containing "<%= searchParams.search %>". Try a different Order ID.</p>
+                        <a href="/my-orders" class="btn btn-primary">
+                            <i class="fas fa-undo"></i>
+                            Clear Search
+                        </a>
+                    <% } else { %>
+                        <i class="fas fa-shopping-bag"></i>
+                        <h3>No Orders Yet</h3>
+                        <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
+                        <a href="/shop" class="btn btn-primary">
+                            <i class="fas fa-shopping-cart"></i>
+                            Start Shopping
+                        </a>
+                    <% } %>
                 </div>
             <% } %>
+
+            <!-- Pagination -->
+            <% if (totalPages > 1) { %>
+                <div class="pagination">
+                    <% if (currentPage > 1) { %>
+                        <a href="/my-orders?page=<%= currentPage - 1 %><%= searchParams?.search ? '&search=' + encodeURIComponent(searchParams.search) : '' %>">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <% } %>
+
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <% if (i === currentPage) { %>
+                            <span class="current"><%= i %></span>
+                        <% } else { %>
+                            <a href="/my-orders?page=<%= i %><%= searchParams?.search ? '&search=' + encodeURIComponent(searchParams.search) : '' %>"><%= i %></a>
+                        <% } %>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                        <a href="/my-orders?page=<%= currentPage + 1 %><%= searchParams?.search ? '&search=' + encodeURIComponent(searchParams.search) : '' %>">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
         </div>
     </div>
 
     <%- include("../partials/user/footer") %>
 
     <script>
-        function filterOrders(status) {
-            const orderCards = document.querySelectorAll('.order-card');
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            
-            // Update active button
-            filterBtns.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Filter orders
-            orderCards.forEach(card => {
-                if (status === 'all' || card.dataset.status === status) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+
+
+
+
+        // Simple cancel order function (keeping existing functionality)
+        async function cancelOrder(orderId) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to cancel this order?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel it!'
             });
+
+            if (result.isConfirmed) {
+                fetch(`/cancel-order/${orderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => {
+                    if (res.ok) {
+                        Swal.fire('Cancelled!', 'Order cancelled successfully.', 'success')
+                        .then(() => window.location.reload());
+                    } else {
+                        Swal.fire('Error!', 'Failed to cancel order.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error!', 'An error occurred.', 'error');
+                });
+            }
         }
 
-        function cancelOrder(orderId) {
-            if (confirm('Are you sure you want to cancel this order?')) {
-
-                     fetch(`/cancel-order/${orderId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => {
-                if (res.ok) {
-                    showToast('Order cancelled successfully.');
-                    window.location.reload(); 
-                } else {
-                    showToast('Failed to cancel order.','error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('An error occurred.','error');
-            });
-        }
-    } 
-
-       
-        document.addEventListener('DOMContentLoaded', function() {
-            const orderCards = document.querySelectorAll('.order-card');
-            orderCards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.4s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-        });
     </script>
 </body>
 </html>

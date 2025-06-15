@@ -126,6 +126,8 @@
         </main>
     </div>
   <%-include("../partials/user/footer")%>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/script.js"></script>
     <script>
         function selectPaymentMethod() {
@@ -165,13 +167,23 @@
                     // Redirect to success page
                     window.location.href = data.redirectUrl || `/order-success?orderId=${data.orderId}`;
                 } else {
-                    alert(data.message || 'Failed to place order');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Order Failed',
+                        text: data.message || 'Failed to place order',
+                        confirmButtonColor: '#3085d6'
+                    });
                     submitBtn.disabled = false;
                     submitBtn.textContent = originalText;
                 }
             } catch (error) {
                 console.error('Error placing order:', error);
-                alert('Something went wrong. Please try again.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    confirmButtonColor: '#3085d6'
+                });
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             }

@@ -414,6 +414,36 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
+        /* Cart item warning styles */
+        .cart-item.warning {
+            border-left: 4px solid #ffc107;
+            background-color: #fff3cd;
+        }
+
+        .cart-item.error {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+        }
+
+        .item-status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .badge-error {
+            background-color: #dc3545;
+            color: white;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             body {
@@ -720,7 +750,9 @@
 
         .shop-now-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            background:#667eea;
+            color: white;
+            box-shadow: 0 15px 35px rgba(8, 46, 217, 0.4);
         }
 
         .wishlist-btn {
@@ -962,7 +994,12 @@
                     </div> -->
 
                     <div class="cart-actions">
-                        <a href="/check-out"><button class="checkout-btn">Proceed to checkout</button></a>
+                        <button class="checkout-btn" onclick="checkOut()">Proceed to checkout</button>
+                        <noscript>
+                            <a href="/check-out" style="display: inline-block; margin-top: 10px;">
+                                <button class="checkout-btn">Proceed to checkout (No JS)</button>
+                            </a>
+                        </noscript>
                         <a href="/shop"><button class="continue-btn">Continue Shopping</button></a>
                     </div>
                 <% } %>
@@ -971,17 +1008,8 @@
         <%-include("../partials/user/footer") %>
 
             <script>
-                function showToast(message) {
-                    const toast = document.createElement('div');
-                    toast.className = 'toast';
-                    toast.textContent = message;
-                    document.body.appendChild(toast);
-                    setTimeout(() => toast.classList.add('show'), 10);
-                    setTimeout(() => {
-                        toast.classList.remove('show');
-                        toast.remove();
-                    }, 3000);
-                }
+                // Toast function is now available globally from notifications.js
+                // No need to redefine it here
 
                 async function updateCart(productId, action) {
                     try {
@@ -1000,10 +1028,10 @@
                                     cartItem.classList.add('removing');
                                     setTimeout(() => {
                                         cartItem.remove();
-                                        // Check if cart is now empty
+                                        
                                         const remainingItems = document.querySelectorAll('.cart-item').length;
-                                        if (remainingItems <= 1) { // <= 1 because we just removed one
-                                            location.reload(); // Reload to show empty cart
+                                        if (remainingItems <= 1) { 
+                                            location.reload();
                                         }
                                     }, 500);
                                 }
@@ -1011,7 +1039,7 @@
                                 document.getElementById(`qty-${productId}`).innerText = data.quantity;
                             }
                             showToast(data.message || 'Cart updated');
-                            setTimeout(() => location.reload(), 500);
+                            // setTimeout(() => location.reload(), 500);
                         } else {
                             showToast(data.message || 'Failed to update cart', 'error');
                         }
@@ -1051,13 +1079,138 @@
                     }
                 }
 
+
+                async function checkOut(){
+                    try {
+                        // Show loading state
+                        const checkoutBtn = document.querySelector('.checkout-btn');
+                        const originalText = checkoutBtn.innerHTML;
+                        checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validating...';
+                        checkoutBtn.disabled = true;
+
+                        // First validate the cart
+                        const response = await fetch('/validate-cart', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        const result = await response.json();
+
+                        // Reset button state
+                        checkoutBtn.innerHTML = originalText;
+                        checkoutBtn.disabled = false;
+
+                        if (!result.success) {
+                            // Show SweetAlert error based on the type of error
+                            if (result.type === 'invalid_products') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Products Unavailable',
+                                    html: `
+                                        <p>The following items are no longer available:</p>
+                                        <ul style="text-align: left; margin: 10px 0;">
+                                            ${result.invalidItems.map(item => `<li><strong>${item}</strong></li>`).join('')}
+                                        </ul>
+                                        <p>Please remove them from your cart to continue.</p>
+                                    `,
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'Update Cart'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else if (result.type === 'out_of_stock') {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Items Out of Stock',
+                                    html: `
+                                        <p>The following items don't have enough stock:</p>
+                                        <ul style="text-align: left; margin: 10px 0;">
+                                            ${result.outOfStockItems.map(item =>
+                                                `<li><strong>${item.name}</strong><br>
+                                                <small>Available: ${item.available}, Requested: ${item.requested}</small></li>`
+                                            ).join('')}
+                                        </ul>
+                                        <p>Please update quantities or remove them from your cart.</p>
+                                    `,
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'Update Cart'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                // Generic error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Checkout Error',
+                                    text: result.message || 'Unable to proceed to checkout',
+                                    confirmButtonColor: '#3085d6'
+                                });
+                            }
+                        } else {
+                            // Validation successful, proceed to checkout
+                            window.location.href = "/check-out";
+                        }
+
+                    } catch (error) {
+                        console.error('Checkout validation error:', error);
+
+                        // Reset button state
+                        const checkoutBtn = document.querySelector('.checkout-btn');
+                        checkoutBtn.innerHTML = 'Proceed to checkout';
+                        checkoutBtn.disabled = false;
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Connection Error',
+                            text: 'Unable to validate your cart. Please check your connection and try again.',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                }
+
+                // Function to check cart validity on page load
+                async function checkCartValidity() {
+                    try {
+                        const response = await fetch('/validate-cart', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        const result = await response.json();
+
+                        if (!result.success) {
+                            // Show a warning toast about cart issues
+                            if (result.type === 'invalid_products' || result.type === 'out_of_stock') {
+                                showWarningToast('Some items in your cart may not be available. Please review before checkout.');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Cart validity check error:', error);
+                    }
+                }
+
+                // Check cart validity when page loads
+                document.addEventListener('DOMContentLoaded', function() {
+                    checkCartValidity();
+                });
+
                 function emptyCart() {
-                    if (confirm('Are you sure you want to empty your cart? This action cannot be undone.')) {
-                        // Add loading state
-                        const emptyBtn = document.querySelector('.empty-cart-btn');
-                        const originalText = emptyBtn.innerHTML;
-                        emptyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emptying...';
-                        emptyBtn.disabled = true;
+                    showConfirmDialog(
+                        'Empty Cart?',
+                        'Are you sure you want to empty your cart? This action cannot be undone.',
+                        'Yes, Empty Cart',
+                        'Cancel'
+                    ).then((result) => {
+                        if (result.isConfirmed) {
+                            // Add loading state
+                            const emptyBtn = document.querySelector('.empty-cart-btn');
+                            const originalText = emptyBtn.innerHTML;
+                            emptyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emptying...';
+                            emptyBtn.disabled = true;
 
                         fetch('/cart/empty', {
                             method: 'POST',
@@ -1086,7 +1239,8 @@
                             emptyBtn.innerHTML = originalText;
                             emptyBtn.disabled = false;
                         });
-                    }
+                        }
+                    });
                 }
 
                 const style = document.createElement('style');

@@ -7,7 +7,14 @@ const orderSchema = new mongoose.Schema({
     quantity: Number,
     variantIndex: Number,
     price: Number,
-    discount:Number
+    discount: Number,
+    status: {
+      type: String,
+      enum: ['Placed', 'Pending', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+      default: 'Placed'
+    },
+    cancelledAt: { type: Date },
+    cancelReason: { type: String }
   }],
   address: {
     fullName: String,
