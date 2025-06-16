@@ -37,21 +37,28 @@
                        <div class="payment-option selected" onclick="selectPaymentMethod()">
                         <i class="fas fa-money-bill-wave"></i>
                         <span>Cash On Delivery (Cash/Card/UPI)</span>
+                        
                         </div>
                         <input type="hidden" id="payment-method-input" name="paymentMethod" value="cod">
                         <!-- <div class="payment-option" onclick="selectPaymentMethod('upi')">
                             <i class="fas fa-mobile-alt"></i>
                             <span>PhonePe/Google Pay/BHIM UPI</span>
-                        </div>
+                        </div> -->
                         <div class="payment-option" onclick="selectPaymentMethod('wallet')">
                             <i class="fas fa-wallet"></i>
-                            <span>Paytm/Wallets</span>
+                            <span>Wallets</span>
                         </div>
                         <div class="payment-option" onclick="selectPaymentMethod('netbanking')">
                             <i class="fas fa-university"></i>
                             <span>Net Banking</span>
-                        </div> -->
-                        <!-- <div class="payment-option" onclick="selectPaymentMethod('emi')">
+                            <form id="paymentForm">
+                                <input type="hidden" id="orderAmount" value="<%= lastAmount %>" >
+                                <button type="button" onclick="payNow('<%=addresses%>')" id="payNowBtn">Pay Now</button>
+                                
+                            </form>
+                        </div> 
+                        
+                         <!-- <div class="payment-option" onclick="selectPaymentMethod('emi')">
                             <i class="fas fa-calendar-alt"></i>
                             <span>EMI/Pay Later</span>
                         </div> -->
@@ -129,6 +136,7 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/script.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function selectPaymentMethod() {
             // Mark as selected visually
@@ -187,7 +195,75 @@
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             }
+            
         });
+        async function payNow(addressId) {
+            const amount = document.getElementById('orderAmount').value;
+
+            if (!amount || !addressId) {
+                return alert("Amount or address is missing");
+            }
+
+            try {
+                const response = await fetch('/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, address: addressId })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    return alert(data.message || 'Failed to create Razorpay order');
+                }
+
+                const options = {
+                    key: data.key,
+                    amount: data.amount,
+                    currency: data.currency,
+                    name: "ChronoX",
+                    description: "Order Payment",
+                    order_id: data.orderId,
+                    handler: async function (response) {
+                        // Payment was successful – now place the order
+                        const result = await fetch('/payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                paymentMethod: 'ONLINE',
+                                razorpayOrderId: response.razorpay_order_id,
+                                paymentId: response.razorpay_payment_id,
+                                addressId: addressId   
+                            })
+                        });
+
+                        const resData = await result.json();
+                        if (resData.success) {
+                            window.location.href = `/order-success?orderId=${resData.orderId}`;
+                        } else {
+                            window.location.href = `/order-failed?orderId=${data.orderId}`;
+                        }
+                    },
+                    prefill: {
+                        name: "<%= user.fullName %>",
+                        email: "<%= user.email %>",
+                        contact: "<%= user.mobile %>"
+                    },
+                    theme: { color: "#3399cc" },
+                    retry: { enabled: true, max_count: 3 }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.open();
+
+            } catch (err) {
+                console.error(err);
+                alert('Something went wrong. Try again.');
+            }
+        }
+
+
+                    
     </script>
 </body>
 </html>

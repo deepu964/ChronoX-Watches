@@ -1,7 +1,7 @@
 
 
 const express = require('express');
-// Import separate controller files
+
 const authController = require('../controller/user/authController');
 const profileController = require('../controller/user/profileController');
 const addressController = require('../controller/user/addressController');
@@ -19,11 +19,11 @@ const isAuth = require('../middlewares/userAuth');
 const productController = require('../controller/admin/productController');
 const invoice = require('../controller/user/invoiceController');
 
-// Page routes
+
 router.get('/',checkBlocked, isAuth, pageController.getLoadHomePage);
 router.get('/PageNotFound', pageController.PageNotFound);
 
-// Authentication routes
+
 router.get('/login', authController.loginPage);
 router.post('/login', checkBlocked, authController.login);
 router.get('/logout', authController.logout);
@@ -42,7 +42,7 @@ router.get('/verify-otp', authController.getVerifyOtp);
 router.post('/verify-otp', authController.verifyOtp);
 router.post('/resend-otp', authController.resendOtp);
 
-// Google OAuth routes
+
 router.get('/user/google',passport.authenticate('google',{scope:['profile','email']}));
 router.get('/user/google/callback',passport.authenticate('google',{failureRedirect:'/login'}),(req,res)=>{
     req.session.user = req.user;
@@ -50,14 +50,14 @@ router.get('/user/google/callback',passport.authenticate('google',{failureRedire
     res.redirect('/');
 });
 
-// Shop and product routes
+
 router.get('/shop', isAuth, pageController.getShopPage);
 router.get('/productdetails/:id', isAuth, pageController.getProductDetails)
 
 router.get('/productdetails/:id', productController.getProductDetails);
 router.post('/productdetails/review/:id', productController.addReview);
 
-// Profile routes
+
 router.get('/userProfile', isAuth, profileController.getUserProfile);
 router.post('/userProfile', isAuth, profileController.updateProfile);
 router.post("/user-email-change", isAuth, profileController.changeEmail);
@@ -66,7 +66,7 @@ router.post("/email-verify-otp", isAuth, profileController.verifyChangeEmailOtp)
 
 router.post('/profile-change-pass', isAuth, profileController.changePassword);
 
-// Address routes
+
 router.get('/address', isAuth, addressController.getAddress);
 router.get('/add-address', isAuth, addressController.getAddAddress);
 router.post('/add-address', isAuth, addressController.addAddress);
@@ -74,20 +74,20 @@ router.get('/edit-address/:id', isAuth, addressController.getEditAddress);
 router.put('/edit-address/:id', isAuth, addressController.editAddress);
 router.delete('/delete-address/:id', isAuth, addressController.deleteAddress);
 
-// Wishlist routes
+
 router.get('/wish-list', isAuth, wishlistController.getWishList);
 router.post('/wishlist-add', isAuth, wishlistController.addWishlist);
 router.post('/wishlist-remove', isAuth, wishlistController.removeFromWishlist);
 router.post('/wishlist-clear', isAuth, wishlistController.clearWishlist);
 
-// Cart routes
+
 router.get('/cart', isAuth, cartController.getCart);
 router.post('/add-to-cart', isAuth, cartController.addToCart);
 router.post('/cart/update', isAuth, cartController.updateCartItem);
 router.post('/cart/remove/:productId', isAuth, cartController.removeFromCart);
 router.post('/cart/empty', isAuth, cartController.emptyCart);
 
-// Order routes
+
 router.post('/validate-cart', isAuth, orderController.validateCartForCheckout);
 router.get('/check-out', isAuth, orderController.checkoutGetController);
 router.post('/check-out', isAuth, orderController.addNewAddress);
@@ -103,14 +103,16 @@ router.put('/cancel-order/:orderId', isAuth, orderController.cancelOrder);
 router.put('/cancel-order-item/:orderId/:itemId', isAuth, orderController.cancelOrderItem);
 router.get('/debug-order-ids', isAuth, orderController.debugOrderIds);
 
-// Return routes
+router.post('/create-order',isAuth, orderController.createRazorpayOrder);
+
+
 router.post('/request-return', isAuth, returnController.requestReturn);
 router.get('/my-returns', isAuth, returnController.getMyReturns);
 
-// Wallet routes
+
 router.get('/wallet', isAuth, walletController.getWallet);
 
-// Invoice routes
+
 router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
 
 

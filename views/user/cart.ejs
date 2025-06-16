@@ -1008,8 +1008,7 @@
         <%-include("../partials/user/footer") %>
 
             <script>
-                // Toast function is now available globally from notifications.js
-                // No need to redefine it here
+                
 
                 async function updateCart(productId, action) {
                     try {
@@ -1039,7 +1038,7 @@
                                 document.getElementById(`qty-${productId}`).innerText = data.quantity;
                             }
                             showToast(data.message || 'Cart updated');
-                            // setTimeout(() => location.reload(), 500);
+                             setTimeout(() => location.reload(), 500);
                         } else {
                             showToast(data.message || 'Failed to update cart', 'error');
                         }

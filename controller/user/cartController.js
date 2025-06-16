@@ -6,7 +6,7 @@ const getCart = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
         const cart = await Cart.findOne({ user: userId }).populate('items.product').lean()
-
+        
         if (!cart || !cart.items || cart.items.length === 0) {
             return res.render('user/cart', {
                 user: req.session.user,

@@ -2,8 +2,16 @@ const addressSchema = require('../../models/addressSchema');
 const Cart = require('../../models/cartSchema');
 const Order = require('../../models/orderSchema');
 const productSchema = require('../../models/productSchema');
+const Wallet = require('../../models/walletSchema');
+const User = require('../../models/userSchema');
+const Razorpay = require('razorpay');
+const cartSchema = require('../../models/cartSchema');
 
-// Validate cart items before checkout
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
 const validateCartForCheckout = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
@@ -29,19 +37,19 @@ const validateCartForCheckout = async (req, res, next) => {
         for (const item of cart.items) {
             const product = item.product;
 
-            // Check if product is active and not deleted
+            
             if (product.isActive === true || product.isDeleted === true) {
                 invalidItems.push(product.name);
                 continue;
             }
 
-            // Check if category is listed
+            
             if (!product.categoryId || !product.categoryId.isListed) {
                 invalidItems.push(product.name);
                 continue;
             }
 
-            // Check stock availability
+            
             const variant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
             if (!variant || variant.quantity < item.quantity) {
                 outOfStockItems.push({
@@ -74,7 +82,7 @@ const validateCartForCheckout = async (req, res, next) => {
             });
         }
 
-        // If validation passes, proceed to checkout
+        
         return res.status(200).json({
             success: true,
             message: 'Cart validation successful'
@@ -274,10 +282,10 @@ const getPayment = async (req, res) => {
     }
 };
 
-const placeOrder = async (req, res) => {
+const placeOrder = async (req, res,next) => {
     try {
         const userId = req.session.user._id;
-        const { paymentMethod, addressId } = req.body;
+        const { paymentMethod, addressId,razorpayOrderId, paymentId } = req.body;
 
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
         if (!cart || cart.items.length === 0) {
@@ -323,11 +331,9 @@ const placeOrder = async (req, res) => {
             });
 
             total += item.quantity * itemPrice;
-
             variant.quantity -= item.quantity;
             await product.save();
         }
-
         const order = new Order({
             user: userId,
             items: orderItems,
@@ -341,7 +347,9 @@ const placeOrder = async (req, res) => {
             },
             totalAmount: total,
             paymentMethod: paymentMethod,
-            status: 'Placed'
+            paymentId: paymentId || null,
+            razorpayOrderId: razorpayOrderId || null,
+            status: paymentMethod === 'online' ? 'Placed' : 'Placed'
         });
 
         await order.save();
@@ -352,7 +360,7 @@ const placeOrder = async (req, res) => {
         res.json({ success: true, orderId: order._id, redirectUrl: `/order-success?orderId=${order._id}` });
 
     } catch (err) {
-        console.error('place oreder page error');
+        console.error('place oreder page error',err);
         next(err)
     }
 };
@@ -421,57 +429,47 @@ const getMyOrders = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
+        const limit = 6;
         const skip = (page - 1) * limit;
 
-        // Simple search parameter for Order ID only
+       
         const search = req.query.search || '';
 
         let orders;
         let totalOrders;
 
         if (search.trim()) {
-            // Search by Order ID - simplified approach
+            
             let searchTerm = search.trim();
 
-            // Remove # prefix if present (e.g., "#C12DB731" becomes "C12DB731")
+            
             if (searchTerm.startsWith('#')) {
                 searchTerm = searchTerm.substring(1);
             }
 
-            console.log('Searching for term:', searchTerm);
-
-            // Get all user orders first, then filter in JavaScript for debugging
             const allOrders = await Order.find({ user: userId })
                 .populate('items.product')
                 .sort({ createdAt: -1 });
 
-            console.log('Total user orders:', allOrders.length);
-
-            // Filter orders based on search term
+            
             const filteredOrders = allOrders.filter(order => {
                 const fullId = order._id.toString();
                 const last8 = fullId.slice(-8).toUpperCase();
                 const searchUpper = searchTerm.toUpperCase();
 
-                console.log(`Order ID: ${fullId}, Last 8: ${last8}, Searching for: ${searchUpper}`);
-
-                // Check if search term matches anywhere in the full ID or last 8 characters
                 const matchesFull = fullId.toUpperCase().includes(searchUpper);
                 const matchesLast8 = last8.includes(searchUpper);
-
-                console.log(`Matches full: ${matchesFull}, Matches last8: ${matchesLast8}`);
 
                 return matchesFull || matchesLast8;
             });
 
-            console.log('Filtered orders:', filteredOrders.length);
+            
 
-            // Apply pagination to filtered results
+            
             totalOrders = filteredOrders.length;
             orders = filteredOrders.slice(skip, skip + limit);
         } else {
-            // No search - show all orders
+            
             totalOrders = await Order.countDocuments({ user: userId });
             orders = await Order.find({ user: userId })
                 .populate('items.product')
@@ -479,15 +477,15 @@ const getMyOrders = async (req, res, next) => {
                 .skip(skip)
                 .limit(limit);
 
-            // Debug: Log all order IDs when no search is performed
+            
             if (orders.length > 0) {
-                console.log('=== ALL ORDER IDs DEBUG ===');
+                
                 orders.forEach(order => {
                     const fullId = order._id.toString();
                     const last8 = fullId.slice(-8).toUpperCase();
-                    console.log(`Full ID: ${fullId} | Display: #${last8}`);
+                    
                 });
-                console.log('=== END DEBUG ===');
+                
             }
         }
 
@@ -515,7 +513,6 @@ const cancelOrder = async (req, res, next) => {
 
         const order = await Order.findById(cancelId);
         if (!order) {
-            
             return res.status(404).json({ message: 'Order not found' });
         }
 
@@ -524,132 +521,128 @@ const cancelOrder = async (req, res, next) => {
         }
 
         order.status = 'Cancelled';
-        // Also cancel all individual items
-        order.items.forEach(item => {
-            if (item.status === 'Placed') {
-                item.status = 'Cancelled';
-                item.cancelledAt = new Date();
-                item.cancelReason = 'Full order cancelled';
-            }
-        });
 
-        await order.save();
-
-        res.status(200).json({ message: 'Order cancelled successfully' });
-
-    } catch (error) {
-        console.log("this is cancel order page error");
-        next(error);
-    }
-}
-
-const cancelOrderItem = async (req, res, next) => {
-    try {
-        const { orderId, itemId } = req.params;
-        const { reason } = req.body;
-        const userId = req.session.user._id;
-
-        const order = await Order.findById(orderId).populate('items.product');
-
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-
-        // Check if user owns this order
-        if (order.user.toString() !== userId.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: 'Unauthorized access'
-            });
-        }
-
-        // Find the specific item
-        const item = order.items.id(itemId);
-        if (!item) {
-            return res.status(404).json({
-                success: false,
-                message: 'Item not found in order'
-            });
-        }
-
-        // Check if item can be cancelled
-        if (item.status !== 'Placed') {
-            return res.status(400).json({
-                success: false,
-                message: `Item cannot be cancelled. Current status: ${item.status}`
-            });
-        }
-
-        // Cancel the item
+       for (const item of order.items) {
+    if (item.status === 'Placed') {
         item.status = 'Cancelled';
         item.cancelledAt = new Date();
-        item.cancelReason = reason || 'Cancelled by customer';
+        item.cancelReason = 'Full order cancelled';
 
-        // Restore product stock
-        const product = await productSchema.findById(item.product._id);
-        if (product && product.variants && product.variants.length > 0) {
-            const variant = product.variants[0]; // Assuming single variant for now
-            variant.quantity += item.quantity;
-            await product.save();
+        console.log("Cancelling item:", item);
+
+        const product = await productSchema.findById(item.product);
+        if (!product) {
+            continue;
         }
 
-        // Check if all items are cancelled
-        const activeitems = order.items.filter(item => item.status !== 'Cancelled');
-        if (activeitems.length === 0) {
-            order.status = 'Cancelled';
+        const variant = product.variants[0];
+        if (!variant) {
+            continue;
         }
 
-        // Recalculate total amount
-        const activeItemsTotal = order.items
-            .filter(item => item.status !== 'Cancelled')
-            .reduce((total, item) => total + (item.price * item.quantity), 0);
-
-        order.totalAmount = activeItemsTotal;
-
-        await order.save();
-
-        // Calculate refund amount for this item
-        const refundAmount = item.price * item.quantity;
-
-        // Add refund to user's wallet if payment was made online
-        if (order.paymentMethod === 'ONLINE' && refundAmount > 0) {
-            const Wallet = require('../../models/walletSchema');
-            const User = require('../../models/userSchema');
-
-            let wallet = await Wallet.findOne({ user: userId });
-            if (!wallet) {
-                wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
-                await wallet.save();
-                await User.findByIdAndUpdate(userId, { wallet: wallet._id });
-            }
-
-            wallet.balance += refundAmount;
-            wallet.transactions.push({
-                type: 'credit',
-                amount: refundAmount,
-                description: `Refund for cancelled item: ${item.product.name}`,
-                orderId: order._id
-            });
-            await wallet.save();
-        }
-
-        res.status(200).json({
-            success: true,
-            message: `Item cancelled successfully. ${order.paymentMethod === 'ONLINE' ? `₹${refundAmount} has been credited to your wallet.` : ''}`,
-            refundAmount: order.paymentMethod === 'ONLINE' ? refundAmount : 0,
-            orderStatus: order.status
-        });
-
-    } catch (error) {
-        console.error("Cancel order item error:", error);
-        next(error);
+        variant.quantity += item.quantity;
+        await product.save();
+      
     }
 }
 
-// Debug function to show all order IDs
+
+        await order.save(); 
+
+        res.status(200).json({ message: 'Order cancelled successfully and stock updated' });
+
+    } catch (error) {
+        console.log("this is cancel order page error", error);
+        next(error);
+    }
+};
+
+const cancelOrderItem = async (req, res, next) => {
+  try {
+    const { orderId, itemId } = req.params;
+    const { reason } = req.body;
+    const userId = req.session.user._id;
+
+    const order = await Order.findById(orderId).populate('items.product');
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (order.user.toString() !== userId.toString()) {
+      return res.status(403).json({ success: false, message: 'Unauthorized access' });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Item not found in order' });
+    }
+
+    if (item.status !== 'Placed') {
+      return res.status(400).json({ success: false, message: `Item cannot be cancelled. Current status: ${item.status}` });
+    }
+
+   
+    item.status = 'Cancelled';
+    item.cancelledAt = new Date();
+    item.cancelReason = reason || 'Cancelled by customer';
+
+   
+    const product = await productSchema.findById(item.product._id);
+    if (product && product.variants.length > 0) {
+      const variant = product.variants[0]; 
+      variant.quantity += item.quantity;
+      await product.save();
+    }
+
+    
+    const activeItems = order.items.filter(i => i.status !== 'Cancelled');
+    if (activeItems.length === 0) {
+      order.status = 'Cancelled';
+    }
+
+    
+    const newTotal = activeItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    order.totalAmount = newTotal;
+
+    await order.save();
+
+   
+    const refundAmount = item.price * item.quantity;
+    if (order.paymentMethod === 'ONLINE' && refundAmount > 0) {
+    
+
+      let wallet = await Wallet.findOne({ user: userId });
+      if (!wallet) {
+        wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
+        await wallet.save();
+        await User.findByIdAndUpdate(userId, { wallet: wallet._id });
+      }
+
+      wallet.balance += refundAmount;
+      wallet.transactions.push({
+        type: 'credit',
+        amount: refundAmount,
+        description: `Refund for cancelled item: ${item.product.name}`,
+        orderId: order._id
+      });
+
+      await wallet.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Item cancelled successfully.${order.paymentMethod === 'ONLINE' ? ` ₹${refundAmount} refunded to wallet.` : ''}`,
+      refundAmount: order.paymentMethod === 'ONLINE' ? refundAmount : 0,
+      orderStatus: order.status
+    });
+
+  } catch (error) {
+    console.error("Cancel order item error:", error);
+    next(error);
+  }
+};
+
+
 const debugOrderIds = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
@@ -673,6 +666,47 @@ const debugOrderIds = async (req, res, next) => {
     }
 };
 
+const createRazorpayOrder = async (req, res) => {
+  try {
+    const { amount,address } = req.body;
+    const selectedAddress = await addressSchema.findById(address)
+    if(!selectedAddress){
+        return res.json({success:false,message:"Inavlid Address"})
+    }
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid amount" });
+    }
+
+    const options = {
+      amount: amount * 100,
+      currency: "INR",
+      receipt: `rcpt_${Math.floor(Math.random() * 100000)}`,
+      payment_capture: 1
+    };
+
+    
+    const cart = await cartSchema.find({user:req.session.user}).populate('items.product').lean()
+    if(!cart){
+        return res.json({success:false,message:"Item not found in cart"})
+    }
+    const order = await razorpayInstance.orders.create(options);
+    console.log(order,"razorpay order")
+    res.status(200).json({
+      success: true,
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      key: process.env.RAZORPAY_KEY_ID
+    });
+
+  } catch (err) {
+    console.error("Razorpay Order Creation Failed:", err);
+    res.status(500).json({ success: false, message: "Order creation failed" });
+  }
+};
+
+
 module.exports = {
     validateCartForCheckout,
     checkoutGetController,
@@ -685,5 +719,6 @@ module.exports = {
     getMyOrders,
     cancelOrder,
     cancelOrderItem,
-    debugOrderIds
+    debugOrderIds,
+    createRazorpayOrder
 };
