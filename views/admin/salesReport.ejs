@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sales Report</title>
+  <link rel="stylesheet" href="/css/salesReport.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/notifications.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-text">Chrono</span>X
+        </div>
+      </div>
+
+      <div class="nav-items">
+        <a href="/admin/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+        <a href="/admin/product" class="nav-item"><i class="fas fa-box"></i> <span>Products</span></a>
+        <a href="/admin/orders" class="nav-item"><i class="fas fa-list"></i> <span>Order List</span></a>
+        <a href="/admin/userlist" class="nav-item"><i class="fas fa-user"></i> <span>Customer</span></a>
+        <a href="/admin/sales-report" class="nav-item active"><i class="fas fa-chart-line"></i> <span>Sales Report</span></a>
+        <a href="/admin/category" class="nav-item"><i class="fas fa-tags"></i> <span>Category</span></a>
+        <a href="/admin/category-offers" class="nav-item"><i class="fas fa-percent"></i> <span>Category Offers</span></a>
+        <a href="/admin/coupon" class="nav-item"><i class="fas fa-ticket-alt"></i> <span>Coupons</span></a>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="account-btn">Account</button>
+        <a href="/admin/logout" style="text-decoration: none;"><button class="logout-btn">Logout</button></a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">SALES REPORT</h1>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Report Type:</label>
+                    <select id="reportType">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group" id="customDateGroup" style="display: none;">
+                    <label>From Date:</label>
+                    <input type="date" id="fromDate">
+                </div>
+                
+                <div class="filter-group" id="customDateGroup2" style="display: none;">
+                    <label>To Date:</label>
+                    <input type="date" id="toDate">
+                </div>
+                
+                <div class="filter-group">
+                    <button class="filter-btn" onclick="generateReport()">
+                        <i class="fas fa-search"></i> Generate Report
+                    </button>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="export-btn pdf-btn" onclick="exportReportPDF()">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                </div>
+
+                <div class="filter-group">
+                    <button class="export-btn excel-btn" onclick="exportReportExcel()">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sales Table -->
+        <div class="sales-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Email</th>
+                        <th>Price</th>
+                        <th>Category Offer</th>
+                        <th>Payment Method</th>
+                        <th>Discount</th>
+                        <th>Coupon</th>
+                        <th>Paid Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <% if (typeof orders !== 'undefined' && orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                         <tr>
+                            <td>#<%= order._id.toString().slice(-6).toUpperCase() %></td>
+                            <td><%= order.user?.name || 'N/A' %></td>
+                            <td><%= order.user?.email || 'N/A' %></td>
+                            <td>₹<%= order.totalAmount + (order.discount || 0) %></td>
+                            <td>₹<%= order.categoryDiscount || 0 %></td>
+                            <td><%= order.paymentMethod %></td>
+                            <td>₹<%= order.discount || 0 %></td>
+                            <td>₹<%= order.couponDiscount || 0 %></td>
+                            <td>₹<%= order.totalAmount %></td>
+                        </tr> 
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
+                                No sales data found for the selected period
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Summary Table -->
+        <div class="summary-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Total Orders</th>
+                        <th>Total Sales Amount</th>
+                        <th>Total Discount</th>
+                        <th>Total Coupon Discount</th>
+                        <th>Net Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="totalOrders"><%= typeof summary !== 'undefined' ? summary.totalOrders : 0 %></td>
+                        <td id="totalSales">₹<%= typeof summary !== 'undefined' ? summary.totalSales.toLocaleString('en-IN') : 0 %></td>
+                        <td id="totalDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalDiscount.toLocaleString('en-IN') : 0 %></td>
+                        <td id="totalCouponDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalCouponDiscount.toLocaleString('en-IN') : 0 %></td>
+                        <td id="totalAmount" class="net-total">₹<%= typeof summary !== 'undefined' ? summary.totalAmount.toLocaleString('en-IN') : 0 %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reportType = document.getElementById('reportType');
+        const customDateGroup = document.getElementById('customDateGroup');
+        const customDateGroup2 = document.getElementById('customDateGroup2');
+
+        reportType.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customDateGroup.style.display = 'block';
+                customDateGroup2.style.display = 'block';
+            } else {
+                customDateGroup.style.display = 'none';
+                customDateGroup2.style.display = 'none';
+            }
+        });
+
+        // Set default dates
+        const today = new Date();
+        const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        document.getElementById('fromDate').value = oneWeekAgo.toISOString().split('T')[0];
+        document.getElementById('toDate').value = today.toISOString().split('T')[0];
+    });
+
+    async function generateReport() {
+        const reportType = document.getElementById('reportType').value;
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+        
+        let url = `/admin/sales-report?type=${reportType}`;
+        
+        if (reportType === 'custom' && fromDate && toDate) {
+            url += `&fromDate=${fromDate}&toDate=${toDate}`;
+        }
+        
+        window.location.href = url;
+    }
+
+    async function exportReportPDF() {
+        const reportType = document.getElementById('reportType').value;
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+
+        // Validate custom date range
+        if (reportType === 'custom' && (!fromDate || !toDate)) {
+            showToast('Please select both from and to dates for custom range', 'error');
+            return;
+        }
+
+        let url = `/admin/sales-report/export-pdf?type=${reportType}`;
+
+        if (reportType === 'custom' && fromDate && toDate) {
+            url += `&fromDate=${fromDate}&toDate=${toDate}`;
+        }
+
+        // Show loading state
+        const btn = document.querySelector('.pdf-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+        btn.disabled = true;
+
+        try {
+            window.open(url, '_blank');
+        } finally {
+            // Reset button after a delay
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
+        }
+    }
+
+    async function exportReportExcel() {
+        const reportType = document.getElementById('reportType').value;
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+
+        // Validate custom date range
+        if (reportType === 'custom' && (!fromDate || !toDate)) {
+            showToast('Please select both from and to dates for custom range', 'error');
+            return;
+        }
+
+        let url = `/admin/sales-report/export-excel?type=${reportType}`;
+
+        if (reportType === 'custom' && fromDate && toDate) {
+            url += `&fromDate=${fromDate}&toDate=${toDate}`;
+        }
+
+        // Show loading state
+        const btn = document.querySelector('.excel-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Excel...';
+        btn.disabled = true;
+
+        try {
+            window.open(url, '_blank');
+        } finally {
+            // Reset button after a delay
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
+        }
+    }
+  </script>
+</body>
+</html>

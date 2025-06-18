@@ -7,6 +7,7 @@ const productController = require('../controller/admin/productController');
 const categoryController = require('../controller/admin/categoryController')
 const couponController = require('../controller/admin/couponController');
 const orderController = require('../controller/admin/orderController');
+const salesController = require('../controller/admin/salesController');
 // const isAdmin = require('../middlewares/adminAuth');
 const {authMiddleware,adminAuth} = require('../middlewares/adminAuth')
 
@@ -77,6 +78,11 @@ router.put('/orders/:id/status', authMiddleware, adminAuth, orderController.upda
 
 router.get('/returns', authMiddleware, adminAuth, orderController.getReturns);
 router.put('/returns/:id/process', authMiddleware, adminAuth, orderController.processReturn);
+
+// Sales Report Routes
+router.get('/sales-report', authMiddleware, adminAuth, salesController.getSalesReport);
+router.get('/sales-report/export-pdf', authMiddleware, adminAuth, salesController.exportSalesReportPDF);
+router.get('/sales-report/export-excel', authMiddleware, adminAuth, salesController.exportSalesReportExcel);
 
 
 module.exports = router;
