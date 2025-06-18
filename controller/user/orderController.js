@@ -543,46 +543,87 @@ const getMyOrders = async (req, res, next) => {
 const cancelOrder = async (req, res, next) => {
     try {
         const cancelId = req.params.orderId;
+        const userId = req.session.user._id;
 
         const order = await Order.findById(cancelId);
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        // Check if order belongs to the user
+        if (order.user.toString() !== userId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized access' });
+        }
+
         if (order.status !== 'Placed') {
-            return res.status(400).json({ message: 'Order cannot be cancelled now' });
+            if (order.status === 'Failed') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This order has already failed and cannot be cancelled. You can retry payment instead.'
+                });
+            }
+            return res.status(400).json({
+                success: false,
+                message: 'Order cannot be cancelled now'
+            });
         }
 
         order.status = 'Cancelled';
+        let totalRefundAmount = 0;
 
-       for (const item of order.items) {
-    if (item.status === 'Placed') {
-        item.status = 'Cancelled';
-        item.cancelledAt = new Date();
-        item.cancelReason = 'Full order cancelled';
+        // Cancel all items and restore stock
+        for (const item of order.items) {
+            if (item.status === 'Placed') {
+                item.status = 'Cancelled';
+                item.cancelledAt = new Date();
+                item.cancelReason = 'Full order cancelled';
 
-        console.log("Cancelling item:", item);
+                console.log("Cancelling item:", item);
 
-        const product = await productSchema.findById(item.product);
-        if (!product) {
-            continue;
+                // Restore stock
+                const product = await productSchema.findById(item.product);
+                if (product && product.variants.length > 0) {
+                    const variant = product.variants[0];
+                    variant.quantity += item.quantity;
+                    await product.save();
+                }
+
+                // Calculate refund amount
+                totalRefundAmount += item.price * item.quantity;
+            }
         }
 
-        const variant = product.variants[0];
-        if (!variant) {
-            continue;
+        await order.save();
+
+        // Handle refund only if payment was successful
+        let refundMessage = '';
+        if (order.paymentMethod === 'ONLINE' && order.isPaid && order.paymentStatus === 'Completed' && totalRefundAmount > 0) {
+            let wallet = await Wallet.findOne({ user: userId });
+            if (!wallet) {
+                wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
+                await wallet.save();
+                await User.findByIdAndUpdate(userId, { wallet: wallet._id });
+            }
+
+            wallet.balance += totalRefundAmount;
+            wallet.transactions.push({
+                type: 'credit',
+                amount: totalRefundAmount,
+                description: `Refund for cancelled order #${order._id.toString().slice(-8).toUpperCase()}`,
+                orderId: order._id
+            });
+
+            await wallet.save();
+            refundMessage = ` ₹${totalRefundAmount} refunded to wallet.`;
+        } else if (order.paymentMethod === 'ONLINE' && (!order.isPaid || order.paymentStatus !== 'Completed')) {
+            refundMessage = ' No refund needed as payment was not completed.';
         }
 
-        variant.quantity += item.quantity;
-        await product.save();
-      
-    }
-}
-
-
-        await order.save(); 
-
-        res.status(200).json({ message: 'Order cancelled successfully and stock updated' });
+        res.status(200).json({
+            success: true,
+            message: `Order cancelled successfully and stock updated.${refundMessage}`,
+            refundAmount: order.paymentMethod === 'ONLINE' && order.isPaid && order.paymentStatus === 'Completed' ? totalRefundAmount : 0
+        });
 
     } catch (error) {
         console.log("this is cancel order page error", error);
@@ -639,11 +680,13 @@ const cancelOrderItem = async (req, res, next) => {
 
     await order.save();
 
-   
-    const refundAmount = item.price * item.quantity;
-    if (order.paymentMethod === 'ONLINE' && refundAmount > 0) {
-    
 
+    const refundAmount = item.price * item.quantity;
+    let actualRefundAmount = 0;
+    let refundMessage = '';
+
+    // Only refund if payment was successful (money was actually charged)
+    if (order.paymentMethod === 'ONLINE' && order.isPaid && order.paymentStatus === 'Completed' && refundAmount > 0) {
       let wallet = await Wallet.findOne({ user: userId });
       if (!wallet) {
         wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
@@ -660,12 +703,17 @@ const cancelOrderItem = async (req, res, next) => {
       });
 
       await wallet.save();
+      actualRefundAmount = refundAmount;
+      refundMessage = ` ₹${refundAmount} refunded to wallet.`;
+    } else if (order.paymentMethod === 'ONLINE' && (!order.isPaid || order.paymentStatus !== 'Completed')) {
+      // Payment failed or pending - no refund needed
+      refundMessage = ' No refund needed as payment was not completed.';
     }
 
     res.status(200).json({
       success: true,
-      message: `Item cancelled successfully.${order.paymentMethod === 'ONLINE' ? ` ₹${refundAmount} refunded to wallet.` : ''}`,
-      refundAmount: order.paymentMethod === 'ONLINE' ? refundAmount : 0,
+      message: `Item cancelled successfully.${refundMessage}`,
+      refundAmount: actualRefundAmount,
       orderStatus: order.status
     });
 

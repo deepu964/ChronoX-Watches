@@ -469,7 +469,7 @@
                     </div>
                     <div class="item-actions">
                         <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
-                        <% if (item.status === 'Placed' && order.status !== 'Cancelled') { %>
+                        <% if (item.status === 'Placed' && order.status !== 'Cancelled' && order.status !== 'Failed') { %>
                             <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
                                 <i class="fas fa-times"></i>
                                 Cancel Item
