@@ -431,14 +431,14 @@
             <div class="payment-details">
                 <div class="amount-section">
                     <div class="amount">
-                        <span class="currency">₹</span><%= totalAmount %>
+                        <span class="currency">₹</span>2,499
                     </div>
                     <div class="order-id">
-                        Order #<%= order._id.toString().slice(-8).toUpperCase() %>
+                        Order #ORD123456
                     </div>
                 </div>
                 <div style="font-size: 14px; color: #4a5568;">
-                    Payment to <strong>ChronoX Watches</strong>
+                    Payment to <strong>Your Store Name</strong>
                 </div>
             </div>
 
@@ -524,7 +524,7 @@
         //     alert('This would show all available banks in a real implementation');
         // }
 
-        async function retryPayment(orderId) {
+    async function retryPayment(orderId) {
     const addressId = document.getElementById('retry').value;  
     console.log(addressId,'thi is sdda')
     const amount = document.getElementById('orderAmount').value;
@@ -558,45 +558,25 @@
             description: "Order Payment",
             order_id: data.orderId,
             handler: async function (response) {
-                try {
-                    const result = await fetch('/verify-payment', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                            localOrderId: orderId
-                        })
-                    });
+                // ✅ use addressId from outer scope
+                const result = await fetch('/payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        paymentMethod: 'ONLINE',
+                        razorpayOrderId: response.razorpay_order_id,
+                        paymentId: response.razorpay_payment_id,
+                        addressId: addressId,                 // ✅ fixed usage
+                        orderId: orderId                      // ✅ make sure backend accepts this if needed
+                    })
+                });
 
-                    const resData = await result.json();
-                    if (resData.success) {
-                        window.location.href = resData.redirectUrl;
-                    } else {
-                        window.location.href = resData.redirectUrl || `/payment-failure?orderId=${orderId}`;
-                    }
-                } catch (error) {
-                    console.error('Payment verification error:', error);
-                    window.location.href = `/payment-failure?orderId=${orderId}`;
-                }
-            },
+                const resData = await result.json();
 
-            // Payment Modal Dismiss Handler
-            modal: {
-                ondismiss: function () {
-                    // Update order status to failed when modal is dismissed
-                    fetch('/update-order-status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            orderId: orderId,
-                            status: 'Failed',
-                            paymentStatus: 'Failed'
-                        })
-                    }).finally(() => {
-                        window.location.href = `/payment-failure?orderId=${orderId}`;
-                    });
+                if (resData.success) {
+                    window.location.href = `/order-success?orderId=${resData.orderId}`;
+                } else {
+                    window.location.href = `/retry-payment/${orderId}`; // ✅ include orderId
                 }
             },
             prefill: {

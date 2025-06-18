@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChronoX - Edit Coupon</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/addCoupon.css"/>
+</head>
+<body>
+  <button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><span class="logo-text">Chrono</span>X</div>
+    </div>
+    <div class="nav-items">
+      <a href="/admin/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+      <a href="/admin/product" class="nav-item"><i class="fas fa-box"></i><span>Products</span></a>
+      <a href="/admin/orderlist" class="nav-item"><i class="fas fa-list"></i><span>Order List</span></a>
+      <a href="/admin/userlist" class="nav-item"><i class="fas fa-user"></i><span>Customer</span></a>
+      <a href="/admin/sales" class="nav-item"><i class="fas fa-chart-line"></i><span>Sales</span></a>
+      <a href="/admin/category" class="nav-item"><i class="fas fa-tags"></i><span>Category</span></a>
+      <a href="/admin/coupon" class="nav-item active"><i class="fas fa-ticket-alt"></i><span>Coupons</span></a>
+      <a href="/admin/category-offers" class="nav-item"><i class="fas fa-percent"></i><span>Category Offers</span></a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="account-btn">Account</button>
+      <button class="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <div class="page-title">EDIT COUPON</div>
+      <a href="/admin/coupon"><button class="action-btn">Back to Coupons</button></a>
+    </div>
+
+    <form id="couponForm">
+      <input type="hidden" id="couponId" value="<%= coupon._id %>">
+
+      <div class="form-group">
+        <label class="form-label">Coupon Name</label>
+        <input type="text" id="couponName" class="form-input" value="<%= coupon.name %>" />
+        <p id="couponNameError" class="error-message" style="color: red; display: none;"></p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Discount (%)</label>
+        <input type="number" id="discount" class="form-input" value="<%= coupon.discount %>" />
+        <p id="discountError" class="error-message" style="color: red; display: none;"></p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Expiry Date</label>
+        <input type="date" id="expiryDate" class="form-input" value="<%= coupon.expiryDate.toISOString().split('T')[0] %>" />
+        <p id="expiryDateError" class="error-message" style="color: red; display: none;"></p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Minimum Purchase (₹)</label>
+        <input type="number" id="minPurchase" class="form-input" value="<%= coupon.minPurchase %>" />
+        <p id="minPurchaseError" class="error-message" style="color: red; display: none;"></p>
+      </div>
+
+      <button type="submit" class="submit-btn">Update Coupon</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('menuToggle')?.addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('active');
+    });
+
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+
+    document.getElementById('couponForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const couponId = document.getElementById('couponId').value;
+      const couponName = document.getElementById('couponName').value.trim();
+      const discount = parseFloat(document.getElementById('discount').value);
+      const expiryDate = document.getElementById('expiryDate').value;
+      const minPurchase = parseFloat(document.getElementById('minPurchase').value);
+
+      let isValid = true;
+      document.querySelectorAll('.error-message').forEach(error => {
+        error.style.display = 'none';
+        error.textContent = '';
+      });
+
+      if (!couponName) {
+            document.getElementById('couponNameError').textContent = 'Coupon name is required';
+            document.getElementById('couponNameError').style.display = 'block';
+            isValid = false;
+        } else if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(couponName)) {
+            document.getElementById('couponNameError').textContent = 'Must start with a letter and be 3–50 characters long';
+            document.getElementById('couponNameError').style.display = 'block';
+            isValid = false;
+        } else {
+            
+            try {
+                const res = await fetch(`/admin/coupon/check-name?name=${encodeURIComponent(couponName.trim())}`);
+                const data = await res.json();
+
+                if (!data.available) {
+                    document.getElementById('couponNameError').textContent = 'Coupon name already exists. Use a different name.';
+                    document.getElementById('couponNameError').style.display = 'block';
+                    isValid = false;
+                }
+            } catch (err) {
+                console.error("Coupon name check failed", err);
+                showToast('Coupon name already exists. Use a different name.', 'error');
+                isValid = false;
+            }
+        }
+
+
+      if (isNaN(discount) || discount <= 0 || discount > 100) {
+        document.getElementById('discountError').textContent = 'Discount must be between 1 and 100';
+        document.getElementById('discountError').style.display = 'block';
+        isValid = false;
+      }
+
+      if (!expiryDate) {
+        document.getElementById('expiryDateError').textContent = 'Expiry date is required';
+        document.getElementById('expiryDateError').style.display = 'block';
+        isValid = false;
+      } else if (new Date(expiryDate) < new Date()) {
+        document.getElementById('expiryDateError').textContent = 'Expiry date must be in the future';
+        document.getElementById('expiryDateError').style.display = 'block';
+        isValid = false;
+      }
+
+      if (isNaN(minPurchase) || minPurchase < 0) {
+        document.getElementById('minPurchaseError').textContent = 'Minimum purchase must be 0 or more';
+        document.getElementById('minPurchaseError').style.display = 'block';
+        isValid = false;
+      }
+
+      if (isValid) {
+        try {
+          const response = await fetch(`/admin/coupon/edit/${couponId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: couponName, discount, expiryDate, minPurchase })
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            showToast(data.message || 'Coupon updated successfully', 'success');
+            setTimeout(() => window.location.href = '/admin/coupon', 2000);
+          } else {
+            showToast(data.message || 'Failed to update coupon', 'error');
+          }
+        } catch (error) {
+          showToast('Network error: Failed to update coupon', 'error');
+        }
+      }
+    });
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.right = '20px';
+      toast.style.padding = '12px 24px';
+      toast.style.borderRadius = '4px';
+      toast.style.zIndex = '1000';
+      toast.style.color = 'white';
+      toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+  </script>
+</body>
+</html>

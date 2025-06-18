@@ -95,9 +95,6 @@ router.delete('/delete-check-address/:id', isAuth, orderController.deleteCheckAd
 
 router.get('/payment', isAuth, orderController.getPayment);
 router.post('/payment', isAuth, orderController.placeOrder);
-router.post('/verify-payment', isAuth, orderController.verifyPayment);
-router.post('/update-order-status', isAuth, orderController.updateOrderStatus);
-router.get('/payment-failure', isAuth, orderController.getPaymentFailure);
 router.get('/retry-payment/:orderId',isAuth,orderController.getRetry);
 
 router.get('/order-success', isAuth, orderController.getOrderSuccess);

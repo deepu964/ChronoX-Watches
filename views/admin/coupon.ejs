@@ -33,7 +33,7 @@
         <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span>Sales</span></a>
         <a href="/admin/category" class="nav-item"><i class="fas fa-tags"></i> <span>Category</span></a>
         <a href="/admin/coupon" class="nav-item active"><i class="fas fa-ticket-alt"></i> <span>Coupons</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-image"></i> <span>Banner</span></a>
+        <a href="/admin/category-offers" class="nav-item"><i class="fas fa-percent"></i> <span>Category Offers</span></a>
     </div>
 
     <div class="sidebar-footer">
@@ -82,6 +82,7 @@
                     <th>Min Purchase</th>
                     <th>Expiry Date</th>
                     <th>Status</th>
+                    <th>Block/unblock</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -98,12 +99,13 @@
                             <td><%= coupon.discount %> %</td>
                             <td>₹<%= coupon.minPurchase %></td>
                             <td><%= coupon.expiryDate ? new Date(coupon.expiryDate).toDateString().slice(4) : 'N/A' %></td>
-                            <td>
-                                <label class="switch">
-                                    <input type="checkbox" class="status-toggle" data-id="<%= coupon._id %>" <%= coupon.active ? 'checked' : '' %>>
-                                    <span class="slider unlist"></span>
-                                </label>
+                           <td>
+                            <label class="switch">
+                                <input type="checkbox" class="status-toggle" data-id="<%= coupon._id %>" <%= coupon.isActive ? 'checked' : '' %>>
+                                <span class="slider unlist"></span>
+                            </label>
                             </td>
+
                             <td>
                                 <button class="action-btn edit" onclick="window.location.href='/admin/coupon/delete/<%= coupon._id %>'">
                                     <i class="fas fa-edit"></i>
@@ -203,6 +205,51 @@
                 });
         }
     });
+
+    document.querySelectorAll('.status-toggle').forEach(toggle => {
+    toggle.addEventListener('change', async function () {
+      const couponId = this.dataset.id;
+      const isChecked = this.checked;
+
+      try {
+        const response = await fetch(`/admin/toggle-status/${couponId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ active: isChecked })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showToast(data.message || 'Coupon status updated', 'success');
+        } else {
+          showToast(data.message || 'Failed to update status', 'error');
+          this.checked = !isChecked; 
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Network error. Try again.', 'error');
+        this.checked = !isChecked; // ❌ Revert if error
+      }
+    });
+  });
+
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '4px';
+    toast.style.zIndex = '1000';
+    toast.style.color = 'white';
+    toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
 </script>
 </body>
 </html>

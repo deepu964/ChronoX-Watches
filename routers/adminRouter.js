@@ -44,23 +44,29 @@ router.put('/product/edit/:id',productController.editProduct);
 router.delete('/product/:id',productController.deleteProduct)
 
 router.get('/category', authMiddleware,adminAuth,categoryController.listCategories);
-
 router.get('/addcategory',authMiddleware,adminAuth, categoryController.getAddCategory);
-router.post('/addcategory', authMiddleware,adminAuth,categoryController.addCategory);
-
+router.post('/addcategory', authMiddleware,adminAuth,categoryController.addCategory)
 router.patch('/category/toggle-status/:id',authMiddleware,adminAuth,categoryController.toggleCategoryStatus);
-
 router.get('/category/edit/:id',authMiddleware,adminAuth,categoryController.getEditCategory);
-router.put('/category/edit/:id',authMiddleware,adminAuth, categoryController.editCategory); 
-
+router.put('/category/edit/:id',authMiddleware,adminAuth, categoryController.editCategory);
 router.delete('/category/:id', authMiddleware,adminAuth,categoryController.deleteCategory)
+
+// Category Offers Routes
+router.get('/category-offers', authMiddleware,adminAuth,categoryController.getCategoryOffers);
+router.get('/category-offers/add', authMiddleware,adminAuth,categoryController.getAddCategoryOffer);
+router.post('/category-offers/add', authMiddleware,adminAuth,categoryController.addCategoryOffer);
+router.get('/category-offers/edit/:id', authMiddleware,adminAuth,categoryController.getEditCategoryOffer);
+router.put('/category-offers/edit/:id', authMiddleware,adminAuth,categoryController.editCategoryOffer);
+router.patch('/category-offers/toggle-status/:id', authMiddleware,adminAuth,categoryController.toggleCategoryOfferStatus);
+router.delete('/category-offers/:id', authMiddleware,adminAuth,categoryController.deleteCategoryOffer);
 
 
 router.get('/coupon',couponController.getCoupon);
-
 router.get('/coupon/addCoupon',couponController.getAddCoupon);
 router.post('/coupon/addCoupon',couponController.addCoupon);
-
+router.get('/coupon/edit/:id',couponController.getEditCoupon);
+router.put('/coupon/edit/:id',couponController.editCoupon); 
+router.patch('/toggle-status/:id',couponController.toggleCouponStatus);
 router.delete('/coupon/delete/:id',couponController.deleteCoupon)
 
 

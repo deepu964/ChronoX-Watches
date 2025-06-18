@@ -301,47 +301,32 @@
             theme: { color: "#3399cc" },
             retry: { enabled: true, max_count: 3 },
 
-            // ✅ Payment Success Handler – verify payment
+            // ✅ [Update #2] Success Handler – place the order
             handler: async function (response) {
-                try {
-                    const result = await fetch('/verify-payment', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                            localOrderId: orderId
-                        })
-                    });
+                const result = await fetch('/payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        paymentMethod: 'ONLINE',
+                        razorpayOrderId: response.razorpay_order_id,
+                        paymentId: response.razorpay_payment_id,
+                        addressId: addressId,
+                        orderId: orderId // ✅ [Update #3] send orderId for updating old order
+                    })
+                });
 
-                    const resData = await result.json();
-                    if (resData.success) {
-                        window.location.href = resData.redirectUrl;
-                    } else {
-                        window.location.href = resData.redirectUrl || `/payment-failure?orderId=${orderId}`;
-                    }
-                } catch (error) {
-                    console.error('Payment verification error:', error);
-                    window.location.href = `/payment-failure?orderId=${orderId}`;
+                const resData = await result.json();
+                if (resData.success) {
+                    window.location.href = `/order-success?orderId=${resData.orderId}`;
+                } else {
+                    window.location.href = `/retry-payment/${orderId}`; // in case something fails after payment
                 }
             },
 
-            // ✅ Payment Modal Dismiss Handler – redirect to failure page
+            // ✅ [Update #4] If user closes payment or it fails, redirect to retry page
             modal: {
                 ondismiss: function () {
-                    // User closed the payment modal - mark order as failed and redirect
-                    fetch('/update-order-status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            orderId: orderId,
-                            status: 'Failed',
-                            paymentStatus: 'Failed'
-                        })
-                    }).finally(() => {
-                        window.location.href = `/payment-failure?orderId=${orderId}`;
-                    });
+                    window.location.href = `/retry-payment/${orderId}?addressId=${addressId}`;
                 }
             }
         };

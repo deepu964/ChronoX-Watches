@@ -369,20 +369,6 @@
                     <span class="detail-label">Payment Method:</span>
                     <span class="detail-value"><%= order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment' %></span>
                 </div>
-                <% if (order.paymentMethod === 'ONLINE') { %>
-                <div class="detail-row">
-                    <span class="detail-label">Payment Status:</span>
-                    <span class="detail-value">
-                        <% if (order.paymentStatus === 'Completed') { %>
-                            <span style="color: #28a745; font-weight: 600;">✓ Paid</span>
-                        <% } else if (order.paymentStatus === 'Failed') { %>
-                            <span style="color: #dc3545; font-weight: 600;">✗ Failed</span>
-                        <% } else { %>
-                            <span style="color: #ffc107; font-weight: 600;">⏳ Pending</span>
-                        <% } %>
-                    </span>
-                </div>
-                <% } %>
                 <div class="detail-row">
                     <span class="detail-label">Order Status:</span>
                     <span class="detail-value"><%= order.status %></span>
@@ -417,14 +403,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Payment Failed Notice -->
-        <% if (order.status === 'Failed' || (order.paymentMethod === 'ONLINE' && order.paymentStatus === 'Failed')) { %>
-        <div class="payment-failed-notice">
-            <i class="fas fa-exclamation-triangle"></i>
-            Payment Failed - Your order is pending payment. Click "Retry Payment" below to complete your purchase.
-        </div>
-        <% } %>
 
         <!-- Order Items -->
         <div class="items-card">
@@ -469,7 +447,7 @@
                     </div>
                     <div class="item-actions">
                         <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
-                        <% if (item.status === 'Placed' && order.status !== 'Cancelled' && order.status !== 'Failed') { %>
+                        <% if (item.status === 'Placed' && order.status !== 'Cancelled') { %>
                             <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
                                 <i class="fas fa-times"></i>
                                 Cancel Item
@@ -670,12 +648,6 @@
                 <i class="fas fa-list"></i>
                 View All Orders
             </a>
-            <% if (order.status === 'Failed' || (order.paymentMethod === 'ONLINE' && order.paymentStatus === 'Failed')) { %>
-                <button class="btn btn-retry" onclick="retryOrderPayment('<%= order._id %>')">
-                    <i class="fas fa-redo"></i>
-                    Retry Payment
-                </button>
-            <% } %>
             <% if (order.status === 'Delivered' && !returnRequest) { %>
                 <button class="btn btn-warning" onclick="openReturnModal()">
                     <i class="fas fa-undo"></i>
@@ -869,47 +841,6 @@
             const modal = document.getElementById('returnModal');
             if (event.target === modal) {
                 closeReturnModal();
-            }
-        }
-
-        // Function to retry payment for failed orders
-        async function retryOrderPayment(orderId) {
-            try {
-                const result = await Swal.fire({
-                    title: 'Retry Payment',
-                    text: 'Do you want to retry payment for this order?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, Retry Payment',
-                    cancelButtonText: 'Cancel'
-                });
-
-                if (result.isConfirmed) {
-                    // Show loading
-                    Swal.fire({
-                        title: 'Redirecting...',
-                        text: 'Please wait while we redirect you to the payment page',
-                        icon: 'info',
-                        allowOutsideClick: false,
-                        showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    // Redirect to retry payment page
-                    window.location.href = `/retry-payment/${orderId}`;
-                }
-            } catch (error) {
-                console.error('Error initiating retry payment:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred. Please try again.',
-                    confirmButtonColor: '#3085d6'
-                });
             }
         }
 
@@ -1206,45 +1137,6 @@
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.3s ease;
-        }
-
-        .btn-retry {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-retry:hover {
-            background: linear-gradient(135deg, #218838, #1ea085);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-            color: white;
-        }
-
-        .payment-failed-notice {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .payment-failed-notice i {
-            margin-right: 8px;
-            font-size: 18px;
-        }
             display: flex;
             align-items: center;
             gap: 5px;

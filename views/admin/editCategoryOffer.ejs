@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit Category Offer</title>
+  <link rel="stylesheet" href="/css/categoryOffer.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/notifications.js"></script>
+  <style>
+    .form-container {
+      background: white;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .form-header h1 {
+      font-size: 24px;
+      color: var(--text-color);
+    }
+    
+    .back-button {
+      padding: 8px 16px;
+      background-color: #3b82f6;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: var(--transition);
+    }
+    
+    .back-button:hover {
+      background-color: #2563eb;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .error-msg {
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 5px;
+      display: block;
+      min-height: 16px;
+      font-weight: 500;
+    }
+
+    .form-group input.error,
+    .form-group select.error {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #111827;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .submit-btn:hover {
+      background-color: #000;
+    }
+    
+    .submit-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-text">Chrono</span>X
+        </div>
+      </div>
+
+      <div class="nav-items">
+        <a href="/admin/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+        <a href="/admin/product" class="nav-item"><i class="fas fa-box"></i> <span>Products</span></a>
+        <a href="/admin/orders" class="nav-item"><i class="fas fa-list"></i> <span>Order List</span></a>
+        <a href="/admin/userlist" class="nav-item"><i class="fas fa-user"></i> <span>Customer</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span>Sales</span></a>
+        <a href="/admin/category" class="nav-item"><i class="fas fa-tags"></i> <span>Category</span></a>
+        <a href="/admin/category-offers" class="nav-item active"><i class="fas fa-percent"></i> <span>Category Offers</span></a>
+        <a href="/admin/coupon" class="nav-item"><i class="fas fa-ticket-alt"></i> <span>Coupons</span></a>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="account-btn">Account</button>
+        <a href="/admin/logout" style="text-decoration: none;"><button class="logout-btn">Logout</button></a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="form-container">
+        <div class="form-header">
+          <h1>Edit Category Offer</h1>
+          <a href="/admin/category-offers" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Offers
+          </a>
+        </div>
+
+        <form id="categoryOfferForm">
+          <div class="form-group">
+            <label for="category">Category *</label>
+            <select id="category" name="category" >
+              <option value="">Select Category</option>
+              <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                <% categories.forEach(category => { %>
+                  <option value="<%= category._id %>" <%= offer.category._id.toString() === category._id.toString() ? 'selected' : '' %>>
+                    <%= category.name %>
+                  </option>
+                <% }) %>
+              <% } %>
+            </select>
+            <div class="error-msg" id="categoryError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="offerName">Offer Name *</label>
+            <input type="text" id="offerName" name="offerName" value="<%= offer.offerName %>" placeholder="Enter offer name"  />
+            <div class="error-msg" id="nameError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="discount">Discount (%) *</label>
+            <input type="number" id="discount" name="discount" value="<%= offer.discount %>" placeholder="Enter discount percentage" min="1" max="99"  />
+            <div class="error-msg" id="discountError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="startDate">Start Date *</label>
+            <input type="date" id="startDate" name="startDate" value="<%= offer.startDate.toISOString().split('T')[0] %>"  />
+            <div class="error-msg" id="startDateError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="endDate">End Date *</label>
+            <input type="date" id="endDate" name="endDate" value="<%= offer.endDate.toISOString().split('T')[0] %>"  />
+            <div class="error-msg" id="endDateError"></div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-save"></i> Update Category Offer
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('categoryOfferForm');
+      const offerId = '<%= offer._id %>';
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        if (!validateForm()) {
+          return;
+        }
+
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('.submit-btn');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+        try {
+          const response = await fetch(`/admin/category-offers/edit/${offerId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              category: formData.get('category'),
+              offerName: formData.get('offerName'),
+              discount: formData.get('discount'),
+              startDate: formData.get('startDate'),
+              endDate: formData.get('endDate')
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showToast(data.message);
+            setTimeout(() => {
+              window.location.href = '/admin/category-offers';
+            }, 1500);
+          } else {
+            showToast(data.message, 'error');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showToast('Error updating category offer', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Category Offer';
+        }
+      });
+
+      function validateForm() {
+        let isValid = true;
+
+        // Clear previous errors and remove error classes
+        document.querySelectorAll('.error-msg').forEach(msg => {
+          msg.textContent = '';
+        });
+        document.querySelectorAll('.error').forEach(field => {
+          field.classList.remove('error');
+        });
+
+        // Validate category
+        const category = document.getElementById('category');
+        if (!category.value) {
+          showError('categoryError', 'Please select a category', category);
+          isValid = false;
+        }
+
+        // Validate offer name
+        const offerName = document.getElementById('offerName');
+        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
+        if (!offerName.value.trim()) {
+          showError('nameError', 'Offer name is required', offerName);
+          isValid = false;
+        } else if (!nameRegex.test(offerName.value.trim())) {
+          showError('nameError', 'Offer name must be 3-50 characters, letters, spaces and hyphens only', offerName);
+          isValid = false;
+        }
+
+        // Validate discount
+        const discount = document.getElementById('discount');
+        const discountValue = parseInt(discount.value);
+        if (!discount.value) {
+          showError('discountError', 'Discount is required', discount);
+          isValid = false;
+        } else if (discountValue < 1 || discountValue > 99) {
+          showError('discountError', 'Discount must be between 1 and 99%', discount);
+          isValid = false;
+        }
+
+        // Validate dates
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const start = new Date(startDate.value);
+        const end = new Date(endDate.value);
+
+        if (!startDate.value) {
+          showError('startDateError', 'Start date is required', startDate);
+          isValid = false;
+        }
+
+        if (!endDate.value) {
+          showError('endDateError', 'End date is required', endDate);
+          isValid = false;
+        } else if (end <= start) {
+          showError('endDateError', 'End date must be after start date', endDate);
+          isValid = false;
+        }
+
+        return isValid;
+      }
+
+      function showError(elementId, message, inputField) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.textContent = message;
+        if (inputField) {
+          inputField.classList.add('error');
+        }
+      }
+
+      // Real-time validation
+      document.getElementById('category').addEventListener('change', function() {
+        if (this.value) {
+          this.classList.remove('error');
+          document.getElementById('categoryError').textContent = '';
+        }
+      });
+
+      document.getElementById('offerName').addEventListener('input', function() {
+        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
+        if (this.value.trim() && nameRegex.test(this.value.trim())) {
+          this.classList.remove('error');
+          document.getElementById('nameError').textContent = '';
+        }
+      });
+
+      document.getElementById('discount').addEventListener('input', function() {
+        const discountValue = parseInt(this.value);
+        if (this.value && discountValue >= 1 && discountValue <= 99) {
+          this.classList.remove('error');
+          document.getElementById('discountError').textContent = '';
+        }
+      });
+
+      document.getElementById('startDate').addEventListener('change', function() {
+        if (this.value) {
+          this.classList.remove('error');
+          document.getElementById('startDateError').textContent = '';
+        }
+      });
+
+      document.getElementById('endDate').addEventListener('change', function() {
+        const startDate = document.getElementById('startDate').value;
+        if (this.value && startDate && new Date(this.value) > new Date(startDate)) {
+          this.classList.remove('error');
+          document.getElementById('endDateError').textContent = '';
+        }
+      });
+
+      // Update end date minimum when start date changes
+      document.getElementById('startDate').addEventListener('change', function() {
+        const startDate = this.value;
+        if (startDate) {
+          const nextDay = new Date(startDate);
+          nextDay.setDate(nextDay.getDate() + 1);
+          document.getElementById('endDate').setAttribute('min', nextDay.toISOString().split('T')[0]);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

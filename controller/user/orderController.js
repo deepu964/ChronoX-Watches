@@ -278,7 +278,7 @@ const getPayment = async (req, res) => {
 
     } catch (err) {
         console.error('Error loading place order page:', err);
-        next(err);
+        next(error);
     }
 };
 
@@ -368,29 +368,44 @@ const placeOrder = async (req, res,next) => {
 const getRetry = async(req,res,next)=>{
         try {
             const userId = req.session.user._id;
-            const orderId = req.params.orderId;
+            const addressId = req.query.addressId
+            
+             const orderId = req.params.orderId; 
             console.log(orderId,"orderid")
+            const order = await Order.findById(orderId) 
+            .populate('items.product')
+            .populate('address');
 
-            const order = await Order.findById(orderId).populate('items.product');
-
-            if (!order || order.user.toString() !== userId.toString()) {
-                req.session.toast = {type :'error', message: "Order not found"};
-                return res.redirect('/my-orders');
+            if (!order ) {
+                return res.json({success:false,message:"Order Not Created"})
             }
 
-            // Get user's addresses
-            const addresses = await addressSchema.find({ userId });
-            const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0];
+            
+            const cart = await Cart.findOne({user:userId}).populate('items.product');
+            let totalAmount =0
+            for(let item of cart.items){
+                totalAmount = item.price
+            }
+
+            if(!cart || cart.items.length === 0 ){
+                req.session.toast = {type :'error', message: "Your cart is empty"};
+                return res.redirect('/cart');
+            }
+            const addresses  = await addressSchema.findById(addressId)
+            console.log(addresses,'thisi sisj   ')
+            
 
             res.render('user/retryPayment', {
+                cart,
                 order,
-                addresses: defaultAddress,
+                addresses,
                 user: req.session.user,
                 toast: req.session.toast,
-                totalAmount: order.totalAmount
+                totalAmount
                 });
 
                 delete req.session.toast;
+
 
         } catch (error) {
             console.log("this is retry page error",error);
@@ -543,87 +558,46 @@ const getMyOrders = async (req, res, next) => {
 const cancelOrder = async (req, res, next) => {
     try {
         const cancelId = req.params.orderId;
-        const userId = req.session.user._id;
 
         const order = await Order.findById(cancelId);
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Check if order belongs to the user
-        if (order.user.toString() !== userId.toString()) {
-            return res.status(403).json({ message: 'Unauthorized access' });
-        }
-
         if (order.status !== 'Placed') {
-            if (order.status === 'Failed') {
-                return res.status(400).json({
-                    success: false,
-                    message: 'This order has already failed and cannot be cancelled. You can retry payment instead.'
-                });
-            }
-            return res.status(400).json({
-                success: false,
-                message: 'Order cannot be cancelled now'
-            });
+            return res.status(400).json({ message: 'Order cannot be cancelled now' });
         }
 
         order.status = 'Cancelled';
-        let totalRefundAmount = 0;
 
-        // Cancel all items and restore stock
-        for (const item of order.items) {
-            if (item.status === 'Placed') {
-                item.status = 'Cancelled';
-                item.cancelledAt = new Date();
-                item.cancelReason = 'Full order cancelled';
+       for (const item of order.items) {
+    if (item.status === 'Placed') {
+        item.status = 'Cancelled';
+        item.cancelledAt = new Date();
+        item.cancelReason = 'Full order cancelled';
 
-                console.log("Cancelling item:", item);
+        console.log("Cancelling item:", item);
 
-                // Restore stock
-                const product = await productSchema.findById(item.product);
-                if (product && product.variants.length > 0) {
-                    const variant = product.variants[0];
-                    variant.quantity += item.quantity;
-                    await product.save();
-                }
-
-                // Calculate refund amount
-                totalRefundAmount += item.price * item.quantity;
-            }
+        const product = await productSchema.findById(item.product);
+        if (!product) {
+            continue;
         }
 
-        await order.save();
-
-        // Handle refund only if payment was successful
-        let refundMessage = '';
-        if (order.paymentMethod === 'ONLINE' && order.isPaid && order.paymentStatus === 'Completed' && totalRefundAmount > 0) {
-            let wallet = await Wallet.findOne({ user: userId });
-            if (!wallet) {
-                wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
-                await wallet.save();
-                await User.findByIdAndUpdate(userId, { wallet: wallet._id });
-            }
-
-            wallet.balance += totalRefundAmount;
-            wallet.transactions.push({
-                type: 'credit',
-                amount: totalRefundAmount,
-                description: `Refund for cancelled order #${order._id.toString().slice(-8).toUpperCase()}`,
-                orderId: order._id
-            });
-
-            await wallet.save();
-            refundMessage = ` ₹${totalRefundAmount} refunded to wallet.`;
-        } else if (order.paymentMethod === 'ONLINE' && (!order.isPaid || order.paymentStatus !== 'Completed')) {
-            refundMessage = ' No refund needed as payment was not completed.';
+        const variant = product.variants[0];
+        if (!variant) {
+            continue;
         }
 
-        res.status(200).json({
-            success: true,
-            message: `Order cancelled successfully and stock updated.${refundMessage}`,
-            refundAmount: order.paymentMethod === 'ONLINE' && order.isPaid && order.paymentStatus === 'Completed' ? totalRefundAmount : 0
-        });
+        variant.quantity += item.quantity;
+        await product.save();
+      
+    }
+}
+
+
+        await order.save(); 
+
+        res.status(200).json({ message: 'Order cancelled successfully and stock updated' });
 
     } catch (error) {
         console.log("this is cancel order page error", error);
@@ -680,13 +654,11 @@ const cancelOrderItem = async (req, res, next) => {
 
     await order.save();
 
-
+   
     const refundAmount = item.price * item.quantity;
-    let actualRefundAmount = 0;
-    let refundMessage = '';
+    if (order.paymentMethod === 'ONLINE' && refundAmount > 0) {
+    
 
-    // Only refund if payment was successful (money was actually charged)
-    if (order.paymentMethod === 'ONLINE' && order.isPaid && order.paymentStatus === 'Completed' && refundAmount > 0) {
       let wallet = await Wallet.findOne({ user: userId });
       if (!wallet) {
         wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
@@ -703,17 +675,12 @@ const cancelOrderItem = async (req, res, next) => {
       });
 
       await wallet.save();
-      actualRefundAmount = refundAmount;
-      refundMessage = ` ₹${refundAmount} refunded to wallet.`;
-    } else if (order.paymentMethod === 'ONLINE' && (!order.isPaid || order.paymentStatus !== 'Completed')) {
-      // Payment failed or pending - no refund needed
-      refundMessage = ' No refund needed as payment was not completed.';
     }
 
     res.status(200).json({
       success: true,
-      message: `Item cancelled successfully.${refundMessage}`,
-      refundAmount: actualRefundAmount,
+      message: `Item cancelled successfully.${order.paymentMethod === 'ONLINE' ? ` ₹${refundAmount} refunded to wallet.` : ''}`,
+      refundAmount: order.paymentMethod === 'ONLINE' ? refundAmount : 0,
       orderStatus: order.status
     });
 
@@ -749,204 +716,98 @@ const debugOrderIds = async (req, res, next) => {
 
 const createRazorpayOrder = async (req, res) => {
   try {
-    const { amount, address } = req.body;
-    console.log(req.body, 'this is body');
-
-    const selectedAddress = await addressSchema.findById(address);
-    if (!selectedAddress) {
-        return res.json({ success: false, message: "Invalid Address" });
+    const { amount,address,orderId } = req.body;
+    console.log(req.body,'this is body')
+    const selectedAddress = await addressSchema.findById(address)
+    if(!selectedAddress){
+        return res.json({success:false,message:"Inavlid Address"})
     }
 
     if (!amount || amount <= 0) {
       return res.status(400).json({ success: false, message: "Invalid amount" });
     }
-
-    const cart = await cartSchema.find({ user: req.session.user }).populate('items.product').lean();
-    if (!cart || cart.length === 0) {
-        return res.json({ success: false, message: "Item not found in cart" });
+     const cart = await cartSchema.find({user:req.session.user}).populate('items.product').lean()
+    if(!cart){
+        return res.json({success:false,message:"Item not found in cart"})
     }
-
-    let cartItems = [];
-    for (let item of cart) {
-        for (let it of item.items) {
-            cartItems.push(it);
+    let cartItems =[]
+    for(let item of cart){
+        for(let it of item.items){
+            cartItems.push(it)
         }
     }
-
-    // Create Razorpay order options
-    const options = {
+    if(orderId){
+        const localOrder = await Order.create({
+        user: req.session.user._id,
+        address: selectedAddress,
+        items: cartItems,
+        totalAmount: amount,
+        status:"Pending",
+        paymentStatus: "Pending",
+        isPaid: false,
+        paymentMethod: "ONLINE"
+        });
+        
+        const options = {
         amount: amount * 100,
         currency: "INR",
         receipt: `rcpt_${Math.floor(Math.random() * 100000)}`,
         payment_capture: 1
-    };
 
-    const razorpayOrder = await razorpayInstance.orders.create(options);
+        };
 
-    // Create local order with pending status
-    const localOrder = await Order.create({
-        user: req.session.user._id,
-        address: {
-            fullName: selectedAddress.fullName,
-            phone: selectedAddress.phone,
-            addressLine: selectedAddress.address,
-            city: selectedAddress.city,
-            pincode: selectedAddress.pinCode,
-            state: selectedAddress.state
-        },
-        items: cartItems,
-        totalAmount: amount,
-        status: "Pending",
-        paymentStatus: "Pending",
-        isPaid: false,
-        paymentMethod: "ONLINE",
-        razorpayOrderId: razorpayOrder.id
-    });
+        const order = await razorpayInstance.orders.create(options);
+    
 
     res.status(200).json({
       success: true,
-      orderId: razorpayOrder.id,
-      amount: razorpayOrder.amount,
-      currency: razorpayOrder.currency,
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
       key: process.env.RAZORPAY_KEY_ID,
-      localOrderId: localOrder._id
+      localOrderId: localOrder._id 
     });
+    }else{
+        const options = {
+        amount: amount * 100,
+        currency: "INR",
+        receipt: `rcpt_${Math.floor(Math.random() * 100000)}`,
+        payment_capture: 1
+
+        };
+        const localOrder = await Order({
+        user: req.session.user._id,
+        address: selectedAddress,
+        items: cartItems,
+        totalAmount: amount,
+        status:"Pending",
+        paymentStatus: "Pending",
+        isPaid: false,
+        paymentMethod: "ONLINE"
+        });
+    
+        const order = await razorpayInstance.orders.create(options);
+        
+
+        res.status(200).json({
+        success: true,
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        key: process.env.RAZORPAY_KEY_ID,
+        localOrderId: localOrder._id 
+        });
+    }
+
+
+
+
+
 
   } catch (err) {
     console.error("Razorpay Order Creation Failed:", err);
-    return res.status(500).json({ success: false, message: "Failed to create order" });
+    return res.redirect('/retry-payment')
   }
-};
-
-// Payment verification function
-const verifyPayment = async (req, res) => {
-    try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, localOrderId } = req.body;
-
-        // Verify payment signature
-        const crypto = require('crypto');
-        const body = razorpay_order_id + "|" + razorpay_payment_id;
-        const expectedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-            .update(body.toString())
-            .digest('hex');
-
-        const isAuthentic = expectedSignature === razorpay_signature;
-
-        if (isAuthentic) {
-            // Payment successful - update order
-            const order = await Order.findById(localOrderId);
-            if (!order) {
-                return res.status(404).json({ success: false, message: "Order not found" });
-            }
-
-            // Update order status
-            order.status = "Placed";
-            order.paymentStatus = "Completed";
-            order.isPaid = true;
-            order.paymentId = razorpay_payment_id;
-            await order.save();
-
-            // Clear cart
-            const cart = await Cart.findOne({ user: req.session.user._id });
-            if (cart) {
-                cart.items = [];
-                await cart.save();
-            }
-
-            // Update product quantities
-            for (const item of order.items) {
-                const product = await productSchema.findById(item.product);
-                if (product && product.variants.length > 0) {
-                    const variant = product.variants[0];
-                    variant.quantity -= item.quantity;
-                    await product.save();
-                }
-            }
-
-            res.json({
-                success: true,
-                orderId: order._id,
-                redirectUrl: `/order-success?orderId=${order._id}`
-            });
-        } else {
-            // Payment verification failed
-            const order = await Order.findById(localOrderId);
-            if (order) {
-                order.status = "Failed";
-                order.paymentStatus = "Failed";
-                order.isPaid = false;
-                await order.save();
-            }
-
-            res.json({
-                success: false,
-                message: "Payment verification failed",
-                redirectUrl: `/payment-failure?orderId=${localOrderId}`
-            });
-        }
-    } catch (error) {
-        console.error("Payment verification error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Payment verification failed",
-            redirectUrl: `/payment-failure`
-        });
-    }
-};
-
-// Payment failure page controller
-const getPaymentFailure = async (req, res, next) => {
-    try {
-        const orderId = req.query.orderId;
-        let order = null;
-
-        if (orderId) {
-            order = await Order.findById(orderId)
-                .populate('items.product')
-                .populate('user');
-
-            // Verify order belongs to current user
-            if (order && order.user._id.toString() !== req.session.user._id.toString()) {
-                order = null;
-            }
-        }
-
-        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-
-        res.render('user/paymentFailure', {
-            user: req.session.user,
-            order,
-            cloudName
-        });
-    } catch (error) {
-        console.error("Payment failure page error:", error);
-        next(error);
-    }
-};
-
-// Update order status (for payment failures)
-const updateOrderStatus = async (req, res) => {
-    try {
-        const { orderId, status, paymentStatus } = req.body;
-        const userId = req.session.user._id;
-
-        const order = await Order.findById(orderId);
-        if (!order || order.user.toString() !== userId.toString()) {
-            return res.status(404).json({ success: false, message: "Order not found" });
-        }
-
-        // Update order status
-        if (status) order.status = status;
-        if (paymentStatus) order.paymentStatus = paymentStatus;
-
-        await order.save();
-
-        res.json({ success: true, message: "Order status updated" });
-    } catch (error) {
-        console.error("Update order status error:", error);
-        res.status(500).json({ success: false, message: "Failed to update order status" });
-    }
 };
 
 
@@ -964,8 +825,5 @@ module.exports = {
     cancelOrderItem,
     debugOrderIds,
     createRazorpayOrder,
-    verifyPayment,
-    getPaymentFailure,
-    updateOrderStatus,
     getRetry
 };

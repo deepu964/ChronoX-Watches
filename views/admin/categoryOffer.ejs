@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Category Offers</title>
+  <link rel="stylesheet" href="/css/categoryOffer.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/notifications.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-text">Chrono</span>X
+        </div>
+      </div>
+
+      <div class="nav-items">
+        <a href="/admin/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+        <a href="/admin/product" class="nav-item"><i class="fas fa-box"></i> <span>Products</span></a>
+        <a href="/admin/orders" class="nav-item"><i class="fas fa-list"></i> <span>Order List</span></a>
+        <a href="/admin/userlist" class="nav-item"><i class="fas fa-user"></i> <span>Customer</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span>Sales</span></a>
+        <a href="/admin/category" class="nav-item"><i class="fas fa-tags"></i> <span>Category</span></a>
+        <a href="/admin/category-offers" class="nav-item active"><i class="fas fa-percent"></i> <span>Category Offers</span></a>
+        <a href="/admin/coupon" class="nav-item"><i class="fas fa-ticket-alt"></i> <span>Coupons</span></a>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="account-btn">Account</button>
+        <a href="/admin/logout" style="text-decoration: none;"><button class="logout-btn">Logout</button></a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">CATEGORY OFFERS</h1>
+
+        <div class="search-actions">
+            <form action="">
+                <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" value="<%= search || '' %>" placeholder="Search category offers...">
+                <a href="category-offers"><i class="fas fa-close" style="margin-left: 80%;"></i></a>
+            </div>
+            </form>
+            <a href="category-offers/add" style="text-decoration: none;"><button class="add-category-btn">
+                <i class="fas fa-plus"></i> Add Category Offer
+            </button></a>
+        </div>
+
+        <div class="category-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Offer</th>
+                        <th>Discount</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (typeof categoryOffers !== 'undefined' && categoryOffers.length > 0) { %>
+                        <% categoryOffers.forEach(offer => { %>
+                         <tr>
+                            <td><%= offer.category?.name || 'N/A' %></td>
+                            <td><%= offer.offerName %></td>
+                            <td><%= offer.discount %>%</td>
+                            <td><%= new Date(offer.startDate).toLocaleDateString() %></td>
+                            <td><%= new Date(offer.endDate).toLocaleDateString() %></td>
+                            <td>
+                                <div class="status <%= offer.status.toLowerCase() %>">
+                                    <%= offer.status %>
+                                </div>
+                            </td>
+                            <td>
+                                <label class="switch">
+                                    <input
+                                    type="checkbox"
+                                    class="status-toggle"
+                                    data-id="<%= offer._id %>"
+                                    <%= offer.status === 'Active' ? 'checked' : '' %>
+                                    />
+                                    <span class="slider"></span>
+                                </label>
+                                <button class="action-btn edit" onclick="editOffer('<%= offer._id %>')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="askDeleteOffer('<%= offer._id %>')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                                No category offers found
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Status toggle functionality
+        document.querySelectorAll('.status-toggle').forEach(toggle => {
+            toggle.addEventListener('change', async function () {
+                const isActive = this.checked;
+                const offerId = this.dataset.id;
+                const row = this.closest('tr');
+                const statusDiv = row.querySelector('.status');
+
+                try {
+                    const response = await fetch(`/admin/category-offers/toggle-status/${offerId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status: isActive ? 'Active' : 'Inactive' })
+                    });
+
+                    const data = await response.json();
+
+                    if(data.success){
+                        showToast(data.message);
+                        statusDiv.textContent = isActive ? 'Active' : 'Inactive';
+                        statusDiv.className = isActive ? 'status active' : 'status inactive';
+                    } else {
+                        showToast(data.message, 'error');
+                        this.checked = !isActive; // Revert toggle
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Error updating status', 'error');
+                    this.checked = !isActive; // Revert toggle
+                }
+            });
+        });
+
+        // Navigation active state
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    });
+
+    // Edit offer function
+    function editOffer(id) {
+        window.location.href = `/admin/category-offers/edit/${id}`;
+    }
+
+    // Delete offer function
+    let offerIdToDelete = null;
+
+    function askDeleteOffer(id) {
+        offerIdToDelete = id;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteOffer();
+            }
+        });
+    }
+
+    async function deleteOffer() {
+        if (!offerIdToDelete) return;
+
+        try {
+            const response = await fetch(`/admin/category-offers/${offerIdToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast(data.message);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error deleting offer', 'error');
+        }
+
+        offerIdToDelete = null;
+    }
+  </script>
+</body>
+</html>

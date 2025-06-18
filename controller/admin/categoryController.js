@@ -1,6 +1,7 @@
 const { json } = require('express');
 const  categorySchema = require('../../models/categorySchema');
 const productSchema = require('../../models/productSchema');
+const categoryOfferSchema = require('../../models/categoryOfferSchema');
 
 const listCategories = async (req,res,next) => {
     try {
@@ -167,6 +168,251 @@ const deleteCategory = async (req,res,next) => {
     
 }
 
+const getCategoryOffers = async (req, res, next) => {
+  try {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+
+    const query = search ? {
+      $or: [
+        { offerName: { $regex: search, $options: "i" } }
+      ],
+      isDeleted: false
+    } : { isDeleted: false };
+
+    const total = await categoryOfferSchema.countDocuments(query);
+    const totalPage = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const categoryOffers = await categoryOfferSchema.find(query)
+      .populate('category', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.render('admin/categoryOffer', {
+      categoryOffers,
+      currentPage: page,
+      totalPage,
+      search,
+      total,
+      limit
+    });
+  } catch (error) {
+    console.log("get category offer error", error);
+    next(error);
+  }
+};
+
+const getAddCategoryOffer = async (req, res, next) => {
+  try {
+    const categories = await categorySchema.find({ isListed: true, isDeleted: false })
+      .sort({ name: 1 });
+
+    res.render('admin/addCategoryOffer', { categories });
+  } catch (error) {
+    console.log("get add category offer error", error);
+    next(error);
+  }
+};
+
+const addCategoryOffer = async (req, res, next) => {
+  try {
+    const { category, offerName, discount, startDate, endDate } = req.body;
+
+    // Check if category already has an active offer
+    const existingOffer = await categoryOfferSchema.findOne({
+      category: category,
+      status: 'Active',
+      isDeleted: false,
+      endDate: { $gte: new Date() }
+    });
+
+    if (existingOffer) {
+      return res.json({
+        success: false,
+        message: "This category already has an active offer"
+      });
+    }
+
+    // Validate dates
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+      return res.json({
+        success: false,
+        message: "Start date cannot be in the past"
+      });
+    }
+
+    if (end <= start) {
+      return res.json({
+        success: false,
+        message: "End date must be after start date"
+      });
+    }
+
+    const newCategoryOffer = new categoryOfferSchema({
+      category,
+      offerName: offerName.trim(),
+      discount: parseInt(discount),
+      startDate: start,
+      endDate: end,
+      status: 'Active'
+    });
+
+    await newCategoryOffer.save();
+
+    return res.json({
+      success: true,
+      message: "Category offer added successfully"
+    });
+  } catch (error) {
+    console.log("add category offer error", error);
+    next(error);
+  }
+};
+
+const toggleCategoryOfferStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate if id is a valid ObjectId
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.json({ success: false, message: "Invalid offer ID" });
+    }
+
+    const offer = await categoryOfferSchema.findById(id);
+    if (!offer) {
+      return res.json({ success: false, message: "Offer not found" });
+    }
+
+    await categoryOfferSchema.findByIdAndUpdate(id, { status });
+
+    res.json({
+      success: true,
+      message: `Offer ${status.toLowerCase()} successfully`
+    });
+  } catch (error) {
+    console.log("toggle category offer status error", error);
+    next(error);
+  }
+};
+
+const deleteCategoryOffer = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Validate if id is a valid ObjectId
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.json({ success: false, message: "Invalid offer ID" });
+    }
+
+    const offer = await categoryOfferSchema.findById(id);
+    if (!offer) {
+      return res.json({ success: false, message: "Offer not found" });
+    }
+
+    await categoryOfferSchema.findByIdAndUpdate(id, { isDeleted: true });
+
+    res.json({
+      success: true,
+      message: "Offer deleted successfully"
+    });
+  } catch (error) {
+    console.log("delete category offer error", error);
+    next(error);
+  }
+};
+
+const getEditCategoryOffer = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Validate if id is a valid ObjectId
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.redirect('/admin/category-offers');
+    }
+
+    const offer = await categoryOfferSchema.findById(id).populate('category');
+    const categories = await categorySchema.find({ isListed: true, isDeleted: false })
+      .sort({ name: 1 });
+
+    if (!offer) {
+      return res.redirect('/admin/category-offers');
+    }
+
+    res.render('admin/editCategoryOffer', { offer, categories });
+  } catch (error) {
+    console.log("get edit category offer error", error);
+    res.redirect('/admin/category-offers');
+  }
+};
+
+const editCategoryOffer = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { category, offerName, discount, startDate, endDate } = req.body;
+
+    // Validate if id is a valid ObjectId
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.json({ success: false, message: "Invalid offer ID" });
+    }
+
+    const currentOffer = await categoryOfferSchema.findById(id);
+    if (!currentOffer) {
+      return res.json({ success: false, message: "Offer not found" });
+    }
+
+    // Check if another category already has an active offer (excluding current offer)
+    const existingOffer = await categoryOfferSchema.findOne({
+      _id: { $ne: id },
+      category: category,
+      status: 'Active',
+      isDeleted: false,
+      endDate: { $gte: new Date() }
+    });
+
+    if (existingOffer) {
+      return res.json({
+        success: false,
+        message: "This category already has another active offer"
+      });
+    }
+
+    // Validate dates
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (end <= start) {
+      return res.json({
+        success: false,
+        message: "End date must be after start date"
+      });
+    }
+
+    await categoryOfferSchema.findByIdAndUpdate(id, {
+      category,
+      offerName: offerName.trim(),
+      discount: parseInt(discount),
+      startDate: start,
+      endDate: end
+    });
+
+    return res.json({
+      success: true,
+      message: "Category offer updated successfully"
+    });
+  } catch (error) {
+    console.log("edit category offer error", error);
+    next(error);
+  }
+};
 
 module.exports ={
     listCategories,
@@ -175,6 +421,12 @@ module.exports ={
     deleteCategory,
     getAddCategory,
     toggleCategoryStatus,
-    getEditCategory
-
-} 
+    getEditCategory,
+    getCategoryOffers,
+    getAddCategoryOffer,
+    addCategoryOffer,
+    toggleCategoryOfferStatus,
+    deleteCategoryOffer,
+    getEditCategoryOffer,
+    editCategoryOffer
+};
