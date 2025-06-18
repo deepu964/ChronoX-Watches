@@ -75,7 +75,7 @@ const addToCart = async (req, res, next) => {
         const stockQty = product.variants[0]?.quantity || 0;
         const itemPrice = product.variants[0]?.salePrice || product.variants[0]?.regularPrice;
 
-        // Validate requested quantity
+        
         if (requestedQty < 1) {
             return res.status(400).json({ success: false, message: 'Invalid quantity.' });
         }
@@ -128,7 +128,7 @@ const addToCart = async (req, res, next) => {
             cart.items.push({ product: productId, quantity: requestedQty, price: itemPrice });
         }
 
-        // Remove from wishlist when added to cart
+        
         await wishlistSchema.updateOne(
             { user: userId },
             { $pull: { products: productId } }

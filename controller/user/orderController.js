@@ -559,7 +559,8 @@ const cancelOrder = async (req, res, next) => {
     try {
         const cancelId = req.params.orderId;
 
-        const order = await Order.findById(cancelId);
+        const order = await Order.findOne({_id:cancelId,user:req.session.user._id});
+        console.log(order,'this is order')
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
@@ -576,7 +577,7 @@ const cancelOrder = async (req, res, next) => {
         item.cancelledAt = new Date();
         item.cancelReason = 'Full order cancelled';
 
-        console.log("Cancelling item:", item);
+        
 
         const product = await productSchema.findById(item.product);
         if (!product) {
@@ -594,6 +595,17 @@ const cancelOrder = async (req, res, next) => {
     }
 }
 
+
+         if (order.paymentMethod === 'ONLINE' && order.isPaid) {
+              console.log("👉 Reached payment refund check");
+            const users = await User.findById(order.user);
+            console.log(users,'this is user');
+             // assuming 'user' field in order
+            if (user) {
+                user.wallet = (user.wallet || 0) + order.totalAmount;
+                await user.save();
+            }
+        }
 
         await order.save(); 
 
@@ -716,99 +728,112 @@ const debugOrderIds = async (req, res, next) => {
 
 const createRazorpayOrder = async (req, res) => {
   try {
-    const { amount,address,orderId } = req.body;
-    console.log(req.body,'this is body')
-    const selectedAddress = await addressSchema.findById(address)
-    if(!selectedAddress){
-        return res.json({success:false,message:"Inavlid Address"})
+    const { amount, address, orderId } = req.body;
+    console.log(req.body, 'this is body');
+
+    // 1. Validate address
+    const selectedAddress = await addressSchema.findById(address);
+    if (!selectedAddress) {
+      return res.json({ success: false, message: "Invalid Address" });
     }
 
+    // 2. Validate amount
     if (!amount || amount <= 0) {
       return res.status(400).json({ success: false, message: "Invalid amount" });
     }
-     const cart = await cartSchema.find({user:req.session.user}).populate('items.product').lean()
-    if(!cart){
-        return res.json({success:false,message:"Item not found in cart"})
+
+    // 3. Get cart items
+    const cart = await cartSchema.find({ user: req.session.user }).populate('items.product').lean();
+    if (!cart || cart.length === 0) {
+      return res.json({ success: false, message: "No items in cart" });
     }
-    let cartItems =[]
-    for(let item of cart){
-        for(let it of item.items){
-            cartItems.push(it)
-        }
+
+    let cartItems = [];
+    for (let item of cart) {
+      for (let it of item.items) {
+        cartItems.push(it);
+      }
     }
-    if(orderId){
-        const localOrder = await Order.create({
+
+    // 4. Create Razorpay Order
+    const options = {
+      amount: amount * 100,
+      currency: "INR",
+      receipt: `rcpt_${Math.floor(Math.random() * 100000)}`,
+      payment_capture: 1
+    };
+
+    const razorpayOrder = await razorpayInstance.orders.create(options);
+
+    // 🔁 UPDATE STARTS HERE:
+    // 5. Create local order only if `orderId` not passed
+    let localOrder;
+    if (!orderId) {
+      localOrder = await Order.create({
         user: req.session.user._id,
         address: selectedAddress,
         items: cartItems,
         totalAmount: amount,
-        status:"Pending",
+        status: "Pending",
         paymentStatus: "Pending",
         isPaid: false,
-        paymentMethod: "ONLINE"
-        });
-        
-        const options = {
-        amount: amount * 100,
-        currency: "INR",
-        receipt: `rcpt_${Math.floor(Math.random() * 100000)}`,
-        payment_capture: 1
+        paymentMethod: "ONLINE",
+        razorpayOrderId: razorpayOrder.id // save for verification later
+      });
+    } else {
+      localOrder = await Order.findById(orderId);
+    }
+    // 🔁 UPDATE ENDS HERE
 
-        };
-
-        const order = await razorpayInstance.orders.create(options);
-    
-
-    res.status(200).json({
+    // 6. Send response
+    return res.status(200).json({
       success: true,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
+      orderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
       key: process.env.RAZORPAY_KEY_ID,
-      localOrderId: localOrder._id 
+      localOrderId: localOrder._id
     });
-    }else{
-        const options = {
-        amount: amount * 100,
-        currency: "INR",
-        receipt: `rcpt_${Math.floor(Math.random() * 100000)}`,
-        payment_capture: 1
-
-        };
-        const localOrder = await Order({
-        user: req.session.user._id,
-        address: selectedAddress,
-        items: cartItems,
-        totalAmount: amount,
-        status:"Pending",
-        paymentStatus: "Pending",
-        isPaid: false,
-        paymentMethod: "ONLINE"
-        });
-    
-        const order = await razorpayInstance.orders.create(options);
-        
-
-        res.status(200).json({
-        success: true,
-        orderId: order.id,
-        amount: order.amount,
-        currency: order.currency,
-        key: process.env.RAZORPAY_KEY_ID,
-        localOrderId: localOrder._id 
-        });
-    }
-
-
-
-
-
 
   } catch (err) {
     console.error("Razorpay Order Creation Failed:", err);
-    return res.redirect('/retry-payment')
+    return res.redirect('/retry-payment');
   }
 };
+
+
+const verifyRazorpayPayment = async (req, res) => {
+  try {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, localOrderId } = req.body;
+
+    const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Invalid signature" });
+    }
+
+    const order = await Order.findById(localOrderId);
+    console.log(order,'this is order');
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+    order.isPaid = true;
+    order.paymentStatus = "Paid";
+    order.status = "Placed";
+    order.razorpayPaymentId = razorpay_payment_id;
+    await order.save();
+
+    await cartSchema.deleteMany({ user: order.user });
+
+    res.status(200).json({ success: true, message: "Payment verified", orderId: order._id });
+  } catch (err) {
+    console.error("verifyRazorpayPayment error:", err);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
 
 
 module.exports = {
@@ -825,5 +850,6 @@ module.exports = {
     cancelOrderItem,
     debugOrderIds,
     createRazorpayOrder,
-    getRetry
+    getRetry,
+    verifyRazorpayPayment
 };

@@ -105,7 +105,7 @@ router.put('/cancel-order-item/:orderId/:itemId', isAuth, orderController.cancel
 router.get('/debug-order-ids', isAuth, orderController.debugOrderIds);
 
 router.post('/create-order',isAuth, orderController.createRazorpayOrder);
-
+router.post('/verify-payment',isAuth, orderController.verifyRazorpayPayment);
 
 router.post('/request-return', isAuth, returnController.requestReturn);
 router.get('/my-returns', isAuth, returnController.getMyReturns);

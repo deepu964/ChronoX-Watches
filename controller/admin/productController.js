@@ -66,7 +66,6 @@ const product = async (req, res, next) => {
     }
 };
 
-
 const getproductAdd = async (req, res) => {
     try {
         const categories = await categorySchema.find({ isListed: true }) || [];
@@ -295,7 +294,6 @@ const editProduct = async (req, res, next) => {
     next(err);
   }
 };
-
 
 const deleteProduct = async (req, res,next) => {
     try {

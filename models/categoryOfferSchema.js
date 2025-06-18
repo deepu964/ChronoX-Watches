@@ -38,11 +38,11 @@ const categoryOfferSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for better query performance
+
 categoryOfferSchema.index({ category: 1, status: 1 });
 categoryOfferSchema.index({ startDate: 1, endDate: 1 });
 
-// Virtual to check if offer is currently valid
+
 categoryOfferSchema.virtual('isCurrentlyActive').get(function() {
   const now = new Date();
   return this.status === 'Active' && 

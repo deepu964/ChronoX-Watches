@@ -161,7 +161,7 @@ const getProductDetails = async (req, res) => {
         const product = await productSchema.findById(id);
         const products = await productSchema.find({ isActive: false, isDeleted: false }).limit(4);
 
-        // Get user's wishlist to check if product is in wishlist
+        
         let userWishlist = [];
         if (userId) {
             const wishlistSchema = require('../../models/wishlistSchema');

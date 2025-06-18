@@ -88,7 +88,6 @@ const addCoupon = async (req,res,next) => {
    } 
 }
 
-
 const getEditCoupon = async (req,res,next) => {
     try {
         const couponId = req.params.id;
@@ -188,7 +187,6 @@ const editCoupon = async (req, res, next) => {
     }
 }
 
-
 const toggleCouponStatus = async (req, res, next) => {
   try {
     const couponId = req.params.id;
@@ -210,7 +208,6 @@ const toggleCouponStatus = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const deleteCoupon = async (req,res,next) => {
     try {

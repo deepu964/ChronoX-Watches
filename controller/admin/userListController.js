@@ -60,7 +60,6 @@ const blockUser = async (req,res,next) => {
 }
 
 
-
 module.exports = {
     userList,
     blockUser,

@@ -52,7 +52,7 @@ router.get('/category/edit/:id',authMiddleware,adminAuth,categoryController.getE
 router.put('/category/edit/:id',authMiddleware,adminAuth, categoryController.editCategory);
 router.delete('/category/:id', authMiddleware,adminAuth,categoryController.deleteCategory)
 
-// Category Offers Routes
+
 router.get('/category-offers', authMiddleware,adminAuth,categoryController.getCategoryOffers);
 router.get('/category-offers/add', authMiddleware,adminAuth,categoryController.getAddCategoryOffer);
 router.post('/category-offers/add', authMiddleware,adminAuth,categoryController.addCategoryOffer);
@@ -79,7 +79,7 @@ router.put('/orders/:id/status', authMiddleware, adminAuth, orderController.upda
 router.get('/returns', authMiddleware, adminAuth, orderController.getReturns);
 router.put('/returns/:id/process', authMiddleware, adminAuth, orderController.processReturn);
 
-// Sales Report Routes
+
 router.get('/sales-report', authMiddleware, adminAuth, salesController.getSalesReport);
 router.get('/sales-report/export-pdf', authMiddleware, adminAuth, salesController.exportSalesReportPDF);
 router.get('/sales-report/export-excel', authMiddleware, adminAuth, salesController.exportSalesReportExcel);

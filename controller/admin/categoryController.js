@@ -221,7 +221,7 @@ const addCategoryOffer = async (req, res, next) => {
   try {
     const { category, offerName, discount, startDate, endDate } = req.body;
 
-    // Check if category already has an active offer
+    
     const existingOffer = await categoryOfferSchema.findOne({
       category: category,
       status: 'Active',
@@ -236,7 +236,7 @@ const addCategoryOffer = async (req, res, next) => {
       });
     }
 
-    // Validate dates
+    
     const start = new Date(startDate);
     const end = new Date(endDate);
     const today = new Date();
@@ -282,7 +282,7 @@ const toggleCategoryOfferStatus = async (req, res, next) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    // Validate if id is a valid ObjectId
+    
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.json({ success: false, message: "Invalid offer ID" });
     }
@@ -308,7 +308,7 @@ const deleteCategoryOffer = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Validate if id is a valid ObjectId
+    
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.json({ success: false, message: "Invalid offer ID" });
     }
@@ -334,7 +334,7 @@ const getEditCategoryOffer = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Validate if id is a valid ObjectId
+    
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.redirect('/admin/category-offers');
     }
@@ -359,7 +359,7 @@ const editCategoryOffer = async (req, res, next) => {
     const { id } = req.params;
     const { category, offerName, discount, startDate, endDate } = req.body;
 
-    // Validate if id is a valid ObjectId
+    
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.json({ success: false, message: "Invalid offer ID" });
     }
@@ -369,7 +369,7 @@ const editCategoryOffer = async (req, res, next) => {
       return res.json({ success: false, message: "Offer not found" });
     }
 
-    // Check if another category already has an active offer (excluding current offer)
+    
     const existingOffer = await categoryOfferSchema.findOne({
       _id: { $ne: id },
       category: category,

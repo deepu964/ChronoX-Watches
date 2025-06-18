@@ -63,7 +63,6 @@ const getOrders = async (req, res, next) => {
     }
 };
 
-
 const getOrderDetails = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -89,7 +88,6 @@ const getOrderDetails = async (req, res, next) => {
         next(error);
     }
 };
-
 
 const updateOrderStatus = async (req, res, next) => {
     try {
@@ -129,7 +127,6 @@ const updateOrderStatus = async (req, res, next) => {
         next(error);
     }
 };
-
 
 const processReturn = async (req, res, next) => {
     try {
@@ -234,7 +231,6 @@ const processReturn = async (req, res, next) => {
         next(error);
     }
 };
-
 
 const getReturns = async (req, res, next) => {
     try {
