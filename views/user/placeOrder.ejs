@@ -330,8 +330,18 @@
             // ✅ Payment Modal Dismiss Handler – redirect to failure page
             modal: {
                 ondismiss: function () {
-                    // User closed the payment modal - consider it a failure
-                    window.location.href = `/payment-failure?orderId=${orderId}`;
+                    // User closed the payment modal - mark order as failed and redirect
+                    fetch('/update-order-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            orderId: orderId,
+                            status: 'Failed',
+                            paymentStatus: 'Failed'
+                        })
+                    }).finally(() => {
+                        window.location.href = `/payment-failure?orderId=${orderId}`;
+                    });
                 }
             }
         };

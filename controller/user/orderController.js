@@ -827,6 +827,7 @@ const verifyPayment = async (req, res) => {
             if (order) {
                 order.status = "Failed";
                 order.paymentStatus = "Failed";
+                order.isPaid = false;
                 await order.save();
             }
 
@@ -876,6 +877,30 @@ const getPaymentFailure = async (req, res, next) => {
     }
 };
 
+// Update order status (for payment failures)
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId, status, paymentStatus } = req.body;
+        const userId = req.session.user._id;
+
+        const order = await Order.findById(orderId);
+        if (!order || order.user.toString() !== userId.toString()) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        // Update order status
+        if (status) order.status = status;
+        if (paymentStatus) order.paymentStatus = paymentStatus;
+
+        await order.save();
+
+        res.json({ success: true, message: "Order status updated" });
+    } catch (error) {
+        console.error("Update order status error:", error);
+        res.status(500).json({ success: false, message: "Failed to update order status" });
+    }
+};
+
 
 module.exports = {
     validateCartForCheckout,
@@ -893,5 +918,6 @@ module.exports = {
     createRazorpayOrder,
     verifyPayment,
     getPaymentFailure,
+    updateOrderStatus,
     getRetry
 };

@@ -585,7 +585,18 @@
             // Payment Modal Dismiss Handler
             modal: {
                 ondismiss: function () {
-                    window.location.href = `/payment-failure?orderId=${orderId}`;
+                    // Update order status to failed when modal is dismissed
+                    fetch('/update-order-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            orderId: orderId,
+                            status: 'Failed',
+                            paymentStatus: 'Failed'
+                        })
+                    }).finally(() => {
+                        window.location.href = `/payment-failure?orderId=${orderId}`;
+                    });
                 }
             },
             prefill: {
