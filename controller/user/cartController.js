@@ -57,7 +57,8 @@ const getCart = async (req, res, next) => {
 const addToCart = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
-        const productId = req.body.productId;
+        const { productId, quantity = 1 } = req.body;
+        const requestedQty = parseInt(quantity) || 1;
 
         const product = await productSchema.findById(productId).populate('categoryId');
 
@@ -71,6 +72,21 @@ const addToCart = async (req, res, next) => {
         }
 
         const maxQuantityAllowed = 5;
+        const stockQty = product.variants[0]?.quantity || 0;
+        const itemPrice = product.variants[0]?.salePrice || product.variants[0]?.regularPrice;
+
+        // Validate requested quantity
+        if (requestedQty < 1) {
+            return res.status(400).json({ success: false, message: 'Invalid quantity.' });
+        }
+
+        if (requestedQty > stockQty) {
+            return res.status(400).json({ success: false, message: `Only ${stockQty} items available in stock.` });
+        }
+
+        if (requestedQty > maxQuantityAllowed) {
+            return res.status(400).json({ success: false, message: `Maximum ${maxQuantityAllowed} items allowed per product.` });
+        }
 
         let cart = await Cart.findOne({ user: userId });
         if (!cart) {
@@ -79,24 +95,40 @@ const addToCart = async (req, res, next) => {
 
         const existingItem = cart.items.find(item => item.product.toString() === productId);
 
-        const stockQty = product.variants[0]?.quantity || 0;
-        const itemPrice = product.variants[0]?.salePrice || product.variants[0]?.regularPrice
-
         if (existingItem) {
-            if (existingItem.quantity >= stockQty) {
-                return res.status(400).json({ success: false, message: 'Cannot add more, stock limit reached.' });
+            const newQuantity = existingItem.quantity + requestedQty;
+
+            if (newQuantity > stockQty) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Cannot add ${requestedQty} more. Only ${stockQty - existingItem.quantity} items available in stock.`
+                });
             }
-            if (existingItem.quantity >= maxQuantityAllowed) {
-                return res.status(400).json({ success: false, message: `Cannot add more than ${maxQuantityAllowed} items.` });
+
+            if (newQuantity > maxQuantityAllowed) {
+                const availableToAdd = maxQuantityAllowed - existingItem.quantity;
+                if (availableToAdd <= 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Maximum ${maxQuantityAllowed} items allowed per product. You already have ${existingItem.quantity} in cart.`
+                    });
+                } else {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Cannot add ${requestedQty} more. You can only add ${availableToAdd} more items (Maximum ${maxQuantityAllowed} per product).`
+                    });
+                }
             }
-            existingItem.quantity += 1;
+
+            existingItem.quantity = newQuantity;
         } else {
             if (stockQty <= 0) {
                 return res.status(400).json({ success: false, message: 'Product out of stock.' });
             }
-            cart.items.push({ product: productId, quantity:1, price: itemPrice });
+            cart.items.push({ product: productId, quantity: requestedQty, price: itemPrice });
         }
 
+        // Remove from wishlist when added to cart
         await wishlistSchema.updateOne(
             { user: userId },
             { $pull: { products: productId } }
@@ -104,10 +136,14 @@ const addToCart = async (req, res, next) => {
 
         await cart.save();
 
-        return res.status(200).json({ success: true, message: 'Product added to cart successfully' });
+        const message = requestedQty === 1 ?
+            'Product added to cart successfully' :
+            `${requestedQty} items added to cart successfully`;
+
+        return res.status(200).json({ success: true, message });
 
     } catch (error) {
-        console.log(' cart add error')
+        console.log('cart add error:', error);
         next(error);
     }
 };

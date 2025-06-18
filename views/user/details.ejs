@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChronoX - Titan Octane Chronos</title>
+    <title>ChronoX - <%= product.name %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -287,6 +288,12 @@
             outline: none;
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
         .add-to-cart {
             background: linear-gradient(135deg, #030202, #090807);
             color: white;
@@ -300,6 +307,11 @@
             box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .add-to-cart:hover {
@@ -310,6 +322,48 @@
 
         .add-to-cart:active {
             transform: translateY(0);
+        }
+
+        .add-to-cart:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wishlist-btn {
+            background: white;
+            color: #ff6b35;
+            border: 2px solid #ff6b35;
+            padding: 1rem;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+        }
+
+        .wishlist-btn:hover {
+            background: #ff6b35;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .wishlist-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .wishlist-btn.active:hover {
+            background: #e55a2b;
+        }
+
+        .wishlist-btn i {
+            font-size: 1.2rem;
         }
 
         
@@ -499,6 +553,22 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .wishlist-btn {
+                width: 45px;
+                height: 45px;
+                padding: 0.8rem;
+            }
+
+            .add-to-cart {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
             .quantity-section {
                 flex-direction: column;
                 align-items: flex-start;
@@ -639,25 +709,7 @@
                 display: none;
             }
 
-             
-        .wishlist-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--bg-light);
-            border: none;
-            color: red;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .wishlist-btn:hover {
-            background-color: #fff0f0;
-            color: #ff5a5a;
-        }
+
 
     </style>
 </head>
@@ -725,11 +777,19 @@
                 <span class="quantity-label">Quantity:</span>
                 <div class="quantity-controls">
                     <button class="qty-btn" onclick="decreaseQty()">−</button>
-                    <input type="number" class="qty-input" value="1" min="1" id="quantity">
+                    <input type="number" class="qty-input" value="1" min="1" max="<%= Math.min(5, (product.variants && product.variants[0] ? product.variants[0].quantity : 0)) %>" id="quantity">
                     <button class="qty-btn" onclick="increaseQty()">+</button>
                 </div>
             </div>
-            <button class="add-to-cart" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+
+            <div class="action-buttons">
+                <button class="add-to-cart" onclick="addToCart('<%= product._id %>')">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                <button class="wishlist-btn <%= isInWishlist ? 'active' : '' %>" onclick="toggleWishlist('<%= product._id %>')" data-product-id="<%= product._id %>">
+                    <i class="<%= isInWishlist ? 'fas' : 'far' %> fa-heart"></i>
+                </button>
+            </div>
 
         </section>
 
@@ -844,64 +904,249 @@
     </div>
 
     <script>
-        
-       const maxStock = '<%= product.variants[0].quantity %>'; 
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            // Add toast styles
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : '#dc3545'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: 500;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+
+            document.body.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Debug product data
+        console.log('Product data:', {
+            id: '<%= product._id %>',
+            name: '<%= product.name %>',
+            variants: <%- JSON.stringify(product.variants) %>,
+            isActive: '<%= product.isActive %>',
+            isDeleted: '<%= product.isDeleted %>'
+        });
+
+        const maxStock = parseInt('<%= product.variants && product.variants[0] ? product.variants[0].quantity : 0 %>') || 0;
+        const maxAllowed = Math.min(5, maxStock); // Maximum 5 items allowed
+        console.log('Max stock available:', maxStock, 'Max allowed:', maxAllowed);
 
         function increaseQty() {
             const input = document.getElementById('quantity');
-            let current = parseInt(input.value);
-            if (current < maxStock) {
+            let current = parseInt(input.value) || 1;
+
+            if (maxStock <= 0) {
+                showToast('Product is out of stock', 'error');
+                return;
+            }
+
+            if (current < maxAllowed) {
                 input.value = current + 1;
+            } else {
+                if (maxAllowed === 5 && maxStock > 5) {
+                    showToast('Maximum 5 items allowed per product', 'error');
+                } else {
+                    showToast(`Maximum stock available: ${maxStock}`, 'error');
+                }
             }
         }
 
         function decreaseQty() {
             const input = document.getElementById('quantity');
-            let current = parseInt(input.value);
+            let current = parseInt(input.value) || 1;
             if (current > 1) {
                 input.value = current - 1;
             }
         }
+
+        // Validate quantity input
+        document.getElementById('quantity').addEventListener('input', function() {
+            let value = parseInt(this.value) || 1;
+            if (value < 1) {
+                this.value = 1;
+            } else if (value > maxAllowed) {
+                this.value = maxAllowed;
+                if (maxAllowed === 5 && maxStock > 5) {
+                    showToast('Maximum 5 items allowed per product', 'error');
+                } else {
+                    showToast(`Maximum stock available: ${maxStock}`, 'error');
+                }
+            }
+        });
        
-  function addToCart(productId) {
-        const quantity = document.getElementById('quantity').value || 1;
-        const btn = document.querySelector('.add-to-cart');
-
-        btn.innerHTML = 'Adding to Cart...';
-        btn.disabled = true;
-
-        
-        fetch('/add-to-cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ productId, quantity })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.message) {
-                btn.innerHTML = 'Added to Cart ✓';
-                btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
-            } else {
-                btn.innerHTML = 'Failed to Add';
+        async function addToCart(productId) {
+            // Check if user is logged in
+            const isLoggedIn = '<%= user ? true : false %>';
+            if (!isLoggedIn) {
+                showToast('Please login to add items to cart', 'error');
+                return;
             }
 
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const btn = document.querySelector('.add-to-cart');
+            const originalContent = btn.innerHTML;
+
+            console.log('Adding to cart:', { productId, quantity, maxStock, maxAllowed });
+
+            // Validate quantity
+            if (quantity < 1) {
+                showToast('Please select a valid quantity', 'error');
+                return;
+            }
+
+            if (maxStock <= 0) {
+                showToast('Product is out of stock', 'error');
+                return;
+            }
+
+            if (quantity > 5) {
+                showToast('Maximum 5 items allowed per product', 'error');
+                return;
+            }
+
+            if (quantity > maxStock) {
+                showToast(`Only ${maxStock} items available in stock`, 'error');
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding to Cart...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/add-to-cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId, quantity })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
+                    btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                    showToast(data.message || 'Product added to cart successfully');
+
+                    // Reset quantity to 1 after successful add
+                    document.getElementById('quantity').value = 1;
+
+                    // Update wishlist button if product was removed from wishlist
+                    updateWishlistButton(productId, false);
+                } else {
+                    btn.innerHTML = '<i class="fas fa-times"></i> Failed to Add';
+                    btn.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+                    showToast(data.message || 'Failed to add to cart', 'error');
+                }
+            } catch (error) {
+                console.error('Add to cart error:', error);
+                btn.innerHTML = '<i class="fas fa-times"></i> Error';
+                btn.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+                showToast('Something went wrong', 'error');
+            }
+
+            // Reset button after 2 seconds
             setTimeout(() => {
-                btn.innerHTML = 'Add to Cart';
+                btn.innerHTML = originalContent;
                 btn.disabled = false;
-                btn.style.background = 'linear-gradient(135deg, #ff6b35, #ff8c42)';
+                btn.style.background = 'linear-gradient(135deg, #030202, #090807)';
             }, 2000);
-        })
-        .catch(err => {
-            console.error(err);
-            btn.innerHTML = 'Error';
-            setTimeout(() => {
-                btn.innerHTML = 'Add to Cart';
-                btn.disabled = false;
-            }, 2000);
-        });
-    }
+        }
+
+        async function toggleWishlist(productId) {
+            // Check if user is logged in
+            const isLoggedIn = '<%= user ? true : false %>';
+            if (!isLoggedIn) {
+                showToast('Please login to add items to wishlist', 'error');
+                return;
+            }
+
+            const btn = document.querySelector('.wishlist-btn');
+            const icon = btn.querySelector('i');
+            const isCurrentlyInWishlist = btn.classList.contains('active');
+
+            // Disable button during request
+            btn.disabled = true;
+
+            // Add loading animation to icon
+            icon.className = 'fas fa-spinner fa-spin';
+
+            try {
+                const endpoint = isCurrentlyInWishlist ? '/wishlist-remove' : '/wishlist-add';
+                console.log('Making request to:', endpoint, 'with productId:', productId);
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    updateWishlistButton(productId, !isCurrentlyInWishlist);
+                    showToast(data.message);
+                } else {
+                    showToast(data.message || 'Failed to update wishlist', 'error');
+                    // Reset icon on error
+                    icon.className = isCurrentlyInWishlist ? 'fas fa-heart' : 'far fa-heart';
+                }
+            } catch (error) {
+                console.error('Wishlist error:', error);
+                showToast('Something went wrong', 'error');
+                // Reset icon on error
+                icon.className = isCurrentlyInWishlist ? 'fas fa-heart' : 'far fa-heart';
+            }
+
+            btn.disabled = false;
+        }
+
+        function updateWishlistButton(productId, isInWishlist) {
+            const btn = document.querySelector('.wishlist-btn');
+            const icon = btn.querySelector('i');
+
+            if (isInWishlist) {
+                btn.classList.add('active');
+                icon.className = 'fas fa-heart';
+            } else {
+                btn.classList.remove('active');
+                icon.className = 'far fa-heart';
+            }
+        }
         
         document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
             thumb.addEventListener('click', () => {

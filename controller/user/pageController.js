@@ -154,23 +154,34 @@ const getShopPage = async (req, res) => {
 
 const getProductDetails = async (req, res) => {
     try {
-        const id = req.params.id
-        const cloudName = process.env.CLOUDINARY_CLOUD_NAME
-        const product = await productSchema.findById(id)
-        const products = await productSchema.find()
-        const productLength = 4
-        const description = await productSchema.find()
+        const id = req.params.id;
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        const userId = req.session.user?._id;
+
+        const product = await productSchema.findById(id);
+        const products = await productSchema.find({ isActive: false, isDeleted: false }).limit(4);
+
+        // Get user's wishlist to check if product is in wishlist
+        let userWishlist = [];
+        if (userId) {
+            const wishlistSchema = require('../../models/wishlistSchema');
+            const wishlist = await wishlistSchema.findOne({ user: userId });
+            if (wishlist && wishlist.products) {
+                userWishlist = wishlist.products.map(p => p.toString());
+            }
+        }
 
         res.render('user/details', {
             user: req.session.user,
             product,
             cloudName,
             products,
-            productLength,
-            description
-        })
+            userWishlist,
+            isInWishlist: userWishlist.includes(id)
+        });
     } catch (error) {
-        console.log(error)
+        console.log("Product details error:", error);
+        res.status(500).send("Server error");
     }
 }
 
