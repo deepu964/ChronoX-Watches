@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retry Payment - Net Banking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden; 
+            width: 145%;
+            
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            padding: 30px 25px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .error-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .error-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        .payment-header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .payment-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .payment-body {
+            padding: 35px 25px;
+        }
+
+        .payment-details {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+        .amount-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .currency {
+            font-size: 18px;
+            color: #718096;
+            margin-right: 5px;
+        }
+
+        .order-id {
+            font-size: 12px;
+            color: #718096;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .payment-methods {
+            margin-bottom: 25px;
+        }
+
+        .method-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .method-title::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23667eea" viewBox="0 0 24 24"><path d="M2 6h20v2H2zm0 5h20v2H2zm0 5h20v2H2z"/></svg>') no-repeat center;
+            margin-right: 10px;
+        }
+
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .bank-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bank-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .bank-option:hover::before {
+            left: 100%;
+        }
+
+        .bank-option:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .bank-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .bank-logo {
+            width: 40px;
+            height: 40px;
+            background: #f7fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: bold;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .bank-option.selected .bank-logo {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .bank-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #4a5568;
+            transition: color 0.3s ease;
+        }
+
+        .bank-option.selected .bank-name {
+            color: white;
+        }
+
+        .other-banks {
+            background: #f8f9ff;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .other-banks:hover {
+            border-color: #667eea;
+            background: #edf2ff;
+            transform: translateY(-2px);
+        }
+
+        .retry-button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .retry-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        .retry-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .security-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fff4;
+            border-radius: 8px;
+            border: 1px solid #c6f6d5;
+        }
+
+        .security-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            fill: #38a169;
+        }
+
+        .security-text {
+            font-size: 12px;
+            color: #2f855a;
+            font-weight: 500;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #5a67d8;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .payment-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .payment-header {
+                padding: 25px 20px;
+            }
+
+            .payment-header h1 {
+                font-size: 20px;
+            }
+
+            .payment-body {
+                padding: 25px 20px;
+            }
+
+            .bank-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .amount {
+                font-size: 24px;
+            }
+
+            .retry-button {
+                padding: 14px 20px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .bank-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .amount-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading .retry-button {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .loading .retry-button::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @keyframes spin {
+            0% { transform: translateY(-50%) rotate(0deg); }
+            100% { transform: translateY(-50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <div class="error-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
+            <h1>Payment Failed</h1>
+            <p>Don't worry, let's try again with a different method</p>
+        </div>
+
+        <div class="payment-body">
+            <div class="payment-details">
+                <div class="amount-section">
+                    <div class="amount">
+                        <span class="currency">₹</span><%= totalAmount %>
+                    </div>
+                    <div class="order-id">
+                        Order #<%= order._id.toString().slice(-8).toUpperCase() %>
+                    </div>
+                </div>
+                <div style="font-size: 14px; color: #4a5568;">
+                    Payment to <strong>ChronoX Watches</strong>
+                </div>
+            </div>
+
+            <div class="payment-methods">
+                <div class="method-title">
+                    Select Your Bank
+                </div>
+
+                <div class="bank-grid">
+                    <div class="bank-option" onclick="selectBank(this)" data-bank="sbi">
+                        <div class="bank-logo">SBI</div>
+                        <div class="bank-name">State Bank</div>
+                    </div>
+                    <div class="bank-option" onclick="selectBank(this)" data-bank="hdfc">
+                        <div class="bank-logo">HDFC</div>
+                        <div class="bank-name">HDFC Bank</div>
+                    </div>
+                    <div class="bank-option" onclick="selectBank(this)" data-bank="icici">
+                        <div class="bank-logo">ICICI</div>
+                        <div class="bank-name">ICICI Bank</div>
+                    </div>
+                    <div class="bank-option" onclick="selectBank(this)" data-bank="axis">
+                        <div class="bank-logo">AXIS</div>
+                        <div class="bank-name">Axis Bank</div>
+                    </div>
+                    <div class="bank-option" onclick="selectBank(this)" data-bank="kotak">
+                        <div class="bank-logo">KMB</div>
+                        <div class="bank-name">Kotak Bank</div>
+                    </div>
+                    <div class="bank-option" onclick="selectBank(this)" data-bank="pnb">
+                        <div class="bank-logo">PNB</div>
+                        <div class="bank-name">Punjab NB</div>
+                    </div>
+                </div>
+
+                <div class="other-banks" onclick="showAllBanks()">
+                    <div style="font-weight: 600; color: #4a5568; margin-bottom: 5px;">
+                        Other Banks
+                    </div>
+                    <div style="font-size: 12px; color: #718096;">
+                        Select from 50+ supported banks
+                    </div>
+                </div>
+            </div>
+
+            <button class="retry-button" onclick="retryPayment('<%= order._id%>')" id="retryBtn">
+                Retry Payment
+            </button>
+            <input type="hidden" id="retry" value="<%= addresses._id %>">
+            <div class="security-info">
+                <svg class="security-icon" viewBox="0 0 24 24">
+                    <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+                </svg>
+                <span class="security-text">256-bit SSL encrypted & secure payment</span>
+            </div>
+
+            <div class="back-link">
+                <a href="/order-details" onclick="goBack()">View Details</a>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="orderAmount" value="<%= totalAmount %>">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        let selectedBank = null;
+
+        // function selectBank(element) {
+        //     // Remove selection from all banks
+        //     document.querySelectorAll('.bank-option').forEach(bank => {
+        //         bank.classList.remove('selected');
+        //     });
+            
+        //     // Add selection to clicked bank
+        //     element.classList.add('selected');
+        //     selectedBank = element.dataset.bank;
+            
+        //     // Enable retry button
+        //     document.getElementById('retryBtn').disabled = false;
+        // }
+
+        // function showAllBanks() {
+        //     // In a real application, this would open a modal or navigate to a page with all banks
+        //     alert('This would show all available banks in a real implementation');
+        // }
+
+        async function retryPayment(orderId) {
+    const addressId = document.getElementById('retry').value;  
+    console.log(addressId,'thi is sdda')
+    const amount = document.getElementById('orderAmount').value;
+     console.log(amount,'this is amunt')       
+    if (!amount || !orderId || !addressId) {
+        return showToast("Amount, orderId or address is missing");
+    }
+
+    try {
+        const response = await fetch('/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount,
+                orderId,                   
+                address: addressId         
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return showToast(data.message || 'Failed to create Razorpay order');
+        }
+
+        const options = {
+            key: data.key,
+            amount: data.amount,
+            currency: data.currency,
+            name: "ChronoX",
+            description: "Order Payment",
+            order_id: data.orderId,
+            handler: async function (response) {
+                try {
+                    const result = await fetch('/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            localOrderId: orderId
+                        })
+                    });
+
+                    const resData = await result.json();
+                    if (resData.success) {
+                        window.location.href = resData.redirectUrl;
+                    } else {
+                        window.location.href = resData.redirectUrl || `/payment-failure?orderId=${orderId}`;
+                    }
+                } catch (error) {
+                    console.error('Payment verification error:', error);
+                    window.location.href = `/payment-failure?orderId=${orderId}`;
+                }
+            },
+
+            // Payment Modal Dismiss Handler
+            modal: {
+                ondismiss: function () {
+                    window.location.href = `/payment-failure?orderId=${orderId}`;
+                }
+            },
+            prefill: {
+                name: "<%= user.fullName %>",
+                email: "<%= user.email %>",
+                contact: "<%= user.mobile %>"
+            },
+            theme: { color: "#3399cc" },
+            retry: { enabled: true, max_count: 3 }
+        };
+
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+
+    } catch (err) {
+        console.error(err);
+        showToast('Something went wrong. Try again.');
+    }
+}
+
+
+
+        function goBack() {
+            // In a real application, this would navigate back to the previous page
+            // For EJS: window.history.back() or window.location.href = '/checkout';
+            window.history.back();
+        }
+
+        // Auto-focus on page load for better UX
+        window.addEventListener('load', function() {
+            document.querySelector('.bank-option').focus();
+        });
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && selectedBank) {
+                retryPayment();
+            }
+        });
+    </script>
+</body>
+</html>

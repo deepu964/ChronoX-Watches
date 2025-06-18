@@ -53,7 +53,7 @@
                             <span>Net Banking</span>
                             <form id="paymentForm">
                                 <input type="hidden" id="orderAmount" value="<%= lastAmount %>" >
-                                <button type="button" onclick="payNow('<%=addresses%>')" id="payNowBtn">Pay Now</button>
+                                <button class="payment-btn" type="button" onclick="payNow('<%=addresses%>')" id="payNowBtn">Pay Now</button>
                                 
                             </form>
                         </div> 
@@ -125,7 +125,7 @@
                         <span>₹<%= lastAmount %></span>
                   <form id="place-order-form" method="POST" action="/payment">
                     <input type="hidden" name="addressId" value="<%= addresses %>">
-                    <input type="hidden" id="payment-method-input" name="paymentMethod" value="COD">
+                    <input type="hidden"  id="payment-method-input" name="paymentMethod" value="COD">
 
                     <button type="submit" class="btn btn-primary" id="confirm-order-btn">Confirm Order</button>
                     </form>
@@ -197,70 +197,153 @@
             }
             
         });
+        // async function payNow(addressId) {
+        //     const amount = document.getElementById('orderAmount').value;
+
+        //     if (!amount || !addressId) {
+        //         return showToast("Amount or address is missing");
+        //     }
+
+        //     try {
+        //         const response = await fetch('/create-order', {
+        //             method: 'POST',
+        //             headers: { 'Content-Type': 'application/json' },
+        //             body: JSON.stringify({ amount, address: addressId })
+        //         });
+
+        //         const data = await response.json();
+
+        //         if (!data.success) {
+        //             return showToast(data.message || 'Failed to create Razorpay order');
+        //         }
+
+        //         const options = {
+        //             key: data.key,
+        //             amount: data.amount,
+        //             currency: data.currency,
+        //             name: "ChronoX",
+        //             description: "Order Payment",
+        //             order_id: data.orderId,
+        //             paid:data.amount_paid,
+        //             handler: async function (response) {
+        //                 // Payment was successful – now place the order
+        //                 const result = await fetch('/payment', {
+        //                     method: 'POST',
+        //                     headers: { 'Content-Type': 'application/json' },
+        //                     body: JSON.stringify({
+        //                         paymentMethod: 'ONLINE',
+        //                         razorpayOrderId: response.razorpay_order_id,
+        //                         paymentId: response.razorpay_payment_id,
+        //                         addressId: addressId   
+        //                     })
+        //                 });
+
+        //                 const resData = await result.json();
+        //                 if (resData.success) {
+        //                     window.location.href = `/order-success?orderId=${resData.orderId}`;
+        //                 } else {
+        //                     window.location.href = `/retry-payment`;
+        //                 }
+        //             },
+        //             prefill: {
+        //                 name: "<%= user.fullName %>",
+        //                 email: "<%= user.email %>",
+        //                 contact: "<%= user.mobile %>"
+        //             },
+        //             theme: { color: "#3399cc" },
+        //             retry: { enabled: true, max_count: 3 }
+        //         };
+
+        //         const razorpay = new Razorpay(options);
+        //         razorpay.open();
+
+        //     } catch (err) {
+        //         console.error(err);
+        //         showToast('Something went wrong. Try again.');
+        //     }
+        // }
+
         async function payNow(addressId) {
-            const amount = document.getElementById('orderAmount').value;
+    const amount = document.getElementById('orderAmount').value;
 
-            if (!amount || !addressId) {
-                return alert("Amount or address is missing");
-            }
+    if (!amount || !addressId) {
+        return showToast("Amount or address is missing");
+    }
 
-            try {
-                const response = await fetch('/create-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount, address: addressId })
-                });
+    try {
+        const response = await fetch('/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount, address: addressId })
+        });
 
-                const data = await response.json();
+        const data = await response.json();
 
-                if (!data.success) {
-                    return alert(data.message || 'Failed to create Razorpay order');
-                }
-
-                const options = {
-                    key: data.key,
-                    amount: data.amount,
-                    currency: data.currency,
-                    name: "ChronoX",
-                    description: "Order Payment",
-                    order_id: data.orderId,
-                    handler: async function (response) {
-                        // Payment was successful – now place the order
-                        const result = await fetch('/payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                paymentMethod: 'ONLINE',
-                                razorpayOrderId: response.razorpay_order_id,
-                                paymentId: response.razorpay_payment_id,
-                                addressId: addressId   
-                            })
-                        });
-
-                        const resData = await result.json();
-                        if (resData.success) {
-                            window.location.href = `/order-success?orderId=${resData.orderId}`;
-                        } else {
-                            window.location.href = `/order-failed?orderId=${data.orderId}`;
-                        }
-                    },
-                    prefill: {
-                        name: "<%= user.fullName %>",
-                        email: "<%= user.email %>",
-                        contact: "<%= user.mobile %>"
-                    },
-                    theme: { color: "#3399cc" },
-                    retry: { enabled: true, max_count: 3 }
-                };
-
-                const razorpay = new Razorpay(options);
-                razorpay.open();
-
-            } catch (err) {
-                console.error(err);
-                alert('Something went wrong. Try again.');
-            }
+        if (!data.success) {
+            return showToast(data.message || 'Failed to create Razorpay order');
         }
+
+        // ✅ [Update #1] Store order ID to use in both success and fail cases
+        const orderId = data.localOrderId; // ← must be sent from backend
+
+        const options = {
+            key: data.key,
+            amount: data.amount,
+            currency: data.currency,
+            name: "ChronoX",
+            description: "Order Payment",
+            order_id: data.orderId,  // Razorpay order_id
+            prefill: {
+                name: "<%= user.fullName %>",
+                email: "<%= user.email %>",
+                contact: "<%= user.mobile %>"
+            },
+            theme: { color: "#3399cc" },
+            retry: { enabled: true, max_count: 3 },
+
+            // ✅ Payment Success Handler – verify payment
+            handler: async function (response) {
+                try {
+                    const result = await fetch('/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            localOrderId: orderId
+                        })
+                    });
+
+                    const resData = await result.json();
+                    if (resData.success) {
+                        window.location.href = resData.redirectUrl;
+                    } else {
+                        window.location.href = resData.redirectUrl || `/payment-failure?orderId=${orderId}`;
+                    }
+                } catch (error) {
+                    console.error('Payment verification error:', error);
+                    window.location.href = `/payment-failure?orderId=${orderId}`;
+                }
+            },
+
+            // ✅ Payment Modal Dismiss Handler – redirect to failure page
+            modal: {
+                ondismiss: function () {
+                    // User closed the payment modal - consider it a failure
+                    window.location.href = `/payment-failure?orderId=${orderId}`;
+                }
+            }
+        };
+
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+
+    } catch (err) {
+        console.error(err);
+        showToast('Something went wrong. Try again.');
+    }
+}
 
 
                     

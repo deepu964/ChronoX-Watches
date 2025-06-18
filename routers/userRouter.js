@@ -95,6 +95,9 @@ router.delete('/delete-check-address/:id', isAuth, orderController.deleteCheckAd
 
 router.get('/payment', isAuth, orderController.getPayment);
 router.post('/payment', isAuth, orderController.placeOrder);
+router.post('/verify-payment', isAuth, orderController.verifyPayment);
+router.get('/payment-failure', isAuth, orderController.getPaymentFailure);
+router.get('/retry-payment/:orderId',isAuth,orderController.getRetry);
 
 router.get('/order-success', isAuth, orderController.getOrderSuccess);
 router.get('/order-details/:orderId', isAuth, orderController.getOrderDetails);
@@ -109,9 +112,7 @@ router.post('/create-order',isAuth, orderController.createRazorpayOrder);
 router.post('/request-return', isAuth, returnController.requestReturn);
 router.get('/my-returns', isAuth, returnController.getMyReturns);
 
-
 router.get('/wallet', isAuth, walletController.getWallet);
-
 
 router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
 

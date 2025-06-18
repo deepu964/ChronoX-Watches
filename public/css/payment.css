@@ -59,6 +59,17 @@ body {
     gap: 30px;
 }
 
+.payment-btn{
+    color: white;
+    background: blueviolet;
+    padding: 5px;
+    margin-left: 457%;
+    width: 100px;
+    border-radius: 8px;
+    border: none;
+}
+
+
 /* Left Section */
 .left-section, .payment-left {
     background: white;

@@ -117,7 +117,7 @@
             <h2>Order Summary</h2>
             <div class="cart-items">
                 <% if (cartItems && cartItems.length > 0) { %>
-                    <% let subtotal = 0; %>
+                    <% let subtotal = 0 %>
                     <% cartItems.forEach(function(item) { 
                         const itemTotal = item.price * item.quantity;
                         subtotal += itemTotal;
