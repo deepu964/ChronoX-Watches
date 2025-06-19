@@ -1,12 +1,13 @@
 const productSchema = require('../../models/productSchema');
 const Cart = require('../../models/cartSchema');
 const wishlistSchema = require('../../models/wishlistSchema');
+const categoryOffer = require('../../models/categoryOfferSchema');
 
 const getCart = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
-        const cart = await Cart.findOne({ user: userId }).populate('items.product').lean()
-        
+        const cart = await Cart.findOne({ user: userId }).populate('items.product').lean();
+
         if (!cart || !cart.items || cart.items.length === 0) {
             return res.render('user/cart', {
                 user: req.session.user,
@@ -19,40 +20,59 @@ const getCart = async (req, res, next) => {
             });
         }
 
-        let total = 0;
+        const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
+
         let totalMRP = 0;
-        let shippingFee = 50;
+        let discount = 0;
+        let grandTotal = 0;
 
-        cart.items.forEach(item => {
-            if (item.product.variants && item.product.variants.length > 0) {
-                const variant = item.product.variants[0];
-                const salePrice = variant.salePrice || variant.regularPrice;
-                const regularPrice = variant.regularPrice;
+        for (let item of cart.items) {
+            const product = item.product;
+            const quantity = item.quantity;
+            const variant = product.variants[0]; // assuming first variant is used
 
-                total += salePrice * item.quantity;
-                totalMRP += regularPrice * item.quantity;
+            const regularPrice = variant.regularPrice;
+            const salePrice = variant.salePrice;
+
+            const productOffer = regularPrice - salePrice;
+
+            // Find category offer for this product
+            const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
+
+            let catDiscount = 0;
+            if (catOffer && catOffer.discount) {
+                catDiscount = (regularPrice * catOffer.discount) / 100;
             }
-        });
 
-        const discount = totalMRP - total;
-        const grandTotal = total + shippingFee;
+            // Choose best offer for this item
+            const bestOffer = Math.max(productOffer, catDiscount);
+            const discountedPrice = regularPrice - bestOffer;
+
+            // Total calculations
+            totalMRP += regularPrice * quantity;
+            discount += bestOffer * quantity;
+            grandTotal += discountedPrice * quantity;
+        }
+
+        const shippingFee = 50;
 
         res.render('user/cart', {
             user: req.session.user,
             items: cart.items,
-            total,
+            total: totalMRP - discount,
             totalMRP,
             discount,
             shippingFee,
-            grandTotal,
+            grandTotal: grandTotal + shippingFee,
             cloudName: process.env.CLOUDINARY_CLOUD_NAME
         });
 
     } catch (error) {
-        console.log(' cart get error')
+        console.log('cart get error:', error);
         next(error);
     }
 };
+
 
 const addToCart = async (req, res, next) => {
     try {
@@ -72,9 +92,11 @@ const addToCart = async (req, res, next) => {
         }
 
         const maxQuantityAllowed = 5;
-        const stockQty = product.variants[0]?.quantity || 0;
-        const itemPrice = product.variants[0]?.salePrice || product.variants[0]?.regularPrice;
-
+        const stockQty = product.variants[0]?.quantity || 0
+        const price = product.variants[0]?.regularPrice;
+        console.log(price, 'price');
+        const itemPrice = product.variants[0]?.salePrice ;
+        console.log(itemPrice, 'item price');
         
         if (requestedQty < 1) {
             return res.status(400).json({ success: false, message: 'Invalid quantity.' });
@@ -89,10 +111,11 @@ const addToCart = async (req, res, next) => {
         }
 
         let cart = await Cart.findOne({ user: userId });
+
         if (!cart) {
             cart = new Cart({ user: userId, items: [] });
         }
-
+         
         const existingItem = cart.items.find(item => item.product.toString() === productId);
 
         if (existingItem) {

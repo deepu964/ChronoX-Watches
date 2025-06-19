@@ -52,7 +52,7 @@
                             <i class="fas fa-university"></i>
                             <span>Net Banking</span>
                             <form id="paymentForm">
-                                <input type="hidden" id="orderAmount" value="<%= lastAmount %>" >
+                                <input type="hidden" id="orderAmount" value="<%= grandTotal+shipping %>" >
                                 <button class="payment-btn" type="button" onclick="payNow('<%=addresses%>')" id="payNowBtn">Pay Now</button>
                                 
                             </form>
@@ -108,7 +108,7 @@
                     <h3>PRICE DETAILS (1 Items)</h3>
                     <div class="price-row">
                         <span>Total MRP</span>
-                        <span>₹<%=grandTotal%></span>
+                        <span>₹<%=subTotal%></span>
                     </div>
                     <div class="price-row">
                         <span>Discount on MRP</span>
@@ -122,7 +122,7 @@
                     </div>
                     <div class="price-row total">
                         <span>Total Amount</span>
-                        <span>₹<%= lastAmount %></span>
+                        <span>₹<%= grandTotal + shipping %></span>
                   <form id="place-order-form" method="POST" action="/payment">
                     <input type="hidden" name="addressId" value="<%= addresses %>">
                     <input type="hidden"  id="payment-method-input" name="paymentMethod" value="COD">

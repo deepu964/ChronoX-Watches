@@ -4,29 +4,38 @@ const ExcelJS = require('exceljs');
 
 const getSalesReport = async (req, res, next) => {
   try {
-    const { type, fromDate, toDate } = req.query;
+    const limit = 10; // Increased to 10 records per page
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * limit;
 
-    
+    const { type, fromDate, toDate } = req.query;
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    
-    const orders = await orderSchema.find({
+    const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' }
-    })
-    .populate('user', 'name email')
-    .sort({ createdAt: -1 });
+    };
 
-    
+    const totalOrders = await orderSchema.countDocuments(filter);
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    const orders = await orderSchema.find(filter)
+      .populate('user', 'fullname email') // Changed from 'name' to 'fullname' to match user schema
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Calculate summary for ALL orders (not just current page)
+    const allOrders = await orderSchema.find(filter);
     const summary = {
-      totalOrders: orders.length,
+      totalOrders,
       totalSales: 0,
       totalDiscount: 0,
       totalCouponDiscount: 0,
       totalAmount: 0
     };
 
-    orders.forEach(order => {
+    allOrders.forEach(order => {
       const originalAmount = order.totalAmount + (order.discount || 0);
       summary.totalSales += originalAmount;
       summary.totalDiscount += order.discount || 0;
@@ -39,14 +48,21 @@ const getSalesReport = async (req, res, next) => {
       summary,
       type: type || 'weekly',
       fromDate: fromDate || '',
-      toDate: toDate || ''
+      toDate: toDate || '',
+      currentPage: page,
+      totalPages,
+      totalOrders,
+      limit,
+      startRecord: skip + 1,
+      endRecord: Math.min(skip + limit, totalOrders)
     });
-
   } catch (error) {
     console.log("sales report error", error);
     next(error);
   }
 };
+
+
 
 const getDateRange = (type, fromDate, toDate) => {
   let startDate, endDate;

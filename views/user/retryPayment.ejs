@@ -431,10 +431,10 @@
             <div class="payment-details">
                 <div class="amount-section">
                     <div class="amount">
-                        <span class="currency">₹</span>2,499
+                        <span class="currency">₹</span><%= totalAmount %>
                     </div>
                     <div class="order-id">
-                        Order #ORD123456
+                        Order #<%= order._id.toString().slice(-8).toUpperCase() %>
                     </div>
                 </div>
                 <div style="font-size: 14px; color: #4a5568;">

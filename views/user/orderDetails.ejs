@@ -431,7 +431,7 @@
                         </div>
                         <div class="item-info">
                             <span>Quantity: <%= item.quantity %></span>
-                            <span>Price: ₹<%= item.price.toLocaleString() %></span>
+                            <span>Price: ₹<%= item.price %></span>
                         </div>
                         <% if (item.status === 'Cancelled' && item.cancelledAt) { %>
                             <div class="cancel-info">
@@ -479,17 +479,17 @@
 
                 <div class="total-row">
                     <span>Subtotal:</span>
-                    <span>₹<%= activeTotal.toLocaleString() %></span>
+                    <span>₹<%=  %></span>
                 </div>
 
                 <% if (activeTotal > 0) { %>
                     <div class="total-row">
                         <span>Shipping:</span>
-                        <span>₹50</span>
+                        <span>₹<%= shippingFee.toLocaleString() %></span>
                     </div>
                     <div class="total-row">
                         <span>Total Amount:</span>
-                        <span>₹<%= (activeTotal + 50).toLocaleString() %></span>
+                        <span>₹<%= (activeTotal + shippingFee).toLocaleString() %></span>
                     </div>
                 <% } else { %>
                     <div class="total-row" style="color: #dc3545;">

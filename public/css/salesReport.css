@@ -411,3 +411,148 @@ body {
         font-size: 14px;
     }
 }
+
+/* Table Header with Page Info */
+.table-header {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Pagination Styles */
+.pagination-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.page-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    background-color: white;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+    cursor: pointer;
+    min-width: 44px;
+    justify-content: center;
+}
+
+.page-btn:hover:not(:disabled) {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    text-decoration: none;
+}
+
+.page-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.prev-btn, .next-btn {
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+.page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.page-dots {
+    padding: 10px 5px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Responsive Pagination */
+@media (max-width: 768px) {
+    .pagination {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 15px;
+    }
+
+    .page-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        min-width: 36px;
+    }
+
+    .prev-btn, .next-btn {
+        padding: 8px 15px;
+    }
+
+    .page-numbers {
+        gap: 3px;
+    }
+
+    .table-header {
+        padding: 10px 15px;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .page-info {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination {
+        padding: 10px;
+        gap: 5px;
+    }
+
+    .page-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 32px;
+    }
+
+    .prev-btn, .next-btn {
+        padding: 6px 12px;
+    }
+
+    /* Hide some page numbers on very small screens */
+    .page-numbers .page-btn:not(.active):nth-child(n+6) {
+        display: none;
+    }
+}

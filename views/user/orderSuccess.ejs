@@ -298,7 +298,7 @@
             </div>
             <div class="order-info">
                 <span class="order-label">Total Amount:</span>
-                <span class="order-value order-total">₹<%= order.totalAmount.toLocaleString() %></span>
+                <span class="order-value order-total">₹<%= order.totalAmount%></span>
             </div>
         </div>
 
@@ -340,7 +340,7 @@
                         <div class="item-name"><%= item.product.name %></div>
                         <div class="item-quantity">Quantity: <%= item.quantity %></div>
                     </div>
-                    <div class="item-price">₹<%= item.price.toLocaleString() %></div>
+                    <div class="item-price">₹<%= item.price %></div>
                 </div>
             <% }) %>
             <% if (order.items.length > 3) { %>

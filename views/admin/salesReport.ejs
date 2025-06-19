@@ -86,6 +86,15 @@
         
         <!-- Sales Table -->
         <div class="sales-table">
+            <!-- Page Info -->
+            <% if (typeof orders !== 'undefined' && orders.length > 0) { %>
+                <div class="table-header">
+                    <div class="page-info">
+                        Showing <%= startRecord %> - <%= endRecord %> of <%= totalOrders %> results
+                    </div>
+                </div>
+            <% } %>
+
             <table>
                 <thead>
                     <tr>
@@ -105,15 +114,15 @@
                         <% orders.forEach(order => { %>
                          <tr>
                             <td>#<%= order._id.toString().slice(-6).toUpperCase() %></td>
-                            <td><%= order.user?.name || 'N/A' %></td>
+                            <td><%= order.user?.fullname || 'N/A' %></td>
                             <td><%= order.user?.email || 'N/A' %></td>
-                            <td>₹<%= order.totalAmount + (order.discount || 0) %></td>
-                            <td>₹<%= order.categoryDiscount || 0 %></td>
+                            <td>₹<%= (order.totalAmount + (order.discount || 0)).toLocaleString('en-IN') %></td>
+                            <td>₹<%= (order.categoryDiscount || 0).toLocaleString('en-IN') %></td>
                             <td><%= order.paymentMethod %></td>
-                            <td>₹<%= order.discount || 0 %></td>
-                            <td>₹<%= order.couponDiscount || 0 %></td>
-                            <td>₹<%= order.totalAmount %></td>
-                        </tr> 
+                            <td>₹<%= (order.discount || 0).toLocaleString('en-IN') %></td>
+                            <td>₹<%= (order.couponDiscount || 0).toLocaleString('en-IN') %></td>
+                            <td>₹<%= order.totalAmount.toLocaleString('en-IN') %></td>
+                        </tr>
                         <% }) %>
                     <% } else { %>
                         <tr>
@@ -125,6 +134,79 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination Controls -->
+        <% if (typeof orders !== 'undefined' && orders.length > 0 && totalPages > 1) { %>
+            <div class="pagination-container">
+                <div class="pagination">
+                    <!-- Previous Button -->
+                    <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>&type=<%= type %>&fromDate=<%= fromDate %>&toDate=<%= toDate %>" class="page-btn prev-btn">
+                            <i class="fas fa-chevron-left"></i>
+                            Previous
+                        </a>
+                    <% } else { %>
+                        <button class="page-btn prev-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                            Previous
+                        </button>
+                    <% } %>
+
+                    <!-- Page Numbers -->
+                    <div class="page-numbers">
+                        <%
+                        let startPage = Math.max(1, currentPage - 2);
+                        let endPage = Math.min(totalPages, currentPage + 2);
+
+                        // Adjust if we're near the beginning or end
+                        if (currentPage <= 3) {
+                            endPage = Math.min(5, totalPages);
+                        }
+                        if (currentPage > totalPages - 3) {
+                            startPage = Math.max(1, totalPages - 4);
+                        }
+                        %>
+
+                        <!-- First page if not in range -->
+                        <% if (startPage > 1) { %>
+                            <a href="?page=1&type=<%= type %>&fromDate=<%= fromDate %>&toDate=<%= toDate %>" class="page-btn">1</a>
+                            <% if (startPage > 2) { %>
+                                <span class="page-dots">...</span>
+                            <% } %>
+                        <% } %>
+
+                        <!-- Page range -->
+                        <% for (let i = startPage; i <= endPage; i++) { %>
+                            <a href="?page=<%= i %>&type=<%= type %>&fromDate=<%= fromDate %>&toDate=<%= toDate %>"
+                               class="page-btn <%= i === currentPage ? 'active' : '' %>">
+                                <%= i %>
+                            </a>
+                        <% } %>
+
+                        <!-- Last page if not in range -->
+                        <% if (endPage < totalPages) { %>
+                            <% if (endPage < totalPages - 1) { %>
+                                <span class="page-dots">...</span>
+                            <% } %>
+                            <a href="?page=<%= totalPages %>&type=<%= type %>&fromDate=<%= fromDate %>&toDate=<%= toDate %>" class="page-btn"><%= totalPages %></a>
+                        <% } %>
+                    </div>
+
+                    <!-- Next Button -->
+                    <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>&type=<%= type %>&fromDate=<%= fromDate %>&toDate=<%= toDate %>" class="page-btn next-btn">
+                            Next
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <% } else { %>
+                        <button class="page-btn next-btn" disabled>
+                            Next
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
         
         <!-- Summary Table -->
         <div class="summary-table">
@@ -152,7 +234,78 @@
     </main>
   </div>
 
-  <script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const reportType = document.getElementById('reportType');
+    const customDateGroup = document.getElementById('customDateGroup');
+    const customDateGroup2 = document.getElementById('customDateGroup2');
+
+    function toggleDateFields() {
+      if (reportType.value === 'custom') {
+        customDateGroup.style.display = 'block';
+        customDateGroup2.style.display = 'block';
+      } else {
+        customDateGroup.style.display = 'none';
+        customDateGroup2.style.display = 'none';
+      }
+    }
+
+    reportType.addEventListener('change', toggleDateFields);
+    toggleDateFields(); // initial check
+
+    // Set default date range (last 7 days)
+    const today = new Date();
+    const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    document.getElementById('fromDate').value ||= oneWeekAgo.toISOString().split('T')[0];
+    document.getElementById('toDate').value ||= today.toISOString().split('T')[0];
+  });
+
+  function generateReport() {
+    const type = document.getElementById('reportType').value;
+    const from = document.getElementById('fromDate').value;
+    const to = document.getElementById('toDate').value;
+    let url = `/admin/sales-report?type=${type}&page=1`; // Reset to page 1 when generating new report
+    if (type === 'custom' && from && to) url += `&fromDate=${from}&toDate=${to}`;
+    window.location.href = url;
+  }
+
+  function exportReportPDF() {
+    exportHelper('pdf-btn', '/admin/sales-report/export-pdf');
+  }
+
+  function exportReportExcel() {
+    exportHelper('excel-btn', '/admin/sales-report/export-excel');
+  }
+
+  function exportHelper(buttonClass, baseUrl) {
+    const type = document.getElementById('reportType').value;
+    const from = document.getElementById('fromDate').value;
+    const to = document.getElementById('toDate').value;
+
+    if (type === 'custom' && (!from || !to)) {
+      alert('Please select both From and To dates for custom range');
+      return;
+    }
+
+    // Export functions should export ALL data for the selected filters, not just current page
+    let url = `${baseUrl}?type=${type}`;
+    if (type === 'custom' && from && to) url += `&fromDate=${from}&toDate=${to}`;
+
+    const btn = document.querySelector(`.${buttonClass}`);
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      window.open(url, '_blank');
+      btn.innerHTML = original;
+      btn.disabled = false;
+    }, 500);
+  }
+</script>
+
+  <!-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         const reportType = document.getElementById('reportType');
         const customDateGroup = document.getElementById('customDateGroup');
@@ -257,6 +410,6 @@
             }, 2000);
         }
     }
-  </script>
+  </script> -->
 </body>
 </html>
