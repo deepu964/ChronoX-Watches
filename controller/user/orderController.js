@@ -351,6 +351,9 @@ const placeOrder = async (req, res,next) => {
             status: paymentMethod === 'online' ? 'Placed' : 'Placed'
         });
         console.log(razorpayOrderId,"id")
+        if(paymentMethod === 'ONLINE'){
+            order.isPaid = true;
+        }
         await order.save();
 
         cart.items = [];
@@ -371,7 +374,7 @@ const getRetry = async(req,res,next)=>{
             const addressId = req.query.addressId
             
              const orderId = req.params.orderId; 
-            console.log(orderId,"orderid")
+            
             const order = await Order.findById(orderId) 
             .populate('items.product')
             .populate('address');
@@ -392,7 +395,7 @@ const getRetry = async(req,res,next)=>{
                 return res.redirect('/cart');
             }
             const addresses  = await addressSchema.findById(addressId)
-            console.log(addresses,'thisi sisj   ')
+            
             
 
             res.render('user/retryPayment', {
@@ -559,8 +562,12 @@ const cancelOrder = async (req, res, next) => {
     try {
         const cancelId = req.params.orderId;
 
-        const order = await Order.findOne({_id:cancelId,user:req.session.user._id});
-        console.log(order,'this is order')
+        const order = await Order.findOne({ _id: cancelId, user: req.session.user._id })
+                         .populate({
+                           path: 'user',
+                           populate: { path: 'wallet' }
+                         });
+        
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
@@ -572,39 +579,36 @@ const cancelOrder = async (req, res, next) => {
         order.status = 'Cancelled';
 
        for (const item of order.items) {
-    if (item.status === 'Placed') {
-        item.status = 'Cancelled';
-        item.cancelledAt = new Date();
-        item.cancelReason = 'Full order cancelled';
+        if (item.status === 'Placed') {
+            item.status = 'Cancelled';
+            item.cancelledAt = new Date();
+            item.cancelReason = 'Full order cancelled';
 
-        
+            const product = await productSchema.findById(item.product);
+            if (!product) {
+                continue;
+            }
 
-        const product = await productSchema.findById(item.product);
-        if (!product) {
-            continue;
+            const variant = product.variants[0];
+            if (!variant) {
+                continue;
+            }
+
+            variant.quantity += item.quantity;
+            await product.save();
         }
-
-        const variant = product.variants[0];
-        if (!variant) {
-            continue;
         }
-
-        variant.quantity += item.quantity;
-        await product.save();
-      
-    }
-}
-
 
          if (order.paymentMethod === 'ONLINE' && order.isPaid) {
-              console.log("👉 Reached payment refund check");
-            const users = await User.findById(order.user);
-            console.log(users,'this is user');
-             // assuming 'user' field in order
-            if (user) {
-                user.wallet = (user.wallet || 0) + order.totalAmount;
-                await user.save();
-            }
+            order.user.wallet.balance += order.totalAmount;
+            
+            order.user.wallet.transactions.push({
+                type: 'credit',
+                amount: order.totalAmount,
+                description: `Refund for cancelled order: ${order._id.toString().slice(-8)}`,
+                orderId: order._id
+              });
+              await order.user.wallet.save();
         }
 
         await order.save(); 
@@ -729,7 +733,7 @@ const debugOrderIds = async (req, res, next) => {
 const createRazorpayOrder = async (req, res) => {
   try {
     const { amount, address, orderId } = req.body;
-    console.log(req.body, 'this is body');
+    
 
     // 1. Validate address
     const selectedAddress = await addressSchema.findById(address);
@@ -802,36 +806,37 @@ const createRazorpayOrder = async (req, res) => {
 };
 
 
-const verifyRazorpayPayment = async (req, res) => {
-  try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, localOrderId } = req.body;
+// const verifyRazorpayPayment = async (req, res) => {
+//   try {
+//     console.log('gfggfffgfggf');
+//     const { razorpay_payment_id, razorpay_order_id, razorpay_signature, localOrderId } = req.body;
 
-    const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest('hex');
+//     const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+//       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+//       .digest('hex');
 
-    if (expectedSignature !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: "Invalid signature" });
-    }
+//     if (expectedSignature !== razorpay_signature) {
+//       return res.status(400).json({ success: false, message: "Invalid signature" });
+//     }
 
-    const order = await Order.findById(localOrderId);
-    console.log(order,'this is order');
-    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+//     const order = await Order.findById(localOrderId);
+//     console.log(order,'this is order');
+//     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-    order.isPaid = true;
-    order.paymentStatus = "Paid";
-    order.status = "Placed";
-    order.razorpayPaymentId = razorpay_payment_id;
-    await order.save();
+//     order.isPaid = true;
+//     order.paymentStatus = "Paid";
+//     order.status = "Placed";
+//     order.razorpayPaymentId = razorpay_payment_id;
+//     await order.save();
 
-    await cartSchema.deleteMany({ user: order.user });
+//     await cartSchema.deleteMany({ user: order.user });
 
-    res.status(200).json({ success: true, message: "Payment verified", orderId: order._id });
-  } catch (err) {
-    console.error("verifyRazorpayPayment error:", err);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-};
+//     res.status(200).json({ success: true, message: "Payment verified", orderId: order._id });
+//   } catch (err) {
+//     console.error("verifyRazorpayPayment error:", err);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// };
 
 
 
@@ -851,5 +856,5 @@ module.exports = {
     debugOrderIds,
     createRazorpayOrder,
     getRetry,
-    verifyRazorpayPayment
+    // verifyRazorpayPayment
 };
