@@ -285,7 +285,45 @@ const getPayment = async (req, res) => {
 const placeOrder = async (req, res,next) => {
     try {
         const userId = req.session.user._id;
-        const { paymentMethod, addressId,razorpayOrderId, paymentId } = req.body;
+        const { paymentMethod, addressId, razorpayOrderId, paymentId, orderId } = req.body;
+
+        // Check if this is a retry payment (orderId provided)
+        if (orderId) {
+            // This is a retry payment - update existing order
+            const existingOrder = await Order.findById(orderId);
+
+            if (!existingOrder) {
+                return res.status(400).json({ success: false, message: 'Order not found' });
+            }
+
+            if (existingOrder.user.toString() !== userId.toString()) {
+                return res.status(403).json({ success: false, message: 'Unauthorized access to order' });
+            }
+
+            // Update the existing order with payment details
+            existingOrder.razorpayPaymentId = paymentId || null;
+            existingOrder.razorpayOrderId = razorpayOrderId || null;
+            existingOrder.status = 'Placed';
+            existingOrder.paymentStatus = 'Paid';
+            existingOrder.isPaid = paymentMethod === 'ONLINE';
+
+            await existingOrder.save();
+
+            // Clear cart only after successful payment
+            const cart = await Cart.findOne({ user: userId });
+            if (cart) {
+                cart.items = [];
+                await cart.save();
+            }
+
+            return res.json({
+                success: true,
+                orderId: existingOrder._id,
+                redirectUrl: `/order-success?orderId=${existingOrder._id}`
+            });
+        }
+
+        // This is a new order - proceed with original logic
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ success: false, message: 'Cart is empty' });
@@ -296,7 +334,7 @@ const placeOrder = async (req, res,next) => {
         if (!address) {
             return res.status(400).json({ success: false, message: 'Invalid address' });
         }
-        
+
         let total = 0;
         const orderItems = [];
         for (const item of cart.items) {
@@ -313,7 +351,7 @@ const placeOrder = async (req, res,next) => {
 
             const itemPrice = variant.salePrice || variant.regularPrice;
             const discount = variant.regularPrice - variant.salePrice
-            
+
             if (!itemPrice || itemPrice <= 0 || isNaN(itemPrice)) {
                 return res.status(400).json({ success: false, message: `${product.name} has invalid pricing` });
             }
@@ -346,13 +384,16 @@ const placeOrder = async (req, res,next) => {
             },
             totalAmount: total,
             paymentMethod: paymentMethod,
-            paymentId: paymentId || null,
+            razorpayPaymentId: paymentId || null,
             razorpayOrderId: razorpayOrderId || null,
             status: paymentMethod === 'online' ? 'Placed' : 'Placed'
         });
         console.log(razorpayOrderId,"id")
         if(paymentMethod === 'ONLINE'){
             order.isPaid = true;
+            order.paymentStatus = 'Paid';
+        } else {
+            order.paymentStatus = 'Pending';
         }
         await order.save();
 
@@ -372,34 +413,32 @@ const getRetry = async(req,res,next)=>{
         try {
             const userId = req.session.user._id;
             const addressId = req.query.addressId
-            
-             const orderId = req.params.orderId; 
-            
-            const order = await Order.findById(orderId) 
+
+             const orderId = req.params.orderId;
+
+            const order = await Order.findById(orderId)
             .populate('items.product')
             .populate('address');
 
-            if (!order ) {
-                return res.json({success:false,message:"Order Not Created"})
+            if (!order) {
+                return res.json({success:false,message:"Order Not Found"})
             }
 
-            
+            // Verify order belongs to current user
+            if (order.user.toString() !== userId.toString()) {
+                return res.status(403).json({success:false,message:"Unauthorized access to order"});
+            }
+
+            // Get total amount from the existing order
+            const totalAmount = order.totalAmount;
+
+            // Get cart for display purposes (might be empty during retry)
             const cart = await Cart.findOne({user:userId}).populate('items.product');
-            let totalAmount =0
-            for(let item of cart.items){
-                totalAmount = item.price
-            }
 
-            if(!cart || cart.items.length === 0 ){
-                req.session.toast = {type :'error', message: "Your cart is empty"};
-                return res.redirect('/cart');
-            }
-            const addresses  = await addressSchema.findById(addressId)
-            
-            
+            const addresses = await addressSchema.findById(addressId)
 
             res.render('user/retryPayment', {
-                cart,
+                cart: cart || { items: [] }, // Provide empty cart if null
                 order,
                 addresses,
                 user: req.session.user,
@@ -733,7 +772,7 @@ const debugOrderIds = async (req, res, next) => {
 const createRazorpayOrder = async (req, res) => {
   try {
     const { amount, address, orderId } = req.body;
-    
+
 
     // 1. Validate address
     const selectedAddress = await addressSchema.findById(address);
@@ -746,16 +785,34 @@ const createRazorpayOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid amount" });
     }
 
-    // 3. Get cart items
-    const cart = await cartSchema.find({ user: req.session.user }).populate('items.product').lean();
-    if (!cart || cart.length === 0) {
-      return res.json({ success: false, message: "No items in cart" });
-    }
-
+    // 3. Handle cart items based on whether this is a retry or new order
     let cartItems = [];
-    for (let item of cart) {
-      for (let it of item.items) {
-        cartItems.push(it);
+    let localOrder;
+
+    if (orderId) {
+      // This is a retry payment - get existing order
+      localOrder = await Order.findById(orderId);
+      if (!localOrder) {
+        return res.json({ success: false, message: "Order not found" });
+      }
+
+      if (localOrder.user.toString() !== req.session.user._id.toString()) {
+        return res.json({ success: false, message: "Unauthorized access to order" });
+      }
+
+      // Use items from existing order
+      cartItems = localOrder.items;
+    } else {
+      // This is a new order - get cart items
+      const cart = await cartSchema.find({ user: req.session.user }).populate('items.product').lean();
+      if (!cart || cart.length === 0) {
+        return res.json({ success: false, message: "No items in cart" });
+      }
+
+      for (let item of cart) {
+        for (let it of item.items) {
+          cartItems.push(it);
+        }
       }
     }
 
@@ -769,9 +826,7 @@ const createRazorpayOrder = async (req, res) => {
 
     const razorpayOrder = await razorpayInstance.orders.create(options);
 
-    // 🔁 UPDATE STARTS HERE:
-    // 5. Create local order only if `orderId` not passed
-    let localOrder;
+    // 5. Create local order only if this is a new order (not retry)
     if (!orderId) {
       localOrder = await Order.create({
         user: req.session.user._id,
@@ -785,9 +840,10 @@ const createRazorpayOrder = async (req, res) => {
         razorpayOrderId: razorpayOrder.id // save for verification later
       });
     } else {
-      localOrder = await Order.findById(orderId);
+      // For retry payments, update the razorpayOrderId with the new one
+      localOrder.razorpayOrderId = razorpayOrder.id;
+      await localOrder.save();
     }
-    // 🔁 UPDATE ENDS HERE
 
     // 6. Send response
     return res.status(200).json({
@@ -801,7 +857,7 @@ const createRazorpayOrder = async (req, res) => {
 
   } catch (err) {
     console.error("Razorpay Order Creation Failed:", err);
-    return res.redirect('/retry-payment');
+    return res.status(500).json({ success: false, message: "Failed to create payment order" });
   }
 };
 
