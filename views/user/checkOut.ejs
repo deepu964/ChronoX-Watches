@@ -141,7 +141,7 @@
                                 <div class="item-quantity"><span>Qty: <%= item.quantity %></span></div>
                             </div>
                             <div class="item-price">
-                                <p class="price">₹<%= item.product.variants[0].regularPrice*item.quantity %></p>
+                                <p class="price">₹<%= item.product.variants[0].regularPrice*item.quantity%></p>
                                 <% if (item.discount > 0) { %>
                                     <p class="discount">-₹<%= item.discount.toFixed(2) %></p>
                                 <% } %>
@@ -149,8 +149,25 @@
                         </div>
                     <% }); %>
 
+                    <div class="coupon-section">
+                      <form id="couponForm">
+                        <label for="couponSelect">Apply Coupon</label>
+                        <div class="coupon-row">
+                          <select id="couponSelect" name="couponCode">
+                            <option value="">Select Coupon</option>
+                            <% coupons.forEach(coupon => { %>
+                              <option value="<%= coupon.couponcode %>"><%= coupon.couponcode %></option>
+                            <% }) %>
+                          </select>
+                          <button type="submit" class="apply-btn" id="applyCouponBtn">Apply</button>
+                          <input type="hidden" id="grandTotalValue" value="<%= grandTotal %>">
+                        </div>
+                        <div id="couponMessage" class="coupon-msg"></div>
+                      </form>
+                    </div>
+
                     <div class="price-summary">
-                        <div class="summary-row"><span>Subtotal</span><span>₹<%= netToatal %></span></div>
+                        <div class="summary-row"><span>Subtotal</span><span>₹<%= netToatal.toFixed(2) %></span></div>
   
                             <div class="summary-row discount"><span>Discount</span><span>-₹<%= discount.toFixed(2) %></span></div>
                         
@@ -162,10 +179,6 @@
                         </div>
                     </div>
 
-                    <div class="promo-code">
-                        <input type="text" placeholder="Promo code" id="promo-code">
-                        <button class="btn btn-secondary" id="apply-promo">Apply</button>
-                    </div>
                     <button class="btn btn-primary btn-place-order" onclick="setAddress()" >Place Order</button>
                     <p class="terms-notice">By placing your order, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy</a>.</p>
                 <% } else { %>
@@ -180,21 +193,22 @@
 </main>
 <div id="toast" class="toast hidden"></div>
 <%- include('../partials/user/footer') %>
-
 <script>
-    let selectAddress 
 document.addEventListener("DOMContentLoaded", () => {
+  let selectAddress;
+
   const addressForm = document.getElementById("address-form");
   const addressIdInput = document.getElementById("address-id");
-   const radios = document.querySelectorAll('input[name="selectedAddress"]');
 
-    radios.forEach(radio => {
-      radio.addEventListener('change', () => {
-         selectAddress = radio.value
-      });
+  // Handle radio button selection
+  const radios = document.querySelectorAll('input[name="selectedAddress"]');
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      selectAddress = radio.value;
     });
+  });
 
-  // OPEN MODAL
+  // Open modal
   document.querySelectorAll('.open-modal-btn').forEach(button => {
     button.addEventListener('click', () => {
       const modalId = button.getAttribute('data-modal-id');
@@ -203,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // CLOSE MODAL
+  // Close modal
   document.querySelectorAll('.close-modal').forEach(span => {
     span.addEventListener('click', () => {
       span.closest('.modal').classList.add('hidden');
@@ -216,7 +230,63 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ✅ Handle edit button click
+  const couponForm = document.getElementById("couponForm");
+
+  couponForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    console.log("Coupon form submitted ✅");
+
+    const code = document.getElementById("couponSelect").value;
+    const grandTotalEl = document.getElementById("grandTotalValue");
+    const grandTotal = parseFloat(grandTotalEl.value);
+
+    if (!code) {
+      showToast("Please select a coupon", "error");
+      return;
+    }
+
+    try {
+      const response = await fetch("/apply-coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, grandTotal })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        document.getElementById("couponMessage").innerText = `Coupon Applied: ₹${result.discount} off`;
+        showToast(`Coupon Applied: ₹${result.discount} off`, "success");
+
+        const totalEl = document.querySelector(".summary-row.total span:last-child");
+        if (totalEl) {
+          const newTotal = grandTotal - result.discount;
+          totalEl.innerText = `₹${newTotal.toFixed(2)}`;
+        }
+
+      } else {
+        document.getElementById("couponMessage").innerText = result.message;
+        showToast(result.message || "Invalid coupon", "error");
+      }
+    } catch (err) {
+      console.error("Coupon apply failed:", err);
+      showToast("Something went wrong", "error");
+    }
+  });
+
+  function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+    toast.classList.remove("hidden");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.classList.add("hidden"), 300);
+    }, 3000);
+  }
+
+  // Handle address edit
   document.querySelectorAll(".edit-address-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       addressForm.reset();
@@ -236,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fields = ["fullName", "address", "city", "state", "pinCode", "landmark", "phone"];
   const validators = {
     fullName: val => /^[A-Za-z ]{2,}$/.test(val.trim()) || "Please enter a valid name.",
-    address: val => val.trim() !== '' || " address is required.",
+    address: val => val.trim() !== '' || "Address is required.",
     city: val => /^[A-Za-z ]+$/.test(val.trim()) || "Enter a valid city name.",
     state: val => /^[A-Za-z ]+$/.test(val.trim()) || "Enter a valid state name.",
     pinCode: val => /^\d{6}$/.test(val.trim()) || "PIN Code must be 6 digits.",
@@ -269,9 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return isValid;
   }
 
- 
-
-  addressForm.addEventListener("submit", async (e) => {
+  addressForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -283,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(isEdit ? `/edit-address/${plainData.addressId}` : '/check-out', {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(plainData,selectAddress)
+        body: JSON.stringify(plainData)
       });
 
       const data = await response.json();
@@ -293,56 +361,40 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         showToast(data.message || "Something went wrong", "error");
       }
-
     } catch (err) {
       console.error("Submit error:", err);
       showToast("Server error!", "error");
     }
   });
 
-  function showToast(message, type = "success") {
-    const toast = document.getElementById("toast");
-    toast.textContent = message;
-    toast.className = `toast show ${type}`;
-    toast.classList.remove("hidden");
+  window.setAddress = function () {
+    const selectedRadio = document.querySelector('input[name="selectedAddress"]:checked');
+    if (!selectedRadio) {
+      showToast("Please select an address", "error");
+      return;
+    }
+    const addressId = selectedRadio.value;
+    window.location.href = `/payment?addressId=${addressId}`;
+  };
 
-    setTimeout(() => {
-      toast.classList.remove("show");
-      setTimeout(() => toast.classList.add("hidden"), 300);
-    }, 3000);
-  }
-});
- function deleteAddress(id){
-    fetch (`/delete-check-address/${id}`,{
-        method:'DELETE',
-        headers:{
-            'content-type':'application/json'
-        },
-    }).then((response)=>response.json())
-    .then((result)=>{
-        if(result.success){
-            showToast(result.message ||"",'success');
-            setTimeout(()=>{
-                window.location.reload();
-            },2000)
-        }
+  window.deleteAddress = function (id) {
+    fetch(`/delete-check-address/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
     })
-  }
-
- function setAddress() {
-  const selectedRadio = document.querySelector('input[name="selectedAddress"]:checked');
-
-  if (!selectedRadio) {
-   showToast("Please select an address", "error")
-    return;
-  }
-
-  const addressId = selectedRadio.value;
-
-  window.location.href = `/payment?addressId=${addressId}`;
-}
-
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          showToast(result.message || "", 'success');
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
+      });
+  };
+});
 </script>
+
 
 </body>
 </html>

@@ -29,14 +29,14 @@ const getCart = async (req, res, next) => {
         for (let item of cart.items) {
             const product = item.product;
             const quantity = item.quantity;
-            const variant = product.variants[0]; // assuming first variant is used
+            const variant = product.variants[0]; 
 
             const regularPrice = variant.regularPrice;
             const salePrice = variant.salePrice;
 
             const productOffer = regularPrice - salePrice;
 
-            // Find category offer for this product
+            
             const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
 
             let catDiscount = 0;
@@ -44,11 +44,11 @@ const getCart = async (req, res, next) => {
                 catDiscount = (regularPrice * catOffer.discount) / 100;
             }
 
-            // Choose best offer for this item
+            
             const bestOffer = Math.max(productOffer, catDiscount);
             const discountedPrice = regularPrice - bestOffer;
 
-            // Total calculations
+            
             totalMRP += regularPrice * quantity;
             discount += bestOffer * quantity;
             grandTotal += discountedPrice * quantity;
@@ -72,7 +72,6 @@ const getCart = async (req, res, next) => {
         next(error);
     }
 };
-
 
 const addToCart = async (req, res, next) => {
     try {

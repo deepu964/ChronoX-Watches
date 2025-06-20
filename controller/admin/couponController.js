@@ -3,7 +3,8 @@ const productSchema = require('../../models/productSchema');
 
 const getCoupon = async (req,res,next) => {
     try {
-      const limit = 3; 
+    const user = req.session.user;
+    const limit = 3; 
     const page = parseInt(req.query.page) || 1;
     const search = req.query.search || '';
 
@@ -27,7 +28,8 @@ const getCoupon = async (req,res,next) => {
         totalPage,
         search,
         limit,
-        total
+        total,
+        user
 
     });
     } catch (error) {
@@ -50,26 +52,25 @@ const getAddCoupon = async (req,res,next) => {
 const addCoupon = async (req,res,next) => {
    try {
     const {name,discount,expiryDate,minPurchase} = req.body;
-    
-
+    console.log(req.body,'this is body');
     const existsCoupon = await couponSchema.findOne({name:name});
     if(existsCoupon ){
          return res.status(400).json({success:false,message:"Coupon is already exists"});
     }
 
-    if (name !== coupon.name) {
-            const nameExists = await couponSchema.findOne({
-                _id: { $ne: couponId },
-                name: { $regex: new RegExp(`^${name}$`, "i") }
-            });
+    
+            // const nameExists = await couponSchema.findOne({
+            //     _id: { $ne: couponId },
+            //     name: { $regex: new RegExp(`^${name}$`, "i") }
+            // });
 
-            if (nameExists) {
-                return res.json({
-                    success: false,
-                    message: 'Coupon name already exists. Use a different name.'
-                });
-            }
-        }
+            // if (nameExists) {
+            //     return res.json({
+            //         success: false,
+            //         message: 'Coupon name already exists. Use a different name.'
+            //     });
+            // }
+        
 
     const newCoupon = new couponSchema({
         name,
@@ -77,13 +78,13 @@ const addCoupon = async (req,res,next) => {
         expiryDate,
         minPurchase
     });
-
+    console.log(newCoupon,'this is new coupon');
     await newCoupon.save()
 
     res.status(200).json({success:true, message:"Coupon Add Successfull"})
    
    } catch (error) {
-    console.log("add coupon error")
+    console.log("add coupon error",error)
     next(error)
    } 
 }

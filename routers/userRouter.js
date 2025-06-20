@@ -11,6 +11,7 @@ const orderController = require('../controller/user/orderController');
 const returnController = require('../controller/user/returnController');
 const walletController = require('../controller/user/walletController');
 const pageController = require('../controller/user/pageController');
+const couponController = require('../controller/user/couponController');
 
 const passport = require('passport');
 const router = express.Router();
@@ -93,6 +94,9 @@ router.get('/check-out', isAuth, orderController.checkoutGetController);
 router.post('/check-out', isAuth, orderController.addNewAddress);
 router.delete('/delete-check-address/:id', isAuth, orderController.deleteCheckAddress);
 
+
+router.post('/apply-coupon', isAuth, couponController.applyCoupon);
+
 router.get('/payment', isAuth, orderController.getPayment);
 router.post('/payment', isAuth, orderController.placeOrder);
 router.get('/retry-payment/:orderId',isAuth,orderController.getRetry);
@@ -103,9 +107,8 @@ router.get('/my-orders', isAuth, orderController.getMyOrders);
 router.put('/cancel-order/:orderId', isAuth, orderController.cancelOrder);
 router.put('/cancel-order-item/:orderId/:itemId', isAuth, orderController.cancelOrderItem);
 router.get('/debug-order-ids', isAuth, orderController.debugOrderIds);
-
 router.post('/create-order',isAuth, orderController.createRazorpayOrder);
-// router.post('/verify-payment',isAuth, orderController.verifyRazorpayPayment);
+
 
 router.post('/request-return', isAuth, returnController.requestReturn);
 router.get('/my-returns', isAuth, returnController.getMyReturns);

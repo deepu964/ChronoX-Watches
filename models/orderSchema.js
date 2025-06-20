@@ -8,6 +8,7 @@ const orderSchema = new mongoose.Schema({
     variantIndex: Number,
     price: Number,
     discount: Number,
+    paidPrice: Number,
     status: {
       type: String,
       enum: ['Placed', 'Pending', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],

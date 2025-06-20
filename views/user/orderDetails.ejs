@@ -431,7 +431,7 @@
                         </div>
                         <div class="item-info">
                             <span>Quantity: <%= item.quantity %></span>
-                            <span>Price: ₹<%= item.price %></span>
+                            <span>MRP: ₹<%= regularPrice %></span>
                         </div>
                         <% if (item.status === 'Cancelled' && item.cancelledAt) { %>
                             <div class="cancel-info">
@@ -446,7 +446,7 @@
                         <% } %>
                     </div>
                     <div class="item-actions">
-                        <div class="item-price">₹<%= (item.price * item.quantity).toLocaleString() %></div>
+                        <div class="item-price">MRP₹<%= regularPrice %>*<%= item.quantity %></div>
                         <% if (item.status === 'Placed' && order.status !== 'Cancelled') { %>
                             <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
                                 <i class="fas fa-times"></i>
@@ -466,20 +466,14 @@
                     const cancelledTotal = cancelledItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 %>
 
-                <% if (cancelledItems.length > 0) { %>
-                    <div class="total-row" style="color: #666;">
-                        <span>Original Subtotal:</span>
-                        <span>₹<%= (activeTotal + cancelledTotal).toLocaleString() %></span>
-                    </div>
-                    <div class="total-row" style="color: #dc3545;">
-                        <span>Cancelled Items:</span>
-                        <span>-₹<%= cancelledTotal.toLocaleString() %></span>
-                    </div>
-                <% } %>
 
                 <div class="total-row">
-                    <span>Subtotal:</span>
-                    <span>₹<%=  %></span>
+                    <span>Grand Total:</span>
+                    <span>₹<%= totalMRP.toLocaleString() %></span>
+                </div>
+                <div class="total-row" style="color:red">
+                    <span >Discount:</span>
+                    <span >-₹<%= discount.toLocaleString() %></span>
                 </div>
 
                 <% if (activeTotal > 0) { %>
@@ -489,7 +483,7 @@
                     </div>
                     <div class="total-row">
                         <span>Total Amount:</span>
-                        <span>₹<%= (activeTotal + shippingFee).toLocaleString() %></span>
+                        <span>₹<%= (grandTotal + shippingFee).toLocaleString() %></span>
                     </div>
                 <% } else { %>
                     <div class="total-row" style="color: #dc3545;">
@@ -693,11 +687,16 @@
                             <% order.items.forEach((item, index) => { %>
                                 <div class="return-item">
                                     <input type="checkbox" id="item_<%= index %>" name="items"
-                                           value="<%= item.product._id %>" data-price="<%= item.price %>"
+                                           value="<%= item.product._id %>" data-price="<%= catDiscount %>"
                                            data-max-qty="<%= item.quantity %>" checked>
                                     <label for="item_<%= index %>">
                                         <span class="item-name"><%= item.product.name %></span>
-                                        <span class="item-price">₹<%= item.price.toLocaleString() %> each</span>
+                                        <% if (bestOffer) { %>
+                                          <span class="item-price">₹<%= catDiscount-besftOffer %> each</span>
+                                          <% } else { %>
+                                            <span class="item-price">₹<%= catDiscount %> each</span>
+                                        <% } %>
+                                       
                                     </label>
                                     <div class="quantity-selector">
                                         <label>Qty:</label>

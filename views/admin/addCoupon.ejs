@@ -133,7 +133,7 @@
 
             if (isValid) {
                 try {
-                    console.log(couponName, discount ,expiryDate,minPurchase    )
+                    console.log(couponName, discount ,expiryDate,minPurchase,'this is form data');
                     const response = await fetch('/admin/coupon/addCoupon', {
                         method: 'POST',
                         headers: { 'Content-type': 'application/json' },
@@ -144,10 +144,11 @@
                             minPurchase
                         })
                     });
-
+                    console.log(response,'this is response');
                     const data = await response.json();
 
                     if (data.success) {
+                        console.log(data,'this is data');
                         showToast(data.message || 'Coupon added successfully', 'success');
                         setTimeout(() => window.location.href = '/admin/coupon', 2000);
                     } else {

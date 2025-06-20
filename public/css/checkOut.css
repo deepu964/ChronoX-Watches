@@ -503,3 +503,60 @@ input[type="email"]:focus {
     object-fit: cover;
     border-radius: 4px;
   }
+
+  .coupon-section {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  max-width: 500px;
+}
+
+.coupon-section label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.coupon-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.coupon-row select {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.apply-btn {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.apply-btn:hover {
+  background-color: #0056b3;
+}
+
+.coupon-msg {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: green;
+}
+
+.coupon-msg.error {
+  color: red;
+}
+  

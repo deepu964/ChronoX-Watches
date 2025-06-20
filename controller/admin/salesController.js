@@ -4,7 +4,7 @@ const ExcelJS = require('exceljs');
 
 const getSalesReport = async (req, res, next) => {
   try {
-    const limit = 10; // Increased to 10 records per page
+    const limit = 10; 
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * limit;
 
@@ -20,12 +20,12 @@ const getSalesReport = async (req, res, next) => {
     const totalPages = Math.ceil(totalOrders / limit);
 
     const orders = await orderSchema.find(filter)
-      .populate('user', 'fullname email') // Changed from 'name' to 'fullname' to match user schema
+      .populate('user', 'fullname email') 
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Calculate summary for ALL orders (not just current page)
+    
     const allOrders = await orderSchema.find(filter);
     const summary = {
       totalOrders,
@@ -61,8 +61,6 @@ const getSalesReport = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 const getDateRange = (type, fromDate, toDate) => {
   let startDate, endDate;
