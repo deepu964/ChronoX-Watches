@@ -127,8 +127,9 @@
                             </td>
                             <td>
                                 <div class="customer-info">
-                                    <span class="customer-name"><%= returnReq.user.fullName %></span>
-                                    <span class="customer-email"><%= returnReq.user.email %></span>
+                                    <span class="customer-name"><%= returnReq.user?.fullName||"Deleted User" %></span>
+                                    <%console.log(returnReq.user?.fullName)%>
+                                    <span class="customer-email"><%= returnReq.user?.email %></span>
                                 </div>
                             </td>
                             <td><%= returnReq.reason %></td>

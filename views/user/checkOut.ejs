@@ -168,14 +168,24 @@
 
                     <div class="price-summary">
                         <div class="summary-row"><span>Subtotal</span><span>₹<%= netToatal.toFixed(2) %></span></div>
-  
-                            <div class="summary-row discount"><span>Discount</span><span>-₹<%= discount.toFixed(2) %></span></div>
                         
+                             <div class="summary-row discount"><span>Discount</span><span>-₹<%= discount.toFixed(2) %></span></div>
+                            <% if (couponAmount) { %>
+                              <div class="summary-row" style="color: green;"><span style="display: flex; align-items: center;">Coupon</span><span style="margin-left: auto;">-₹<%= discountAmount %></span>
+                              <button onclick="removeCoupon()" class="remove-coupon-btn" style="border: none; background-color: white; padding: 5px;">
+                                <i class="fas fa-times" style="color: red; border:none ; background-color: white; width: 5px;"></i>
+                              </button>
+                            <% } %>
+                        </div>
                         <div class="summary-row"><span>Shipping</span><span>₹<%= shipping.toFixed(2) %></span></div>
                       
                         <div class="summary-row total">
                             <span>Total</span>
-                            <span>₹<%= grandTotal.toFixed(2) %></span>
+                            <% if (couponAmount) { %>
+                                <span>₹<%= grandTotal-discountAmount %></span>
+                                <% } else { %>
+                                 <span>₹<%= grandTotal.toFixed(2) %></span>
+                            <% } %>
                         </div>
                     </div>
 
@@ -255,12 +265,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
 
       if (result.success) {
-        document.getElementById("couponMessage").innerText = `Coupon Applied: ₹${result.discount} off`;
-        showToast(`Coupon Applied: ₹${result.discount} off`, "success");
+        document.getElementById("couponMessage").innerText = `Coupon Applied: ₹${result.discountAmount} off`;
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+        showToast(`Coupon Applied: ₹${result.discountAmount} off`, "success");
 
         const totalEl = document.querySelector(".summary-row.total span:last-child");
         if (totalEl) {
-          const newTotal = grandTotal - result.discount;
+          const newTotal = grandTotal - result.discountAmount;
           totalEl.innerText = `₹${newTotal.toFixed(2)}`;
         }
 
@@ -393,6 +406,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   };
 });
+
+async function removeCoupon(){
+
+  fetch(`/remove-coupon`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        showToast(result.message || "", 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    });
+
+  }
 </script>
 
 

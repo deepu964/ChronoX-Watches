@@ -105,88 +105,87 @@ const getEditCoupon = async (req,res,next) => {
 }
 
 const editCoupon = async (req, res, next) => {
-    try {
-        let { name, discount, expiryDate, minPurchase } = req.body;
-        const couponId = req.params.id;
+  try {
+    let { name, discount, expiryDate, minPurchase } = req.body;
+    const couponId = req.params.id;
 
-        const coupon = await couponSchema.findById(couponId);
-        if (!coupon) {
-            return res.status(404).json({ success: false, message: 'Coupon not found' });
-        }
-
-        
-        name = name.trim();
-
-        
-        if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(name)) {
-            return res.json({
-                success: false,
-                message: 'Invalid coupon name. Must start with a letter and be 3–50 characters long.'
-            });
-        }
-
-        
-        if (name !== coupon.name) {
-            const nameExists = await couponSchema.findOne({
-                _id: { $ne: couponId },
-                name: { $regex: new RegExp(`^${name}$`, "i") }
-            });
-
-            if (nameExists) {
-                return res.json({
-                    success: false,
-                    message: 'Coupon name already exists. Use a different name.'
-                });
-            }
-        }
-
-        
-        discount = parseFloat(discount);
-        if (isNaN(discount) || discount <= 0 || discount > 100) {
-            return res.json({
-                success: false,
-                message: 'Discount must be a number between 1 and 100.'
-            });
-        }
-
-        
-        const expiry = new Date(expiryDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-
-        if (isNaN(expiry.getTime()) || expiry < today) {
-            return res.json({
-                success: false,
-                message: 'Expiry date must be a valid future date.'
-            });
-        }
-
-        
-        minPurchase = parseFloat(minPurchase);
-        if (isNaN(minPurchase) || minPurchase < 0) {
-            return res.json({
-                success: false,
-                message: 'Minimum purchase must be 0 or more.'
-            });
-        }
-
-        
-        await couponSchema.findByIdAndUpdate(couponId, {
-            $set: {
-                name,
-                discount,
-                expiryDate: expiry, 
-                minPurchase
-            }
-        });
-
-        res.json({ success: true, message: 'Coupon updated successfully' });
-
-    } catch (error) {
-        console.log('editCoupon error:', error); 
-        next(error);
+    const coupon = await couponSchema.findById(couponId);
+    if (!coupon) {
+      return res.status(404).json({ success: false, message: 'Coupon not found' });
     }
-}
+
+    name = name.trim();
+
+    
+    if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(name)) {
+      return res.json({
+        success: false,
+        message: 'Invalid coupon name. Must start with a letter and be 3–50 characters long.'
+      });
+    }
+
+    
+    if (name.toLowerCase() !== coupon.name.toLowerCase()) {
+      const nameExists = await couponSchema.findOne({
+        _id: { $ne: couponId },
+        name: { $regex: new RegExp(`^${name}$`, "i") }
+      });
+
+      if (nameExists) {
+        return res.json({
+          success: false,
+          message: 'Coupon name already exists. Use a different name.'
+        });
+      }
+    }
+
+    
+    discount = parseFloat(discount);
+    if (isNaN(discount) || discount <= 0 || discount > 100) {
+      return res.json({
+        success: false,
+        message: 'Discount must be a number between 1 and 100.'
+      });
+    }
+
+    
+    const expiry = new Date(expiryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(expiry.getTime()) || expiry < today) {
+      return res.json({
+        success: false,
+        message: 'Expiry date must be a valid future date.'
+      });
+    }
+
+   
+    minPurchase = parseFloat(minPurchase);
+    if (isNaN(minPurchase) || minPurchase < 0) {
+      return res.json({
+        success: false,
+        message: 'Minimum purchase must be 0 or more.'
+      });
+    }
+
+    
+    await couponSchema.findByIdAndUpdate(couponId, {
+      $set: {
+        name,
+        discount,
+        expiryDate: expiry,
+        minPurchase
+      }
+    });
+
+    return res.json({ success: true, message: 'Coupon updated successfully' });
+
+  } catch (error) {
+    console.error('editCoupon error:', error);
+    next(error);
+  }
+};
 
 const toggleCouponStatus = async (req, res, next) => {
   try {

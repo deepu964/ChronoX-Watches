@@ -105,23 +105,24 @@
             document.getElementById('couponNameError').textContent = 'Must start with a letter and be 3–50 characters long';
             document.getElementById('couponNameError').style.display = 'block';
             isValid = false;
-        } else {
+        } 
+        // else {
             
-            try {
-                const res = await fetch(`/admin/coupon/check-name?name=${encodeURIComponent(couponName.trim())}`);
-                const data = await res.json();
+        //     try {
+        //         const res = await fetch(`/admin/coupon/check-name?name=${encodeURIComponent(couponName.trim())}`);
+        //         const data = await res.json();
 
-                if (!data.available) {
-                    document.getElementById('couponNameError').textContent = 'Coupon name already exists. Use a different name.';
-                    document.getElementById('couponNameError').style.display = 'block';
-                    isValid = false;
-                }
-            } catch (err) {
-                console.error("Coupon name check failed", err);
-                showToast('Coupon name already exists. Use a different name.', 'error');
-                isValid = false;
-            }
-        }
+        //         if (!data.available) {
+        //             document.getElementById('couponNameError').textContent = 'Coupon name already exists. Use a different name.';
+        //             document.getElementById('couponNameError').style.display = 'block';
+        //             isValid = false;
+        //         }
+        //     } catch (err) {
+        //         console.error("Coupon name check failed", err);
+        //         showToast('Coupon name already exists. Use a different name.', 'error');
+        //         isValid = false;
+        //     }
+        // }
 
 
       if (isNaN(discount) || discount <= 0 || discount > 100) {

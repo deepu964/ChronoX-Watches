@@ -260,6 +260,7 @@ const getReturns = async (req, res, next) => {
             .sort({ requestedAt: -1 })
             .skip(skip)
             .limit(limit);
+            console.log(returns,'return');
         
         res.render('admin/returns', {
             returns,

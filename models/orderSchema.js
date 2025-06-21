@@ -26,6 +26,12 @@ const orderSchema = new mongoose.Schema({
     state: String,
   },
   totalAmount: Number,
+  coupon:{
+    type:String,
+    code:String,
+    discountAmount:Number
+  },
+  shippingFee: Number,
   isPaid: { type: Boolean, default: false },
   paymentMethod: { type: String, enum: ['COD', 'ONLINE'] },
   paymentStatus: {

@@ -8,6 +8,7 @@ const Razorpay = require('razorpay');
 const cartSchema = require('../../models/cartSchema');
 const categoryOffer = require('../../models/categoryOfferSchema');
 const couponSchema = require('../../models/couponSchema');
+const Return = require('../../models/returnSchema');
 
 const razorpayInstance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -105,6 +106,10 @@ const checkoutGetController = async (req, res, next) => {
 
         const addresses = await addressSchema.find({ userId });
         const defaultAddress = addresses.find(addr => addr.isDefault);
+        const couponAmount = req.session.coupon? req.session.coupon : 0;
+        const discountAmount = couponAmount.discountAmount || 0;
+        
+
 
         const cart = await Cart.findOne({ user: userId }).populate('items.product').lean();
 
@@ -118,7 +123,7 @@ const checkoutGetController = async (req, res, next) => {
                 expiryDate: { $gte: today },
                 usersUsed: { $ne: userId } 
             });
-           
+          console.log(coupons,'this is coupons'); 
 
         const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
 
@@ -163,17 +168,9 @@ const checkoutGetController = async (req, res, next) => {
             });
         }
 
-        let discountAmount = 0;
-        if (req.session.coupon) {
-          console.log(req.session.coupon, 'this is session coupon');
-          discountAmount = req.session.coupon.discountAmount;
-        }
-
-    console.log(discountAmount, 'this is discountAmount');
 
         const shipping = 50;
         const grandTotal = subTotal + shipping;
-        
 
         res.render('user/checkOut', {
             user: req.session.user,
@@ -187,6 +184,8 @@ const checkoutGetController = async (req, res, next) => {
             grandTotal,
             netToatal,
             coupons,
+            discountAmount,
+            couponAmount,
             cloudName: process.env.CLOUDINARY_CLOUD_NAME
         });
 
@@ -271,14 +270,14 @@ const getPayment = async (req, res, next) => {
         if (!cart || !cart.items || cart.items.length === 0) {
             return res.redirect('/cart');
         }
-
-        
+        const coupon = req.session.coupon? req.session.coupon : 0;
+        console.log(coupon, 'this is coupon');
         const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
 
          let totalMRP = 0;
         let discount = 0;
         let grandTotal = 0;
-
+        
         const cartItems = cart.items.map(item => {
             const product = item.product;
             const variant = product.variants?.[0] || {};
@@ -304,10 +303,14 @@ const getPayment = async (req, res, next) => {
             
             totalMRP += regularPrice * quantity;
             discount += bestOffer * quantity;
-            grandTotal += discountedPrice * quantity;
 
-            
-
+            if(coupon){
+                grandTotal += discountedPrice * quantity - coupon.discountAmount;
+                console.log(grandTotal, 'grandTotal if');
+            }else{
+                grandTotal += discountedPrice * quantity;
+                console.log(grandTotal, 'grandTotal else');
+            }
             return {
                 _id: product._id,
                 name: product.name,
@@ -330,6 +333,7 @@ const getPayment = async (req, res, next) => {
             shipping,
             discount: discount,
             grandTotal,
+            coupon
             
         });
 
@@ -343,7 +347,7 @@ const placeOrder = async (req, res, next) => {
   try {
     const userId = req.session.user._id;
     const { paymentMethod, addressId, razorpayOrderId, paymentId, orderId } = req.body;
-
+    const coupon = req.session.coupon?req.session.coupon :0;
    
     if (orderId) {
       const existingOrder = await Order.findById(orderId);
@@ -359,6 +363,7 @@ const placeOrder = async (req, res, next) => {
       existingOrder.status = 'Placed';
       existingOrder.paymentStatus = 'Paid';
       existingOrder.isPaid = paymentMethod === 'ONLINE';
+      existingOrder.coupon = coupon.discountAmount;
 
       await existingOrder.save();
 
@@ -415,12 +420,21 @@ const placeOrder = async (req, res, next) => {
         catDiscount = (regularPrice * catOffer.discount) / 100;
       }
 
+      let finalPrice = 0;
+      let shippingFee = 50;
       const bestOffer = Math.max(productOffer, catDiscount);
-      const finalPrice = regularPrice - bestOffer;
-      console.log(finalPrice, 'finalPrice');
-      const paidPrice = finalPrice * quantity;
-      console.log(paidPrice, 'paidPrice');
+       finalPrice = regularPrice - bestOffer;
+      if(coupon){
+        finalPrice -= coupon.discountAmount;
+      }else{
+        finalPrice = finalPrice;
+      }
+      const paidPrice = finalPrice * quantity +shippingFee;
 
+      if(paidPrice>4000){
+        return res.status(400).json({ success: false, message: 'Minimum order amount is 4000' });
+      }
+      
       if (variant.quantity < quantity) {
         return res.status(400).json({ success: false, message: `${product.name} is out of stock` });
       }
@@ -450,6 +464,7 @@ const placeOrder = async (req, res, next) => {
         state: address.state
       },
       totalAmount: total,
+      coupon:coupon.discountAmount,
       paymentMethod: paymentMethod,
       razorpayPaymentId: paymentId || null,
       razorpayOrderId: razorpayOrderId || null,
@@ -459,11 +474,14 @@ const placeOrder = async (req, res, next) => {
     if (paymentMethod === 'ONLINE') {
       order.isPaid = true;
       order.paymentStatus = 'Paid';
+      order.coupon = coupon.discountAmount
     } else {
       order.paymentStatus = 'Pending';
     }
 
     await order.save();
+
+    req.session.coupon = null;
 
     cart.items = [];
     await cart.save();
@@ -533,7 +551,8 @@ const getOrderSuccess = async (req, res, next) => {
         const order = await Order.findById(orderId)
             .populate('items.product')
             .populate('user');
-
+        console.log(order,"order"); 
+      
         if (!order || order.user._id.toString() !== req.session.user._id.toString()) {
             return res.redirect('/shop');
         }
@@ -553,99 +572,103 @@ const getOrderSuccess = async (req, res, next) => {
 };
 
 const getOrderDetails = async (req, res, next) => {
-    try {
-        const orderId = req.params.orderId;
-        const userId = req.session.user._id;
+  try {
+    const orderId = req.params.orderId;
+    const userId = req.session.user._id;
 
-        const order = await Order.findById(orderId)
-            .populate('items.product')
-            .populate('user');
+   
+    
 
-        if (!order || order.user._id.toString() !== userId.toString()) {
-            return res.status(404).render('user/404');
-        }
-        console.log(order,"order");
-        const Return = require('../../models/returnSchema');
-        const returnRequest = await Return.findOne({ order: orderId, user: userId })
-            .populate('items.product', 'name');
-        
-        console.log(returnRequest,"returnRequest");
-        
-        const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
-        
-                let totalMRP = 0;
-                let discount = 0;
-                let grandTotal = 0;
-                let regularPrice;
-                let bestOffer=0
-                for (let item of order.items) {
-                    console.log(item,"item");
-                    const product = item.product;
-                    const quantity = item.quantity;
-                    const variant = product.variants[0]; 
-        
-                     regularPrice = variant.regularPrice;
-                    const salePrice = variant.salePrice;
-        
-                    const productOffer = regularPrice - salePrice;
-        
-                    
-                    const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
-        
-                    let catDiscount = 0;
-                    if (catOffer && catOffer.discount) {
-                        catDiscount = (regularPrice * catOffer.discount) / 100;
-                    }
-        
-                    
-                    bestOffer = Math.max(productOffer, catDiscount);
-                    const discountedPrice = regularPrice - bestOffer;
-        
-                    
-                    totalMRP += regularPrice * quantity;
-                    discount += bestOffer * quantity;
-                    grandTotal += discountedPrice * quantity;
+    // ✅ Get the order from DB and populate required fields
+    const order = await Order.findById(orderId)
+      .populate('items.product')
+      .populate('user');
+      console.log(order, 'order hi skndknkdnkn');
 
-                    console.log(totalMRP, 'totalMRP');
-                    console.log(discount, 'discount');
-                    console.log(grandTotal, 'grandTotal');  
-                    console.log(bestOffer,"bestOffer");
-                    
-                }
-                
-               
-                const shippingFee = 50;
-        
-                res.render('user/orderDetails', {
-                    user: req.session.user,
-                    items: order.items,
-                    total: totalMRP - discount,
-                    totalMRP,
-                    order,
-                    regularPrice,
-                    returnRequest,
-                    discount,
-                    bestOffer,
-                    shippingFee,
-                    grandTotal: grandTotal,
-                    cloudName: process.env.CLOUDINARY_CLOUD_NAME
-                });    
-        
-        // const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-        // const shippingFee = 50;
-
-        // res.render('user/orderDetails', {
-        //     user: req.session.user,
-        //     order,
-        //     returnRequest,
-        //     cloudName,
-        //     shippingFee,
-            
-        // });
-    } catch (error) {
-        console.error("Order details page error");
-        next(error);
+    // ✅ Check if order exists and belongs to current user
+    if (!order || order.user._id.toString() !== userId.toString()) {
+      return res.status(404).render('user/404');
     }
+
+    // ✅ Check if return request exists for this order
+    const returnRequest = await Return.findOne({ order: orderId, user: userId })
+      .populate('items.product', 'name');
+
+    // ✅ Get all active category offers
+    const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
+
+    // ✅ Initialize totals
+    let totalMRP = 0;
+    let discount = 0;
+    let grandTotal = 0;
+    let bestOffer = 0;
+    let regularPrice = 0;
+    let salePrice = 0;
+
+    // ✅ Loop through each item in the order
+    for (let item of order.items) {
+      const product = item.product;
+      const quantity = item.quantity;
+      const variant = product.variants[0]; // assuming 1 variant per product
+
+       regularPrice = variant.regularPrice;
+      console.log(regularPrice, 'regularPrice');
+       salePrice = variant.salePrice;
+      console.log(salePrice, 'salePrice');
+
+      // ✅ Calculate product-level offer
+      const productOffer = regularPrice - salePrice;
+
+      // ✅ Check if category offer applies
+      const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
+      let catDiscount = 0;
+      if (catOffer && catOffer.discount) {
+        catDiscount = (regularPrice * catOffer.discount) / 100;
+      }
+
+      // ✅ Take the best offer (product vs category)
+      bestOffer = Math.max(productOffer, catDiscount);
+      const discountedPrice = regularPrice - bestOffer;
+
+      // ✅ Add to total MRP and total discount
+      totalMRP += regularPrice * quantity;
+      discount += bestOffer * quantity;
+
+      // ✅ Add to grand total
+      // If coupon exists, apply discount once (not for every item)
+      grandTotal += discountedPrice * quantity;
+      console.log(grandTotal, 'grandTotal');
+    }
+
+
+    // ✅ Add shipping fee
+    const shippingFee = 50;
+    const finalTotal = grandTotal + shippingFee;
+    console.log(finalTotal, 'finalTotal');
+
+
+
+    // ✅ Render order details view
+    res.render('user/orderDetails', {
+      user: req.session.user,
+      items: order.items,
+      total: totalMRP - discount,
+      totalMRP,
+      order,
+      returnRequest,
+      discount,
+      bestOffer,
+      regularPrice,
+      salePrice,
+      shippingFee,
+      grandTotal: finalTotal,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME
+    });
+
+  } catch (error) {
+    console.error("Order details page error:", error);
+    next(error);
+  }
 };
 
 const getMyOrders = async (req, res, next) => {
@@ -686,9 +709,6 @@ const getMyOrders = async (req, res, next) => {
                 return matchesFull || matchesLast8;
             });
 
-            
-
-            
             totalOrders = filteredOrders.length;
             orders = filteredOrders.slice(skip, skip + limit);
         } else {
@@ -849,8 +869,19 @@ const cancelOrderItem = async (req, res, next) => {
 
     
     const totalMRP = regularPrice * item.quantity;
-    const refundAmount = totalMRP - bestOffer ;
+    let refundAmount = totalMRP - bestOffer ;
 
+    if(order.paymentMethod === 'ONLINE'){
+      if(order.coupon>1){
+        refundAmount -= order.coupon;
+      }
+      if(totalMRP<2000){
+        refundAmount = order.totalAmount- totalMRP;
+      }
+      console.log(refundAmount, 'this is refundAmount');
+    }
+    console.log(refundAmount, 'this is refundAmount2');
+      
     
     const activeItems = order.items.filter(i => i.status !== 'Cancelled');
     if (activeItems.length === 0) {
@@ -972,7 +1003,7 @@ const createRazorpayOrder = async (req, res) => {
     };
 
     const razorpayOrder = await razorpayInstance.orders.create(options);
-
+    const coupon = req.session.coupon? req.session.coupon : 0;
     
     if (!orderId) {
       localOrder = await Order.create({
@@ -984,7 +1015,8 @@ const createRazorpayOrder = async (req, res) => {
         paymentStatus: "Pending",
         isPaid: false,
         paymentMethod: "ONLINE",
-        razorpayOrderId: razorpayOrder.id 
+        razorpayOrderId: razorpayOrder.id,
+        coupon:coupon.discountAmount
       });
     } else {
       

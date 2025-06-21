@@ -96,6 +96,7 @@ router.delete('/delete-check-address/:id', isAuth, orderController.deleteCheckAd
 
 
 router.post('/apply-coupon', isAuth, couponController.applyCoupon);
+router.delete('/remove-coupon',isAuth,couponController.removeCoupon);
 
 router.get('/payment', isAuth, orderController.getPayment);
 router.post('/payment', isAuth, orderController.placeOrder);

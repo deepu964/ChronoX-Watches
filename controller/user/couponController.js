@@ -1,17 +1,17 @@
 const couponSchema = require('../../models/couponSchema');
 const Cart = require('../../models/cartSchema');
+const User = require('../../models/userSchema');
 
 const applyCoupon = async (req, res, next) => {
   try {
     const userId = req.session.user._id;
     const { code, grandTotal } = req.body;
 
-    console.log("Code:", code, "Grand Total:", grandTotal);
-
-    const coupon = await Coupon.findOne({
+    const coupon = await couponSchema.findOne({
       couponcode: code.trim().toUpperCase(),
       isActive: true
     });
+    console.log(coupon,'this is coupon');
 
     if (!coupon) {
       return res.json({ success: false, message: "Invalid coupon" });
@@ -34,12 +34,13 @@ const applyCoupon = async (req, res, next) => {
 
     const discountAmount = Math.round((grandTotal * coupon.discount) / 100);
 
+    // coupon.user.push(userId);
+    // await coupon.save();
+
     req.session.coupon = {
       couponcode: coupon.couponcode,
       discountAmount
     };
-
-    console.log("Session Coupon Set:", req.session.coupon);
 
     return res.json({ success: true, discountAmount });
   } catch (err) {
@@ -49,6 +50,54 @@ const applyCoupon = async (req, res, next) => {
 };
 
 
+const removeCoupon = async (req, res, next) => {
+  try {
+    const userId = req.session.user?._id;
+    if (!userId) {
+      return res.json({ success: false, message: "User not logged in" });
+    }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    const coupon = req.session.coupon;
+    console.log(coupon,'this is coupon');
+    if (!coupon) {
+      return res.json({ success: false, message: "No coupon to remove" });
+    }
+
+    const existCoupon = await couponSchema.findOne({
+      couponcode: coupon.couponcode,
+      isActive: true
+    });
+    console.log(existCoupon,'this is exist coupon');
+
+    if (!existCoupon) {
+      return res.json({ success: false, message: "Coupon not found or inactive" });
+    }
+
+    await couponSchema.findOneAndUpdate(
+      { couponcode: coupon.couponcode, isActive: true },
+      { $pull: { user: userId } }
+    );
+
+    
+    delete req.session.coupon;
+
+    return res.json({ success: true, message: "Coupon removed successfully" });
+
+  } catch (error) {
+    console.log("remove coupon error", error);
+    next(error);
+  }
+};
+
+
+
+
 module.exports={
     applyCoupon,
+    removeCoupon
 }

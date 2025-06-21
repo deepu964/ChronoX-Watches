@@ -431,7 +431,7 @@
                         </div>
                         <div class="item-info">
                             <span>Quantity: <%= item.quantity %></span>
-                            <span>MRP: ₹<%= regularPrice %></span>
+                            
                         </div>
                         <% if (item.status === 'Cancelled' && item.cancelledAt) { %>
                             <div class="cancel-info">
@@ -446,7 +446,7 @@
                         <% } %>
                     </div>
                     <div class="item-actions">
-                        <div class="item-price">MRP₹<%= regularPrice %>*<%= item.quantity %></div>
+                        
                         <% if (item.status === 'Placed' && order.status !== 'Cancelled') { %>
                             <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
                                 <i class="fas fa-times"></i>
@@ -475,16 +475,29 @@
                     <span >Discount:</span>
                     <span >-₹<%= discount.toLocaleString() %></span>
                 </div>
+                <% if (order.coupon>0) { %>
+                 <div class="total-row" style="color:red">
+                    <span >Coupon:</span>
+                    <span >-₹<%= order.coupon%></span>
+                </div>
+                <% } %>
 
                 <% if (activeTotal > 0) { %>
                     <div class="total-row">
                         <span>Shipping:</span>
                         <span>₹<%= shippingFee.toLocaleString() %></span>
                     </div>
-                    <div class="total-row">
-                        <span>Total Amount:</span>
-                        <span>₹<%= (grandTotal + shippingFee).toLocaleString() %></span>
-                    </div>
+                   <% if (order.coupon>0) { %>
+                        <div class="total-row">
+                            <span>Total Amount:</span>
+                            <span>₹<%= grandTotal-order.coupon %></span>
+                        </div>
+                        <% } else { %>
+                        <div class="total-row">
+                            <span>Total Amount:</span>
+                            <span>₹<%= grandTotal %></span>
+                        </div>
+                   <% } %>
                 <% } else { %>
                     <div class="total-row" style="color: #dc3545;">
                         <span>Total Amount:</span>

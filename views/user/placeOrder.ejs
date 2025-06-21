@@ -52,7 +52,12 @@
                             <i class="fas fa-university"></i>
                             <span>Net Banking</span>
                             <form id="paymentForm">
-                                <input type="hidden" id="orderAmount" value="<%= grandTotal+shipping %>" >
+                                <% if (coupon.discountAmount>0) { %>
+                                 <input type="hidden" id="orderAmount" value="<%= (subTotal-coupon.discountAmount-discount)+shipping %>" >
+                                 <% } else { %>
+                                 <input type="hidden" id="orderAmount" value="<%= (subTotal - discount) +shipping%>" >
+                                <% } %>
+                                
                                 <button class="payment-btn" type="button" onclick="payNow('<%=addresses%>')" id="payNowBtn">Pay Now</button>
                                 
                             </form>
@@ -66,40 +71,7 @@
                 </div>
 
                 
-                <!-- <div class="card-form" id="cardForm">
-                    <h3>CREDIT/ DEBIT CARD</h3>
-                    <form id="paymentForm" onsubmit="processPayment(event)">
-                        <div class="form-group">
-                            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19" required>
-                            <span class="error-message" id="cardNumberError"></span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="cardName" placeholder="Name on card" required>
-                            <span class="error-message" id="cardNameError"></span>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
-                                <span class="error-message" id="expiryError"></span>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" id="cvv" placeholder="CVV" maxlength="4" required>
-                                <span class="error-message" id="cvvError"></span>
-                            </div>
-                        </div>
-                        <button type="submit" class="place-order-btn">PLACE ORDER</button>
-                    </form>
-                </div> -->
-
-                <!-- Gift Card -->
-                <!-- <div class="gift-card">
-                    <div class="gift-card-header">
-                        <i class="fas fa-gift"></i>
-                        <span>Have a Gift Card?</span>
-                    </div>
-                    <button class="apply-gift-card">APPLY GIFT CARD</button>
-                </div>
-            </div> -->
+          
 
             
             <div class="payment-right">
@@ -114,6 +86,12 @@
                         <span>Discount on MRP</span>
                         <span class="discount-amount">-₹<%=discount%></span>
                     </div>
+                    <% if (coupon.discountAmount>0) { %>
+                     <div class="price-row">
+                        <span>Coupon</span>
+                        <span class="discount-amount">-₹<%=coupon.discountAmount%></span>
+                    </div>
+                    <% } %>
                     <div class="price-row">
                         <span>Convenience Fee</span>
                         <span class="know-more">Know More</span>
@@ -122,12 +100,15 @@
                     </div>
                     <div class="price-row total">
                         <span>Total Amount</span>
-                        <span>₹<%= grandTotal + shipping %></span>
+                        <% if (coupon.discountAmount>0) { %>
+                             <span>₹<%=(subTotal-coupon.discountAmount-discount)+shipping %></span>
+                             <% } else { %>
+                             <span>₹<%= (subTotal - discount) +shipping%></span>
+                        <% } %>
                   <form id="place-order-form" method="POST" action="/payment">
                     <input type="hidden" name="addressId" value="<%= addresses %>">
                     <input type="hidden"  id="payment-method-input" name="paymentMethod" value="COD">
-
-                    <button type="submit" class="btn btn-primary" id="confirm-order-btn">Confirm Order</button>
+                        <button type="submit" class="btn btn-primary" id="confirm-order-btn">Confirm Order</button>
                     </form>
             </div>
         </main>
