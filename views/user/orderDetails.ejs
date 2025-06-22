@@ -483,10 +483,7 @@
                 <% } %>
 
                 <% if (activeTotal > 0) { %>
-                    <div class="total-row">
-                        <span>Shipping:</span>
-                        <span>₹<%= shippingFee.toLocaleString() %></span>
-                    </div>
+                
                    <% if (order.coupon>0) { %>
                         <div class="total-row">
                             <span>Total Amount:</span>
@@ -682,7 +679,6 @@
                             <option value="Wrong Item Received">Wrong Item Received</option>
                             <option value="Size/Color Issue">Size/Color Issue</option>
                             <option value="Product Not as Described">Product Not as Described</option>
-                            <option value="Damaged During Shipping">Damaged During Shipping</option>
                             <option value="Changed Mind">Changed Mind</option>
                             <option value="Other">Other</option>
                         </select>

@@ -16,11 +16,11 @@ const getAdminLogin =async (req,res,next) => {
 
 
     } catch (error) {
+        console.log('this is adminlogin page error',error);
         next(error)
     }
     
 }
-
 const getDashBoard = async (req,res,next) => {
     try {
         if(!req.session.admin){
@@ -28,6 +28,7 @@ const getDashBoard = async (req,res,next) => {
         }
         res.render('admin/dashboard')
     } catch (error) {
+        console.log('this is dash board page error',error);
         next(error)
     }
     
@@ -56,17 +57,17 @@ const adminLogin =async (req,res,next) => {
     res.redirect('/admin/dashboard');
 
    }catch (error) {
+    console.log('this is admin login error',error);
         next(error)
 
    }
     
 }
 
-
 const logout = async (req,res)=>{
     req.session.destroy((err)=>{
         if(err){
-            console.log(err);
+            
             return res.redirect('/page-404');
         }
     }) 

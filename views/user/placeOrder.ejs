@@ -53,9 +53,9 @@
                             <span>Net Banking</span>
                             <form id="paymentForm">
                                 <% if (coupon.discountAmount>0) { %>
-                                 <input type="hidden" id="orderAmount" value="<%= (subTotal-coupon.discountAmount-discount)+shipping %>" >
+                                 <input type="hidden" id="orderAmount" value="<%= (subTotal-coupon.discountAmount-discount)%>" >
                                  <% } else { %>
-                                 <input type="hidden" id="orderAmount" value="<%= (subTotal - discount) +shipping%>" >
+                                 <input type="hidden" id="orderAmount" value="<%= (subTotal - discount)%>" >
                                 <% } %>
                                 
                                 <button class="payment-btn" type="button" onclick="payNow('<%=addresses%>')" id="payNowBtn">Pay Now</button>
@@ -92,18 +92,13 @@
                         <span class="discount-amount">-₹<%=coupon.discountAmount%></span>
                     </div>
                     <% } %>
-                    <div class="price-row">
-                        <span>Convenience Fee</span>
-                        <span class="know-more">Know More</span>
-                        <div class="summary-row"><span>Shipping: </span><span>₹<%= shipping %></span></div>
-                        <!-- <span><span class="strikethrough">₹99</span> FREE</span> -->
-                    </div>
+                   
                     <div class="price-row total">
                         <span>Total Amount</span>
                         <% if (coupon.discountAmount>0) { %>
-                             <span>₹<%=(subTotal-coupon.discountAmount-discount)+shipping %></span>
+                             <span>₹<%=(subTotal-coupon.discountAmount-discount)%></span>
                              <% } else { %>
-                             <span>₹<%= (subTotal - discount) +shipping%></span>
+                             <span>₹<%= (subTotal - discount)%></span>
                         <% } %>
                   <form id="place-order-form" method="POST" action="/payment">
                     <input type="hidden" name="addressId" value="<%= addresses %>">

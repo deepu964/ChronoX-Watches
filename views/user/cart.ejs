@@ -345,12 +345,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
-        .shipping-info {
-            text-align: center;
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-        }
+       
 
         .cart-actions {
             display: flex;
@@ -875,7 +870,7 @@
                             <div class="feature-icon">
                                 <i class="fas fa-truck"></i>
                             </div>
-                            <div class="feature-title">Free Shipping</div>
+                            
                             <div class="feature-desc">Free delivery on orders above ₹500</div>
                         </div>
                         <div class="feature-item">
@@ -975,12 +970,6 @@
                             <span>Coupon Discount</span>
                             <span class="red">Apply Coupon</span>
                         </div> -->
-
-                        <div class="price-row">
-                            <span>Shipping Fee</span>
-                            <span class="green">₹<%= shippingFee.toLocaleString() %></span>
-                        </div>
-
                         <hr />
 
                         <div class="price-row total">
@@ -988,10 +977,6 @@
                             <strong>₹<%= grandTotal  %></strong>
                         </div>
                     </div>
-
-                    <!-- <div class="shipping-info">
-                        Shipping, taxes, and discount codes calculated at checkout.
-                    </div> -->
 
                     <div class="cart-actions">
                         <button class="checkout-btn" onclick="checkOut()">Proceed to checkout</button>

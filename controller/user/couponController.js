@@ -11,7 +11,7 @@ const applyCoupon = async (req, res, next) => {
       couponcode: code.trim().toUpperCase(),
       isActive: true
     });
-    console.log(coupon,'this is coupon');
+    
 
     if (!coupon) {
       return res.json({ success: false, message: "Invalid coupon" });
@@ -33,13 +33,15 @@ const applyCoupon = async (req, res, next) => {
     }
 
     const discountAmount = Math.round((grandTotal * coupon.discount) / 100);
-
+    const minPurchase = coupon.minPurchase;
+    
     // coupon.user.push(userId);
     // await coupon.save();
 
     req.session.coupon = {
       couponcode: coupon.couponcode,
-      discountAmount
+      discountAmount,
+      minPurchase
     };
 
     return res.json({ success: true, discountAmount });
@@ -48,7 +50,6 @@ const applyCoupon = async (req, res, next) => {
     next(err);
   }
 };
-
 
 const removeCoupon = async (req, res, next) => {
   try {
@@ -63,7 +64,7 @@ const removeCoupon = async (req, res, next) => {
     }
 
     const coupon = req.session.coupon;
-    console.log(coupon,'this is coupon');
+
     if (!coupon) {
       return res.json({ success: false, message: "No coupon to remove" });
     }
@@ -72,7 +73,7 @@ const removeCoupon = async (req, res, next) => {
       couponcode: coupon.couponcode,
       isActive: true
     });
-    console.log(existCoupon,'this is exist coupon');
+
 
     if (!existCoupon) {
       return res.json({ success: false, message: "Coupon not found or inactive" });
@@ -83,7 +84,7 @@ const removeCoupon = async (req, res, next) => {
       { $pull: { user: userId } }
     );
 
-    
+
     delete req.session.coupon;
 
     return res.json({ success: true, message: "Coupon removed successfully" });
@@ -97,7 +98,9 @@ const removeCoupon = async (req, res, next) => {
 
 
 
-module.exports={
-    applyCoupon,
-    removeCoupon
+
+
+module.exports = {
+  applyCoupon,
+  removeCoupon
 }

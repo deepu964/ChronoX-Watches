@@ -52,7 +52,7 @@ const getAddCoupon = async (req,res,next) => {
 const addCoupon = async (req,res,next) => {
    try {
     const {name,discount,expiryDate,minPurchase} = req.body;
-    console.log(req.body,'this is body');
+    
     const existsCoupon = await couponSchema.findOne({name:name});
     if(existsCoupon ){
          return res.status(400).json({success:false,message:"Coupon is already exists"});
@@ -78,7 +78,7 @@ const addCoupon = async (req,res,next) => {
         expiryDate,
         minPurchase
     });
-    console.log(newCoupon,'this is new coupon');
+    
     await newCoupon.save()
 
     res.status(200).json({success:true, message:"Coupon Add Successfull"})
@@ -190,9 +190,9 @@ const editCoupon = async (req, res, next) => {
 const toggleCouponStatus = async (req, res, next) => {
   try {
     const couponId = req.params.id;
-    console.log(couponId,'this is id'   )
+    
     const { active } = req.body;
-    console.log(req.body,'this is body')
+    
 
     const coupon = await couponSchema.findById(couponId);
     if (!coupon) {

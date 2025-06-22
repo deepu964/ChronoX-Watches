@@ -58,11 +58,12 @@
                 <thead>
                     <tr>
                         <th>Category</th>
-                        <th>Offer</th>
+                        <th>Name of Offer</th>
                         <th>Discount</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Status</th>
+                        <th>Block/Unblock</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -81,7 +82,7 @@
                                 </div>
                             </td>
                             <td>
-                                <label class="switch">
+                                <label class="switch" style="margin-left: 10px;">
                                     <input
                                     type="checkbox"
                                     class="status-toggle"
@@ -90,8 +91,10 @@
                                     />
                                     <span class="slider"></span>
                                 </label>
-                                <button class="action-btn edit" onclick="editOffer('<%= offer._id %>')">
-                                    <i class="fas fa-edit"></i>
+                                </td>
+                                <td>
+                                <button class="action-btn edit"  onclick="editOffer('<%= offer._id %>')">
+                                    <i class="fas fa-edit" ></i>
                                 </button>
                                 <button class="action-btn delete" onclick="askDeleteOffer('<%= offer._id %>')">
                                     <i class="fas fa-trash"></i>

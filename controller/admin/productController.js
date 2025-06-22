@@ -173,7 +173,7 @@ const addProduct = async (req, res) => {
                 quantity: stock
             }]
         });
-        console.log(newProduct, 'thisi sjnfn dghbnx')
+        
         await newProduct.save();
         res.redirect('/admin/product');
 

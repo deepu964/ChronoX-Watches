@@ -302,18 +302,7 @@
           <span>Subtotal:</span>
           <span>₹<%= order.totalAmount %></span>
         </div>
-<!--         
-           <div class="summary-row">
-          <span>Discount:</span>
-          
-          <span> -₹ <%= order.totalDiscount %></span>
-           
-        </div> -->
-         
-        <div class="summary-row">
-          <span>Shipping:</span>
-          <span>₹ 50</span>
-        </div>
+
         <div class="summary-row total">
           <span>Total Amount:</span>
           <span>₹<%= Math.round(order.totalAmount + 50) %></span>

@@ -21,7 +21,7 @@ const getWallet = async (req, res, next) => {
             .slice()
             .reverse()
             .slice((page - 1) * limit, page * limit);
-            console.log(transactions,'this is transaction')
+            
 
         res.render('user/wallet', {
             user: req.session.user,

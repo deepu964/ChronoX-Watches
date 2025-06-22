@@ -25,7 +25,6 @@ if (!fs.existsSync(tempDir)) {
 }
 
 connectDB();
-
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -51,12 +50,9 @@ app.use(errorHandler);
 app.use('/',userRouter);
 app.use('/admin',adminRouter)
 
-
-
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 app.set('layout', 'layout/main');
-
 
 const port = process.env.PORT;
 app.listen(port,()=>{

@@ -32,7 +32,8 @@ const userList = async (req,res,next) => {
                  
             })
     } catch (error) {
-        res.redirect('/admin/dashboard');
+        console.log('this is userlist page error ',error);
+        // res.redirect('/admin/dashboard');
         next(error)
     }
     

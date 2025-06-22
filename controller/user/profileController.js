@@ -51,6 +51,7 @@ const verifyChangeEmail = async (req, res, next) => {
             res.redirect('/')
         }
     } catch (error) {
+        console.log('this is  verifychange mail page ',error);
         next(error);
     }
 }

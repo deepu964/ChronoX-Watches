@@ -71,7 +71,7 @@ const addCategory = async (req,res,next) => {
       
       return res.json({ success:true, message:"Category added successfully"});
     } catch (error) {
-      console.log("add category error")
+      console.log("add category error",error)
         next(error);
     }
     
@@ -89,11 +89,11 @@ const toggleCategoryStatus = async (req, res,next) => {
     
     res.json({ success: true, message:"Updated successfully" });
   } catch (err) {
+    console.log('this is toggle page error',error)
     next(err)
     res.status(500).json({ success: false });
   }
 };
-
 
 const getEditCategory = async (req,res) => {
     try {
@@ -107,7 +107,6 @@ const getEditCategory = async (req,res) => {
         res.status(500).redirect('admin/page-404');
     }
 }
-
 
 const editCategory = async (req, res, next) => {
   try {
@@ -142,7 +141,7 @@ const editCategory = async (req, res, next) => {
 
     return res.json({ success: true, message: "Updated Successfully" });
   } catch (error) {
-    console.log(" edit category error")
+    console.log(" edit category error",error)
     next(error);
   }
 };
@@ -162,7 +161,7 @@ const deleteCategory = async (req,res,next) => {
         }
         return res.json({success:true,message:"Successfully Deleted"})
     } catch (error) {
-      console.log(" delete category error")
+      console.log(" delete category error",error)
         next(error);
     }
     
@@ -385,7 +384,7 @@ const editCategoryOffer = async (req, res, next) => {
       });
     }
 
-    // Validate dates
+    
     const start = new Date(startDate);
     const end = new Date(endDate);
 

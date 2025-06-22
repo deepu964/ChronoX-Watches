@@ -14,13 +14,6 @@
     <h1>Checkout</h1>
     <div class="checkout-grid">
 
-        <!-- Shipping Address Section -->
-        <section class="address-section">
-            <div class="section-header">
-                <h2>Shipping Address</h2>
-                <button class="open-modal-btn" data-modal-id="addAddressModal" style="color: rgb(253, 253, 253); font-size: 15px; padding: 12px; background-color: rgb(1, 1, 14); border-radius: 5px;">Add New Address</button>
-            </div>
-
             <div class="addresses-container">
                 <% if (addresses && addresses.length > 0) { %>
                     <% addresses.forEach((address, index) => { %>
@@ -177,7 +170,7 @@
                               </button>
                             <% } %>
                         </div>
-                        <div class="summary-row"><span>Shipping</span><span>₹<%= shipping.toFixed(2) %></span></div>
+                        
                       
                         <div class="summary-row total">
                             <span>Total</span>

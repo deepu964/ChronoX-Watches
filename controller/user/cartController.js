@@ -14,7 +14,6 @@ const getCart = async (req, res, next) => {
                 items: [],
                 totalMRP: 0,
                 discount: 0,
-                shippingFee: 0,
                 grandTotal: 0,
                 total: 0
             });
@@ -29,14 +28,14 @@ const getCart = async (req, res, next) => {
         for (let item of cart.items) {
             const product = item.product;
             const quantity = item.quantity;
-            const variant = product.variants[0]; 
+            const variant = product.variants[0];
 
             const regularPrice = variant.regularPrice;
             const salePrice = variant.salePrice;
 
             const productOffer = regularPrice - salePrice;
 
-            
+
             const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
 
             let catDiscount = 0;
@@ -44,17 +43,17 @@ const getCart = async (req, res, next) => {
                 catDiscount = (regularPrice * catOffer.discount) / 100;
             }
 
-            
+
             const bestOffer = Math.max(productOffer, catDiscount);
             const discountedPrice = regularPrice - bestOffer;
 
-            
+
             totalMRP += regularPrice * quantity;
             discount += bestOffer * quantity;
             grandTotal += discountedPrice * quantity;
         }
 
-        const shippingFee = 50;
+
 
         res.render('user/cart', {
             user: req.session.user,
@@ -62,8 +61,7 @@ const getCart = async (req, res, next) => {
             total: totalMRP - discount,
             totalMRP,
             discount,
-            shippingFee,
-            grandTotal: grandTotal + shippingFee,
+            grandTotal: grandTotal,
             cloudName: process.env.CLOUDINARY_CLOUD_NAME
         });
 
@@ -93,9 +91,8 @@ const addToCart = async (req, res, next) => {
         const maxQuantityAllowed = 5;
         const stockQty = product.variants[0]?.quantity || 0
         const price = product.variants[0]?.regularPrice;
-        console.log(price, 'price');
         const itemPrice = product.variants[0]?.salePrice ;
-        console.log(itemPrice, 'item price');
+        
         
         if (requestedQty < 1) {
             return res.status(400).json({ success: false, message: 'Invalid quantity.' });

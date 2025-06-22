@@ -86,7 +86,7 @@ const getMyReturns = async (req, res, next) => {
             .lean())
             .filter(r => r.order);
 
-        console.log(returns,'this is returrn');
+        
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
         res.render('user/myReturns', {
