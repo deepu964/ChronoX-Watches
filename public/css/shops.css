@@ -400,6 +400,67 @@
             background-color: var(--primary-dark);
             transform: translateY(-2px);
         }
+
+        /* Unified Filter Form Styles */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type="text"] {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .search-container input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(42, 104, 119, 0.1);
+        }
+
+        .search-btn, .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover, .clear-search-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .sort-container {
+            margin-top: 20px;
+        }
+
+        .sort-container select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sort-container select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
         
         /* Product Grid */
         .product-grid {

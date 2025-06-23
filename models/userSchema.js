@@ -44,7 +44,13 @@ const userSchema = new Schema({
     },
     resetToken: String,
     resetTokenExpr: Date,
-    
+    referralCode: { 
+        type: String,
+         unique: true
+    },
+    referredBy: { 
+        type: String
+    }, 
     isEmailVerified: {
         type: Boolean,
         default: false

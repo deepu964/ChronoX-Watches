@@ -5,6 +5,15 @@ const sendOtpEmail = require('../../utils/sendOtpEmail');
 const sendResetPass = require('../../utils/sendResetPass');
 const crypto = require('crypto');
 
+
+function generateReferralCode(name) {
+  return name.toLowerCase().slice(0, 3) + Math.floor(1000 + Math.random() * 9000);
+}
+
+function generateCouponCode() {
+    return 'CPN' + Math.floor(100000 + Math.random() * 900000); 
+}
+
 const loginPage = (req, res) => {
     try {
         if (req.session.user) {
@@ -94,7 +103,8 @@ const signUp = async (req, res) => {
             mobile,
             password: hashedPassword,
             otp,
-            otpExpr
+            otpExpr,
+            referredBy: req.body.referredBy || null
         };
 
         return res.redirect('/verify-otp');
@@ -124,12 +134,71 @@ const getVerifyOtp = (req, res) => {
     }
 };
 
+// const verifyOtp = async (req, res) => {
+//     try {
+//         const { otp } = req.body;
+
+//         const sessionUser = req.session.tempUser;
+//         console.log("Session User:", sessionUser);
+//         if (!sessionUser) {
+//             return res.redirect('/signup?message=Session expired. Please sign up again.');
+//         }
+
+//         console.log("Session OTP:", sessionUser.otp);
+//         console.log("Submitted OTP:", otp);
+
+//         if (new Date() > sessionUser?.otpExpr) {
+//             delete sessionUser.otp
+//             return res.redirect('/verify-otp?message=OTP expired . Please try again.');
+//         }
+
+//         if (String(otp).trim() !== String(sessionUser.otp).trim()) {
+//             return res.redirect('/verify-otp?message=Invalid OTP. Please try again.');
+//         }
+
+//         if (sessionUser.userId) {
+//             await User.findByIdAndUpdate(sessionUser.userId, { isVerified: true });
+
+//             req.session.user = {
+//                 _id: sessionUser.userId,
+//                 email: sessionUser.email,
+//                 fullname: sessionUser.fullname
+//             };
+
+//             delete req.session.tempUser;
+//             return res.redirect('/?message=Account created successfully');
+//         } else {
+//             const newUser = new User({
+//                 fullname: sessionUser.fullname,
+//                 email: sessionUser.email,
+//                 password: sessionUser.password,
+//                 mobile: sessionUser.mobile,
+//                 isVerified: true
+//             });
+
+//             const savedUser = await newUser.save();
+
+//             req.session.user = {
+//                 _id: savedUser._id,
+//                 email: savedUser.email,
+//                 fullname: savedUser.fullname
+//             };
+
+//             delete req.session.tempUser;
+//             return res.redirect('/?message=Account created successfully');
+//         }
+
+//     } catch (error) {
+//         console.error("OTP verification error:", error);
+//         return res.redirect('/verify-otp?message=Verification failed: ' + error.message);
+//     }
+// };
+
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
-
         const sessionUser = req.session.tempUser;
-        console.log("Session User:", sessionUser);
+
         if (!sessionUser) {
             return res.redirect('/signup?message=Session expired. Please sign up again.');
         }
@@ -138,15 +207,19 @@ const verifyOtp = async (req, res) => {
         console.log("Submitted OTP:", otp);
 
         if (new Date() > sessionUser?.otpExpr) {
-            delete sessionUser.otp
-            return res.redirect('/verify-otp?message=OTP expired . Please try again.');
+            delete sessionUser.otp;
+            return res.redirect('/verify-otp?message=OTP expired. Please try again.');
         }
 
         if (String(otp).trim() !== String(sessionUser.otp).trim()) {
             return res.redirect('/verify-otp?message=Invalid OTP. Please try again.');
         }
 
+        // OTP is valid
+        const referralCode = generateReferralCode(sessionUser.fullname);
+
         if (sessionUser.userId) {
+            // If it's an existing user (OTP for email change or other action)
             await User.findByIdAndUpdate(sessionUser.userId, { isVerified: true });
 
             req.session.user = {
@@ -156,17 +229,34 @@ const verifyOtp = async (req, res) => {
             };
 
             delete req.session.tempUser;
-            return res.redirect('/?message=Account created successfully');
+            return res.redirect('/?message=Account verified successfully');
         } else {
+            // New user registration
             const newUser = new User({
                 fullname: sessionUser.fullname,
                 email: sessionUser.email,
                 password: sessionUser.password,
                 mobile: sessionUser.mobile,
-                isVerified: true
+                isVerified: true,
+                referralCode,
+                referredBy: sessionUser.referredBy || null
             });
 
             const savedUser = await newUser.save();
+
+            // Reward the referrer
+            if (sessionUser.referredBy) {
+                const referrer = await User.findOne({ referralCode: sessionUser.referredBy });
+                if (referrer) {
+                    const coupon = new Coupon({
+                        user: referrer._id,
+                        code: generateCouponCode(),
+                        discount: 100,
+                        expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+                    });
+                    await coupon.save();
+                }
+            }
 
             req.session.user = {
                 _id: savedUser._id,
@@ -183,6 +273,8 @@ const verifyOtp = async (req, res) => {
         return res.redirect('/verify-otp?message=Verification failed: ' + error.message);
     }
 };
+
+
 
 const resendOtp = async (req, res) => {
     try {

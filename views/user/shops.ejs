@@ -36,58 +36,57 @@
                 <div class="filter-sidebar">
                     <h3 class="filter-title">Refine Selection</h3>
 
-                    <!-- Search box -->
-                    <form method="GET" action="/shop">
-                        <input type="text" name="search" value="<%= query.search || '' %>"
-                            placeholder="Search product...">
-                        <% if (query.search) { %>
-                            <a href="/shop"><i class="fas fa-times"></i></a>
+                    <!-- Unified Filter Form -->
+                    <form id="shopFilterForm" method="GET" action="/shop">
+                        <!-- Search box -->
+                        <div class="search-container">
+                            <input type="text" name="search" value="<%= query.search || '' %>"
+                                placeholder="Search product..." id="searchInput">
+                            <% if (query.search) { %>
+                                <button type="button" id="clearSearch" class="clear-search-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             <% } else { %>
-                                <button type="submit"><i class="fas fa-search"></i></button>
-                                <% } %>
-                    </form>
-
-                    <!-- Category Filter -->
-                    <form id="filterForm" method="GET" action="/shop">
-                        <% if (query.search) { %>
-                            <input type="hidden" name="search" value="<%= query.search %>">
+                                <button type="submit" class="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             <% } %>
-                                <div class="filter-group">
-                                    <h4 class="filter-group-title">Category</h4>
-                                    <% categories.forEach(cat=> { %>
-                                        <div class="filter-option active">
-                                          
-                                            <input type="checkbox" id="catId" name="categoryId" value="<%= cat._id %>"
-                                                <%=categoryFilter.includes(cat._id.toString()) ? 'checked' : '' %>
-                                            onchange="document.getElementById('filterForm').submit()"
-                                            >
-                                            <label for="catId">
-                                                <%= cat.name %>
-                                            </label>
-                                        </div>
-                                        <% }) %>
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="filter-group">
+                            <h4 class="filter-group-title">Category</h4>
+                            <% categories.forEach((cat, index) => { %>
+                                <div class="filter-option active">
+                                    <input type="checkbox" id="cat_<%= index %>" name="categoryId" value="<%= cat._id %>"
+                                        <%= categoryFilter.includes(cat._id.toString()) ? 'checked' : '' %>
+                                        onchange="submitFilters()"
+                                    >
+                                    <label for="cat_<%= index %>">
+                                        <%= cat.name %>
+                                    </label>
                                 </div>
-                    </form>
+                            <% }) %>
+                        </div>
 
-                    <!-- Sort Dropdown -->
-                    <form method="GET" action="/shop">
-                        <% if (query.search) { %>
-                            <input type="hidden" name="search" value="<%= query.search %>">
-                            <% } %>
-                                <% categoryFilter.forEach(catId=> { %>
-                                    <input type="hidden" name="categoryId" value="<%= catId %>">
-                                    <% }) %>
-                                        <select name="sortBy" onchange="this.form.submit()">
-                                            <option value="">Sort By</option>
-                                            <option value="price-asc" <%=query.sortBy==='price-asc' ? 'selected' : '' %>
-                                                >Price: Low to High</option>
-                                            <option value="price-desc" <%=query.sortBy==='price-desc' ? 'selected' : ''
-                                                %>>Price: High to Low</option>
-                                            <option value="name-asc" <%=query.sortBy==='name-asc' ? 'selected' : '' %>
-                                                >Name: A-Z</option>
-                                            <option value="name-desc" <%=query.sortBy==='name-desc' ? 'selected' : '' %>
-                                                >Name: Z-A</option>
-                                        </select>
+                        <!-- Sort Dropdown -->
+                        <div class="sort-container">
+                            <select name="sortBy" onchange="submitFilters()">
+                                <option value="">Sort By</option>
+                                <option value="price-asc" <%= query.sortBy === 'price-asc' ? 'selected' : '' %>>
+                                    Price: Low to High
+                                </option>
+                                <option value="price-desc" <%= query.sortBy === 'price-desc' ? 'selected' : '' %>>
+                                    Price: High to Low
+                                </option>
+                                <option value="name-asc" <%= query.sortBy === 'name-asc' ? 'selected' : '' %>>
+                                    Name: A-Z
+                                </option>
+                                <option value="name-desc" <%= query.sortBy === 'name-desc' ? 'selected' : '' %>>
+                                    Name: Z-A
+                                </option>
+                            </select>
+                        </div>
                     </form>
                 </div>
 
@@ -159,24 +158,36 @@
             </div>
 
             <div class="page-controls">
-                <% if (currentPage> 1) { %>
-                    <a href="/shop?page=<%= currentPage - 1 %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>"
-                        class="page-btn">
+                <%
+                // Helper function to build query string
+                function buildQueryString(page) {
+                    let params = [];
+                    if (page) params.push(`page=${page}`);
+                    if (query.search) params.push(`search=${encodeURIComponent(query.search)}`);
+                    if (query.sortBy) params.push(`sortBy=${query.sortBy}`);
+                    categoryFilter.forEach(catId => params.push(`categoryId=${catId}`));
+                    return params.length > 0 ? '?' + params.join('&') : '';
+                }
+                %>
+
+                <% if (currentPage > 1) { %>
+                    <a href="/shop<%= buildQueryString(currentPage - 1) %>" class="page-btn">
                         <i class="fas fa-chevron-left"></i>
                     </a>
-                    <% } %>
-                        <% for (let i=1; i <totalPage; i++) { %>
-                            <a href="/shop?page=<%= i %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>"
-                                class="page-btn <%= currentPage === i ? 'active' : '' %>">
-                                <%= i %>
-                            </a>
-                            <% } %>
-                                <% if (currentPage < totalPage) { %>
-                                    <a href="/shop?page=<%= currentPage + 1 %>&search=<%= query.search || '' %>&sortBy=<%= query.sortBy || '' %><% categoryFilter.forEach(catId => { %>&categoryId=<%= catId %><% }) %>"
-                                        class="page-btn">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                    <% } %>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPage; i++) { %>
+                    <a href="/shop<%= buildQueryString(i) %>"
+                       class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
+
+                <% if (currentPage < totalPage) { %>
+                    <a href="/shop<%= buildQueryString(currentPage + 1) %>" class="page-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                <% } %>
             </div>
         </section>
 
@@ -291,20 +302,33 @@
 
         </script> -->
         <script>
+  // ===== Filter Management =====
+  function submitFilters() {
+    document.getElementById('shopFilterForm').submit();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
-    const sortSelect = document.querySelector('select[name="sortBy"]');
-    if (sortSelect) {
-      sortSelect.addEventListener('change', () => {
-        sortSelect.form.submit();
+    // Handle search form submission
+    const searchInput = document.getElementById('searchInput');
+    const shopFilterForm = document.getElementById('shopFilterForm');
+
+    if (searchInput) {
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitFilters();
+        }
       });
     }
 
-    const checkboxes = document.querySelectorAll('#filterForm input[type="checkbox"]');
-    checkboxes.forEach(box => {
-      box.addEventListener('change', () => {
-        document.getElementById('filterForm').submit();
+    // Handle clear search button
+    const clearSearchBtn = document.getElementById('clearSearch');
+    if (clearSearchBtn) {
+      clearSearchBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        submitFilters();
       });
-    });
+    }
 
     // ===== Wishlist Button Toggle =====
     const wishlistButtons = document.querySelectorAll(".wishlist-btn");

@@ -53,12 +53,15 @@ const getShopPage = async (req, res) => {
             ];
         }
 
-        let categoryIds = categoryFilter;
-        if (!Array.isArray(categoryIds)) {
-            categoryIds = categoryIds ? [categoryIds] : [];
+        // Handle category filter - keep original strings for frontend, convert to ObjectIds for query
+        let categoryFilterArray = categoryFilter;
+        if (!Array.isArray(categoryFilterArray)) {
+            categoryFilterArray = categoryFilterArray ? [categoryFilterArray] : [];
         }
-        if (categoryIds.length > 0) {
-            categoryIds = categoryIds.map(id => new mongoose.Types.ObjectId(id));
+
+        let categoryIds = [];
+        if (categoryFilterArray.length > 0) {
+            categoryIds = categoryFilterArray.map(id => new mongoose.Types.ObjectId(id));
             filter.categoryId = { $in: categoryIds };
         }
         const totalProduct = await productSchema.countDocuments(filter);
@@ -140,7 +143,7 @@ const getShopPage = async (req, res) => {
             cloudName,
             query: req.query,
             categories,
-            categoryFilter: categoryIds,
+            categoryFilter: categoryFilterArray, // Use original string array for frontend
             currentPage: page,
             totalPage,
             userWishlist
