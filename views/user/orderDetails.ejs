@@ -696,12 +696,12 @@
                             <% order.items.forEach((item, index) => { %>
                                 <div class="return-item">
                                     <input type="checkbox" id="item_<%= index %>" name="items"
-                                           value="<%= item.product._id %>" data-price="<%= catDiscount %>"
+                                           value="<%= item.product._id %>" data-price="<%= catDiscount?catDiscount:0 %>"
                                            data-max-qty="<%= item.quantity %>" checked>
                                     <label for="item_<%= index %>">
                                         <span class="item-name"><%= item.product.name %></span>
                                         <% if (bestOffer) { %>
-                                          <span class="item-price">₹<%= catDiscount-besftOffer %> each</span>
+                                          <span class="item-price">₹<%= catDiscount-bestOffer %> each</span>
                                           <% } else { %>
                                             <span class="item-price">₹<%= catDiscount %> each</span>
                                         <% } %>

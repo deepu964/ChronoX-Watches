@@ -19,7 +19,12 @@ const getCart = async (req, res, next) => {
             });
         }
 
-        const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
+       
+        
+        const categoryOff = await categoryOffer.find({
+                            isDeleted: false,
+                            status: 'Active',
+                            }).lean();
 
         let totalMRP = 0;
         let discount = 0;

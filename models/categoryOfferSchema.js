@@ -33,7 +33,8 @@ const categoryOfferSchema = new mongoose.Schema({
   isDeleted: {
     type: Boolean,
     default: false
-  }
+  },
+ 
 }, {
   timestamps: true
 });

@@ -63,13 +63,13 @@
                     <label>To Date:</label>
                     <input type="date" id="toDate">
                 </div>
-                
+             
                 <div class="filter-group">
                     <button class="filter-btn" onclick="generateReport()">
                         <i class="fas fa-search"></i> Generate Report
                     </button>
                 </div>
-                
+                 
                 <div class="filter-group">
                     <button class="export-btn pdf-btn" onclick="exportReportPDF()">
                         <i class="fas fa-file-pdf"></i> Export PDF
@@ -305,111 +305,5 @@
   }
 </script>
 
-  <!-- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const reportType = document.getElementById('reportType');
-        const customDateGroup = document.getElementById('customDateGroup');
-        const customDateGroup2 = document.getElementById('customDateGroup2');
-
-        reportType.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                customDateGroup.style.display = 'block';
-                customDateGroup2.style.display = 'block';
-            } else {
-                customDateGroup.style.display = 'none';
-                customDateGroup2.style.display = 'none';
-            }
-        });
-
-        // Set default dates
-        const today = new Date();
-        const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        
-        document.getElementById('fromDate').value = oneWeekAgo.toISOString().split('T')[0];
-        document.getElementById('toDate').value = today.toISOString().split('T')[0];
-    });
-
-    async function generateReport() {
-        const reportType = document.getElementById('reportType').value;
-        const fromDate = document.getElementById('fromDate').value;
-        const toDate = document.getElementById('toDate').value;
-        
-        let url = `/admin/sales-report?type=${reportType}`;
-        
-        if (reportType === 'custom' && fromDate && toDate) {
-            url += `&fromDate=${fromDate}&toDate=${toDate}`;
-        }
-        
-        window.location.href = url;
-    }
-
-    async function exportReportPDF() {
-        const reportType = document.getElementById('reportType').value;
-        const fromDate = document.getElementById('fromDate').value;
-        const toDate = document.getElementById('toDate').value;
-
-        // Validate custom date range
-        if (reportType === 'custom' && (!fromDate || !toDate)) {
-            showToast('Please select both from and to dates for custom range', 'error');
-            return;
-        }
-
-        let url = `/admin/sales-report/export-pdf?type=${reportType}`;
-
-        if (reportType === 'custom' && fromDate && toDate) {
-            url += `&fromDate=${fromDate}&toDate=${toDate}`;
-        }
-
-        // Show loading state
-        const btn = document.querySelector('.pdf-btn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
-        btn.disabled = true;
-
-        try {
-            window.open(url, '_blank');
-        } finally {
-            // Reset button after a delay
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, 2000);
-        }
-    }
-
-    async function exportReportExcel() {
-        const reportType = document.getElementById('reportType').value;
-        const fromDate = document.getElementById('fromDate').value;
-        const toDate = document.getElementById('toDate').value;
-
-        // Validate custom date range
-        if (reportType === 'custom' && (!fromDate || !toDate)) {
-            showToast('Please select both from and to dates for custom range', 'error');
-            return;
-        }
-
-        let url = `/admin/sales-report/export-excel?type=${reportType}`;
-
-        if (reportType === 'custom' && fromDate && toDate) {
-            url += `&fromDate=${fromDate}&toDate=${toDate}`;
-        }
-
-        // Show loading state
-        const btn = document.querySelector('.excel-btn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Excel...';
-        btn.disabled = true;
-
-        try {
-            window.open(url, '_blank');
-        } finally {
-            // Reset button after a delay
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, 2000);
-        }
-    }
-  </script> -->
 </body>
 </html>

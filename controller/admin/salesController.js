@@ -4,23 +4,28 @@ const ExcelJS = require('exceljs');
 
 const getSalesReport = async (req, res, next) => {
   try {
-    const limit = 10; 
+    const limit = 10;
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * limit;
 
     const { type, fromDate, toDate } = req.query;
-    const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
+    
+    const { startDate, endDate } = getDateRange(type, fromDate, toDate);
+    console.log(" FILTER RANGE:", startDate, endDate);
+
+    
     const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' }
     };
 
+    
     const totalOrders = await orderSchema.countDocuments(filter);
     const totalPages = Math.ceil(totalOrders / limit);
 
     const orders = await orderSchema.find(filter)
-      .populate('user', 'fullname email') 
+      .populate('user', 'fullname email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -43,6 +48,7 @@ const getSalesReport = async (req, res, next) => {
       summary.totalAmount += order.totalAmount;
     });
 
+    
     res.render('admin/salesReport', {
       orders,
       summary,
@@ -57,51 +63,72 @@ const getSalesReport = async (req, res, next) => {
       endRecord: Math.min(skip + limit, totalOrders)
     });
   } catch (error) {
-    console.log("sales report error", error);
+    console.log(" Sales report error:", error);
     next(error);
   }
 };
 
+
 const getDateRange = (type, fromDate, toDate) => {
   let startDate, endDate;
-  const today = new Date();
+  const now = new Date();
 
   switch (type) {
     case 'daily':
-      startDate = new Date(today.setHours(0, 0, 0, 0));
-      endDate = new Date(today.setHours(23, 59, 59, 999));
+      startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date();
+      endDate.setHours(23, 59, 59, 999);
       break;
+
     case 'weekly':
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - today.getDay());
-      startDate = new Date(weekStart.setHours(0, 0, 0, 0));
-      endDate = new Date(today.setHours(23, 59, 59, 999));
+      const currentDay = now.getDay(); 
+      const diff = currentDay === 0 ? 6 : currentDay - 1; 
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - diff);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date();
+      endDate.setHours(23, 59, 59, 999);
       break;
+
     case 'monthly':
-      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
       break;
+
     case 'yearly':
-      startDate = new Date(today.getFullYear(), 0, 1);
-      endDate = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999);
+      startDate = new Date(now.getFullYear(), 0, 1);
+      endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
       break;
+
     case 'custom':
       if (fromDate && toDate) {
         startDate = new Date(fromDate);
+        startDate.setHours(0, 0, 0, 0);
         endDate = new Date(toDate);
         endDate.setHours(23, 59, 59, 999);
       } else {
-        startDate = new Date(today.setDate(today.getDate() - 7));
+        
+        startDate = new Date();
+        startDate.setDate(now.getDate() - 7);
+        startDate.setHours(0, 0, 0, 0);
         endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
       }
       break;
+
     default:
-      startDate = new Date(today.setDate(today.getDate() - 7));
+      
+      startDate = new Date();
+      startDate.setDate(now.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
       endDate = new Date();
+      endDate.setHours(23, 59, 59, 999);
   }
 
   return { startDate, endDate };
 };
+
 
 const exportSalesReportPDF = async (req, res, next) => {
   try {

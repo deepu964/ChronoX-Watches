@@ -595,6 +595,7 @@ const getOrderDetails = async (req, res, next) => {
     let bestOffer = 0;
     let regularPrice = 0;
     let salePrice = 0;
+    let catDiscount = 0;
 
 
     for (let item of order.items) {
@@ -609,7 +610,6 @@ const getOrderDetails = async (req, res, next) => {
 
 
       const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
-      let catDiscount = 0;
       if (catOffer && catOffer.discount) {
         catDiscount = (regularPrice * catOffer.discount) / 100;
       }
@@ -634,6 +634,7 @@ const getOrderDetails = async (req, res, next) => {
       order,
       returnRequest,
       discount,
+      catDiscount,
       bestOffer,
       regularPrice,
       salePrice,
@@ -843,17 +844,13 @@ const cancelOrderItem = async (req, res, next) => {
 
     bestOffer = Math.max(productOffer, categoryDiscount);
 
-    const piadTotal = order.totalAmount;
-  
-     totalMRP = regularPrice * item.quantity;
+    
+    totalMRP = regularPrice * item.quantity;
     
     let refundAmount = totalMRP - bestOffer;
 
-    
-
-    
       if (order.coupon > 1  && totalMRP > order.couponMinAmount) {
-        refundAmount -= order.coupon;
+            refundAmount -= order.coupon;
         
       }else{
         refundAmount = order.totalAmount;

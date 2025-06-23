@@ -58,20 +58,6 @@ const addCoupon = async (req,res,next) => {
          return res.status(400).json({success:false,message:"Coupon is already exists"});
     }
 
-    
-            // const nameExists = await couponSchema.findOne({
-            //     _id: { $ne: couponId },
-            //     name: { $regex: new RegExp(`^${name}$`, "i") }
-            // });
-
-            // if (nameExists) {
-            //     return res.json({
-            //         success: false,
-            //         message: 'Coupon name already exists. Use a different name.'
-            //     });
-            // }
-        
-
     const newCoupon = new couponSchema({
         name,
         discount,
