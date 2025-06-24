@@ -187,9 +187,10 @@
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-bottom: 30px;
+            align-items: stretch;
         }
         
         .stat-card {
@@ -206,6 +207,17 @@
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-md);
+        }
+
+        /* Referral-specific stat card styling */
+        .stat-card:nth-child(5) .stat-icon {
+            background-color: rgba(139, 69, 19, 0.2);
+            color: #8b4513;
+        }
+
+        .stat-card:nth-child(6) .stat-icon {
+            background-color: rgba(255, 165, 0, 0.2);
+            color: #ff8c00;
         }
         
         .stat-icon {
@@ -736,6 +748,18 @@
         }
         
         /* Responsive Design */
+        @media (min-width: 1400px) {
+            .stats-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 1399px) and (min-width: 1201px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         @media (max-width: 1200px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -970,7 +994,24 @@
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                margin-right: 12px;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+        }
             
             .header {
                 margin-bottom: 20px;
@@ -1038,5 +1079,83 @@
         
         .metric:hover .metric-value {
             transform: scale(1.1);
+        }
+
+        /* Additional Sidebar Fixes */
+        .sidebar {
+            display: flex !important;
+            flex-direction: column !important;
+            background-color: white !important;
+            border-right: 1px solid #e5e7eb !important;
+        }
+
+        .sidebar-header {
+            padding: 20px !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        .logo {
+            font-size: 24px !important;
+            font-weight: 600 !important;
+            color: black !important;
+            text-align: center !important;
+        }
+
+        .nav-items {
+            flex: 1 !important;
+            padding: 20px 0 !important;
+            overflow-y: auto !important;
+        }
+
+        .nav-item {
+            display: flex !important;
+            align-items: center !important;
+            padding: 12px 20px !important;
+            color: rgb(117, 115, 115) !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            margin-bottom: 5px !important;
+            cursor: pointer !important;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #dbeafe !important;
+            color: #3b82f6 !important;
+            border-left: 3px solid #3b82f6 !important;
+        }
+
+        .nav-item i {
+            margin-right: 12px !important;
+            width: 20px !important;
+            text-align: center !important;
+            font-size: 18px !important;
+        }
+
+        .sidebar-footer {
+            padding: 20px !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
+
+        .account-btn, .logout-btn {
+            display: block !important;
+            width: 100% !important;
+            padding: 10px !important;
+            margin-bottom: 10px !important;
+            border-radius: 4px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            font-weight: 500 !important;
+        }
+
+        .account-btn {
+            background-color: rgb(10, 9, 9) !important;
+            color: white !important;
+            border: 1px solid #e5e7eb !important;
+        }
+
+        .logout-btn {
+            background-color: #111827 !important;
+            color: white !important;
+            border: none !important;
         }
     

@@ -4,6 +4,7 @@ const Order = require('../../models/orderSchema');
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
+const Referral = require('../../models/referralSchema');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const PDFDocument = require('pdfkit');
@@ -135,13 +136,29 @@ const getDashboardMetrics = async () => {
             isActive: false // isActive=false means available in your schema
         });
 
+        // Referral statistics
+        const referralStats = await Referral.getReferralStats();
+        const thisMonthReferrals = await Referral.countDocuments({
+            createdAt: { $gte: startOfMonth },
+            status: 'Completed'
+        });
+        const lastMonthReferrals = await Referral.countDocuments({
+            createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+            status: 'Completed'
+        });
+        const referralGrowth = lastMonthReferrals > 0 ?
+            ((thisMonthReferrals - lastMonthReferrals) / lastMonthReferrals * 100).toFixed(1) : 0;
+
         return {
             totalCustomers,
             customerGrowth,
             totalOrders,
             totalSales,
             salesGrowth,
-            totalProducts
+            totalProducts,
+            totalReferrals: referralStats.totalReferrals,
+            totalReferralRewards: referralStats.totalRewardsGiven,
+            referralGrowth
         };
     } catch (error) {
         console.error('Error fetching dashboard metrics:', error);

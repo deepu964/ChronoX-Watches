@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Details - ChronoX Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/userlist.css?v=1.3">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <h2>ChronoX</h2>
+                    <span>Admin Panel</span>
+                </div>
+            </div>
+            
+            <div class="nav-items">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/orders" class="nav-item">
+                    <i class="fas fa-list"></i>
+                    <span>Order List</span>
+                </a>
+                <a href="/admin/returns" class="nav-item">
+                    <i class="fas fa-undo"></i>
+                    <span>Returns</span>
+                </a>
+                <a href="/admin/userlist" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Customer</span>
+                </a>
+                <a href="/admin/sales-report" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales Report</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Category</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/category-offers" class="nav-item">
+                    <i class="fas fa-percent"></i>
+                    <span>Category Offers</span>
+                </a>
+                <a href="/admin/referrals" class="nav-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Referrals</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="account-btn">Account</button>
+                <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1 class="page-title">REFERRAL DETAILS</h1>
+                    <div class="breadcrumb">
+                        <a href="/admin/dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="/admin/referrals" style="text-decoration: none; color: gray;">Referrals</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Details</span>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div style="margin-bottom: 20px;">
+                <a href="/admin/referrals" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Referrals
+                </a>
+            </div>
+
+            <!-- Referral Information -->
+            <div class="detail-grid">
+                <!-- Referrer Information -->
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <h3><i class="fas fa-user-plus"></i> Referrer Information</h3>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value"><%= referral.referrer.fullname %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value"><%= referral.referrer.email %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Mobile:</span>
+                        <span class="info-value"><%= referral.referrer.mobile || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Referral Code:</span>
+                        <span class="info-value" style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #1976d2;">
+                            <%= referral.referrer.referralCode %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Joined Date:</span>
+                        <span class="info-value"><%= new Date(referral.referrer.createdAt).toLocaleDateString('en-IN') %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Wallet Balance:</span>
+                        <span class="info-value">₹<%= referrerWallet ? referrerWallet.balance : 0 %></span>
+                    </div>
+                </div>
+
+                <!-- Referred User Information -->
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <h3><i class="fas fa-user-check"></i> Referred User Information</h3>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value"><%= referral.referred.fullname %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value"><%= referral.referred.email %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Mobile:</span>
+                        <span class="info-value"><%= referral.referred.mobile || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Joined Date:</span>
+                        <span class="info-value"><%= new Date(referral.referred.createdAt).toLocaleDateString('en-IN') %></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral Transaction Details -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <h3><i class="fas fa-exchange-alt"></i> Referral Transaction Details</h3>
+                </div>
+                <div class="detail-grid">
+                    <div>
+                        <div class="info-item">
+                            <span class="info-label">Referral Code Used:</span>
+                            <span class="info-value" style="background: #e8f5e8; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #2e7d32;">
+                                <%= referral.referralCode %>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Reward Amount:</span>
+                            <span class="info-value" style="font-weight: bold; color: #4caf50;">₹<%= referral.rewardAmount %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value">
+                                <% if (referral.status === 'Completed') { %>
+                                    <span class="status-badge status-active">Completed</span>
+                                <% } else if (referral.status === 'Pending') { %>
+                                    <span class="status-badge status-pending">Pending</span>
+                                <% } else { %>
+                                    <span class="status-badge status-blocked">Failed</span>
+                                <% } %>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Reward Given:</span>
+                            <span class="info-value">
+                                <% if (referral.rewardGiven) { %>
+                                    <i class="fas fa-check-circle" style="color: #4caf50;"></i> Yes
+                                <% } else { %>
+                                    <i class="fas fa-times-circle" style="color: #f44336;"></i> No
+                                <% } %>
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="info-item">
+                            <span class="info-label">Referral Date:</span>
+                            <span class="info-value"><%= new Date(referral.createdAt).toLocaleDateString('en-IN') %></span>
+                        </div>
+                        <% if (referral.rewardGivenAt) { %>
+                        <div class="info-item">
+                            <span class="info-label">Reward Given Date:</span>
+                            <span class="info-value"><%= new Date(referral.rewardGivenAt).toLocaleDateString('en-IN') %></span>
+                        </div>
+                        <% } %>
+                        <% if (referral.notes) { %>
+                        <div class="info-item">
+                            <span class="info-label">Notes:</span>
+                            <span class="info-value"><%= referral.notes %></span>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Status Update Form (for failed referrals) -->
+                <% if (referral.status === 'Failed') { %>
+                <div class="status-update-form">
+                    <h4><i class="fas fa-edit"></i> Update Referral Status</h4>
+                    <form id="statusUpdateForm">
+                        <div style="margin-bottom: 15px;">
+                            <label for="status">Status:</label>
+                            <select id="status" name="status" style="padding: 8px; margin-left: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                                <option value="Failed" <%= referral.status === 'Failed' ? 'selected' : '' %>>Failed</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label for="notes">Notes:</label>
+                            <textarea id="notes" name="notes" rows="3" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;" placeholder="Add notes about this status update..."><%= referral.notes || '' %></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Status
+                        </button>
+                    </form>
+                </div>
+                <% } %>
+            </div>
+
+            <!-- Referrer Statistics -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <h3><i class="fas fa-chart-bar"></i> Referrer Statistics</h3>
+                </div>
+                <div class="detail-grid">
+                    <div class="stat-item" style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 2rem; color: #007bff; margin-bottom: 10px;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 style="margin: 0; color: #007bff;"><%= referrerStats.totalReferrals %></h4>
+                        <p style="margin: 5px 0 0 0; color: #666;">Total Referrals</p>
+                    </div>
+                    <div class="stat-item" style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 2rem; color: #28a745; margin-bottom: 10px;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h4 style="margin: 0; color: #28a745;"><%= referrerStats.successfulReferrals %></h4>
+                        <p style="margin: 5px 0 0 0; color: #666;">Successful</p>
+                    </div>
+                    <div class="stat-item" style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 2rem; color: #ffc107; margin-bottom: 10px;">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <h4 style="margin: 0; color: #ffc107;">₹<%= referrerStats.totalRewards %></h4>
+                        <p style="margin: 5px 0 0 0; color: #666;">Total Rewards</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle status update form submission
+        document.getElementById('statusUpdateForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {
+                status: formData.get('status'),
+                notes: formData.get('notes')
+            };
+
+            try {
+                const response = await fetch(`/admin/referrals/update-status/<%= referral._id %>`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: result.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: result.message,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to update referral status',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

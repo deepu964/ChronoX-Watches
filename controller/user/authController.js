@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../../models/userSchema');
+const Wallet = require('../../models/walletSchema');
+const Referral = require('../../models/referralSchema');
 const generateOtp = require('../../utils/generateOtp');
 const sendOtpEmail = require('../../utils/sendOtpEmail');
 const sendResetPass = require('../../utils/sendResetPass');
@@ -73,8 +75,9 @@ const signUpPage = (req, res) => {
         }
         const message = req.query.message || '';
         const error2 = req.query.error2 || '';
+        const referralCode = req.query.ref || ''; // Get referral code from URL
 
-        res.render('user/signup', { message, error2 });
+        res.render('user/signup', { message, error2, referralCode });
     } catch (error) {
         console.error("Signup page error:", error);
         res.status(500).send("Internal Server Error");
@@ -83,11 +86,27 @@ const signUpPage = (req, res) => {
 
 const signUp = async (req, res) => {
     try {
-        const { fullname, email, mobile, password } = req.body;
+        const { fullname, email, mobile, password, referredBy } = req.body;
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.redirect('/signup?error2=User already exists with this email');
+        }
+
+        // Validate referral code if provided
+        let validReferralCode = null;
+        if (referredBy && referredBy.trim()) {
+            const referrer = await User.findOne({ referralCode: referredBy.trim() });
+            if (!referrer) {
+                return res.redirect('/signup?message=Invalid referral code. Please check and try again.');
+            }
+            if (referrer.isBlocked) {
+                return res.redirect('/signup?message=This referral code is not available.');
+            }
+            if (referrer.email.toLowerCase() === email.toLowerCase()) {
+                return res.redirect('/signup?message=You cannot use your own referral code.');
+            }
+            validReferralCode = referredBy.trim();
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -104,7 +123,7 @@ const signUp = async (req, res) => {
             password: hashedPassword,
             otp,
             otpExpr,
-            referredBy: req.body.referredBy || null
+            referredBy: validReferralCode
         };
 
         return res.redirect('/verify-otp');
@@ -244,17 +263,92 @@ const verifyOtp = async (req, res) => {
 
             const savedUser = await newUser.save();
 
-            // Reward the referrer
+            // Reward the referrer with wallet credit
             if (sessionUser.referredBy) {
                 const referrer = await User.findOne({ referralCode: sessionUser.referredBy });
-                if (referrer) {
-                    const coupon = new Coupon({
-                        user: referrer._id,
-                        code: generateCouponCode(),
-                        discount: 100,
-                        expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-                    });
-                    await coupon.save();
+                if (referrer && referrer._id.toString() !== savedUser._id.toString()) {
+                    try {
+                        // Additional validation checks
+                        if (referrer.isBlocked) {
+                            throw new Error('Referrer account is blocked');
+                        }
+
+                        // Check if this referral already exists
+                        const existingReferral = await Referral.findOne({
+                            referrer: referrer._id,
+                            referred: savedUser._id
+                        });
+
+                        if (existingReferral) {
+                            console.log('Referral record already exists, skipping reward');
+                        } else {
+                            // Find or create wallet for referrer
+                            let referrerWallet = await Wallet.findOne({ user: referrer._id });
+                            if (!referrerWallet) {
+                                referrerWallet = new Wallet({ user: referrer._id, balance: 0, transactions: [] });
+                                await referrerWallet.save();
+                                await User.findByIdAndUpdate(referrer._id, { wallet: referrerWallet._id });
+                            }
+
+                            // Add ₹100 to referrer's wallet
+                            const rewardAmount = 100;
+                            await referrerWallet.addMoney(
+                                rewardAmount,
+                                `Referral reward for referring ${savedUser.fullname}`,
+                                null,
+                                null
+                            );
+
+                            // Add ₹100 to new user's wallet as well
+                            let newUserWallet = await Wallet.findById(savedUser.wallet);
+                            if (!newUserWallet) {
+                                newUserWallet = new Wallet({ user: savedUser._id, balance: 0, transactions: [] });
+                                await newUserWallet.save();
+                                await User.findByIdAndUpdate(savedUser._id, { wallet: newUserWallet._id });
+                            }
+
+                            await newUserWallet.addMoney(
+                                rewardAmount,
+                                `Welcome bonus for joining with referral code ${sessionUser.referredBy}`,
+                                null,
+                                null
+                            );
+
+                            // Create referral record
+                            const referralRecord = new Referral({
+                                referrer: referrer._id,
+                                referred: savedUser._id,
+                                referralCode: sessionUser.referredBy,
+                                rewardAmount: rewardAmount,
+                                status: 'Completed',
+                                rewardGiven: true,
+                                rewardGivenAt: new Date(),
+                                notes: `Referral reward of ₹${rewardAmount} credited to wallet successfully`
+                            });
+                            await referralRecord.save();
+
+                            console.log(`Referral reward of ₹${rewardAmount} credited to ${referrer.fullname}'s wallet`);
+                        }
+                    } catch (error) {
+                        console.error('Error processing referral reward:', error);
+                        // Create failed referral record for tracking
+                        try {
+                            const failedReferralRecord = new Referral({
+                                referrer: referrer._id,
+                                referred: savedUser._id,
+                                referralCode: sessionUser.referredBy,
+                                rewardAmount: 100,
+                                status: 'Failed',
+                                rewardGiven: false,
+                                notes: `Failed to credit referral reward: ${error.message}`
+                            });
+                            await failedReferralRecord.save();
+                        } catch (recordError) {
+                            console.error('Error creating failed referral record:', recordError);
+                        }
+                    }
+                } else {
+                    console.log('Invalid referrer or self-referral attempt detected');
                 }
             }
 
@@ -393,6 +487,56 @@ const newPass = async (req, res) => {
     }
 }
 
+// Validate referral code API endpoint
+const validateReferralCode = async (req, res) => {
+    try {
+        const { referralCode, userEmail } = req.body;
+
+        if (!referralCode || !referralCode.trim()) {
+            return res.json({ valid: false, message: 'Referral code is required' });
+        }
+
+        // Check if referral code format is valid (basic format check)
+        const codePattern = /^[a-zA-Z]{3}\d{4}$/;
+        if (!codePattern.test(referralCode.trim())) {
+            return res.json({ valid: false, message: 'Invalid referral code format' });
+        }
+
+        const referrer = await User.findOne({ referralCode: referralCode.trim() });
+
+        if (!referrer) {
+            return res.json({ valid: false, message: 'Referral code not found' });
+        }
+
+        if (referrer.isBlocked) {
+            return res.json({ valid: false, message: 'This referral code is not available' });
+        }
+
+        // Prevent self-referral if email is provided
+        if (userEmail && referrer.email.toLowerCase() === userEmail.toLowerCase()) {
+            return res.json({ valid: false, message: 'You cannot use your own referral code' });
+        }
+
+        // Check if user has already been referred by someone else
+        if (userEmail) {
+            const existingUser = await User.findOne({ email: userEmail.toLowerCase() });
+            if (existingUser && existingUser.referredBy) {
+                return res.json({ valid: false, message: 'This email has already been referred' });
+            }
+        }
+
+        return res.json({
+            valid: true,
+            message: 'Valid referral code',
+            referrerName: referrer.fullname
+        });
+
+    } catch (error) {
+        console.error('Error validating referral code:', error);
+        return res.json({ valid: false, message: 'Error validating referral code' });
+    }
+};
+
 module.exports = {
     loginPage,
     login,
@@ -405,5 +549,6 @@ module.exports = {
     getforgotPass,
     forgotPass,
     getNewPass,
-    newPass
+    newPass,
+    validateReferralCode
 };

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Management - ChronoX Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/userlist.css?v=1.3">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <h2>ChronoX</h2>
+                    <span>Admin Panel</span>
+                </div>
+            </div>
+            
+            <div class="nav-items">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/orders" class="nav-item">
+                    <i class="fas fa-list"></i>
+                    <span>Order List</span>
+                </a>
+                <a href="/admin/returns" class="nav-item">
+                    <i class="fas fa-undo"></i>
+                    <span>Returns</span>
+                </a>
+                <a href="/admin/userlist" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Customer</span>
+                </a>
+                <a href="/admin/sales-report" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales Report</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Category</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/category-offers" class="nav-item">
+                    <i class="fas fa-percent"></i>
+                    <span>Category Offers</span>
+                </a>
+                <a href="/admin/referrals" class="nav-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Referrals</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="account-btn">Account</button>
+                <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1 class="page-title">REFERRAL MANAGEMENT</h1>
+                    <div class="breadcrumb">
+                        <a href="/admin/dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="/admin/referrals" style="text-decoration: none; color: gray;">Referrals</a>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <form action="/admin/referrals" method="get">
+                <div class="search-filter">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" placeholder="Search by name, email, or referral code..." value="<%= search %>">
+                    </div>
+                    <button type="submit" class="filter-btn">Search</button>
+                </div>
+            </form>
+
+            <!-- Statistics Cards -->
+            <div class="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <div class="stat-icon" style="font-size: 2rem; margin-bottom: 10px;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalReferrals">Loading...</h3>
+                        <p>Total Referrals</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <div class="stat-icon" style="font-size: 2rem; margin-bottom: 10px;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completedReferrals">Loading...</h3>
+                        <p>Successful Referrals</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <div class="stat-icon" style="font-size: 2rem; margin-bottom: 10px;">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalRewards">Loading...</h3>
+                        <p>Total Rewards Given</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <div class="stat-icon" style="font-size: 2rem; margin-bottom: 10px;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingRewards">Loading...</h3>
+                        <p>Pending Rewards</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referrals Table -->
+            <div class="customer-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Referrer</th>
+                            <th>Referred User</th>
+                            <th>Referral Code</th>
+                            <th>Reward Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (referrals && referrals.length > 0) { %>
+                            <% referrals.forEach(referral => { %>
+                                <tr>
+                                    <td>
+                                        <div class="customer-info">
+                                            <span class="customer-name"><%= referral.referrer.fullname %></span>
+                                            <span class="customer-email"><%= referral.referrer.email %></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <span class="customer-name"><%= referral.referred.fullname %></span>
+                                            <span class="customer-email"><%= referral.referred.email %></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="referral-code" style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #1976d2;">
+                                            <%= referral.referralCode %>
+                                        </span>
+                                    </td>
+                                    <td>₹<%= referral.rewardAmount %></td>
+                                    <td>
+                                        <% if (referral.status === 'Completed') { %>
+                                            <span class="status-badge status-active">Completed</span>
+                                        <% } else if (referral.status === 'Pending') { %>
+                                            <span class="status-badge status-pending">Pending</span>
+                                        <% } else { %>
+                                            <span class="status-badge status-blocked">Failed</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= new Date(referral.createdAt).toLocaleDateString('en-IN') %></td>
+                                    <td>
+                                        <a href="/admin/referrals/details/<%= referral._id %>" class="action-btn view-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                                    <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.3;"></i>
+                                    <p>No referrals found</p>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <% if (totalPages > 1) { %>
+                <div class="pagination">
+                    <% if (currentPage > 1) { %>
+                        <a href="/admin/referrals?page=<%= currentPage - 1 %>&search=<%= search %>" class="pagination-btn">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    <% } %>
+                    
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <a href="/admin/referrals?page=<%= i %>&search=<%= search %>" 
+                           class="pagination-btn <%= currentPage === i ? 'active' : '' %>">
+                            <%= i %>
+                        </a>
+                    <% } %>
+                    
+                    <% if (currentPage < totalPages) { %>
+                        <a href="/admin/referrals?page=<%= currentPage + 1 %>&search=<%= search %>" class="pagination-btn">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Load referral statistics
+        async function loadReferralStats() {
+            try {
+                const response = await fetch('/admin/referrals/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalReferrals').textContent = data.stats.totalReferrals;
+                    document.getElementById('completedReferrals').textContent = data.stats.completedReferrals;
+                    document.getElementById('totalRewards').textContent = '₹' + data.stats.totalRewardsGiven;
+                    document.getElementById('pendingRewards').textContent = '₹' + data.stats.pendingRewards;
+                }
+            } catch (error) {
+                console.error('Error loading referral stats:', error);
+            }
+        }
+
+        // Load stats on page load
+        document.addEventListener('DOMContentLoaded', loadReferralStats);
+    </script>
+</body>
+</html>

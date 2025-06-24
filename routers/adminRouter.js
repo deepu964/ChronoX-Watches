@@ -8,6 +8,7 @@ const categoryController = require('../controller/admin/categoryController')
 const couponController = require('../controller/admin/couponController');
 const orderController = require('../controller/admin/orderController');
 const salesController = require('../controller/admin/salesController');
+const referralController = require('../controller/admin/referralController');
 const {authMiddleware,adminAuth} = require('../middlewares/adminAuth')
 
 function preventBackHistory(req, res, next) {
@@ -76,6 +77,13 @@ router.put('/returns/:id/process', authMiddleware, adminAuth, orderController.pr
 router.get('/sales-report', authMiddleware, adminAuth, salesController.getSalesReport);
 router.get('/sales-report/export-pdf', authMiddleware, adminAuth, salesController.exportSalesReportPDF);
 router.get('/sales-report/export-excel', authMiddleware, adminAuth, salesController.exportSalesReportExcel);
+
+// Referral Management Routes
+router.get('/referrals', authMiddleware, adminAuth, referralController.getReferralList);
+router.get('/referrals/stats', authMiddleware, adminAuth, referralController.getReferralStats);
+router.get('/referrals/details/:id', authMiddleware, adminAuth, referralController.getReferralDetails);
+router.put('/referrals/update-status/:id', authMiddleware, adminAuth, referralController.updateReferralStatus);
+router.get('/referrals/analytics', authMiddleware, adminAuth, referralController.getReferralAnalytics);
 
 module.exports = router;
 

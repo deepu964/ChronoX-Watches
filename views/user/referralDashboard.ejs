@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Referrals - ChronoX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/userProfile.css?v=1.4">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-card:nth-child(3) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stat-card:nth-child(4) {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .referral-code-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .referral-code {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .share-btn.copy {
+            background: #28a745;
+            color: white;
+        }
+        
+        .share-btn.whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        
+        .share-btn.telegram {
+            background: #0088cc;
+            color: white;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .recent-referrals {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .referral-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .referral-item:last-child {
+            border-bottom: none;
+        }
+        
+        .referral-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .user-info h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        .user-info p {
+            margin: 5px 0 0 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .referral-reward {
+            text-align: right;
+        }
+        
+        .reward-amount {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 1.1rem;
+        }
+        
+        .reward-date {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        @media (max-width: 768px) {
+            .referral-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .share-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .referral-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .referral-reward {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+<%-include("../partials/user/header") %>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <div class="profile-info">
+                    <div class="profile-avatar"></div>
+                    <div class="profile-name"><%= user.fullname %></div>
+                </div>
+            </div>
+            
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="/userProfile">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-user"></i></div>
+                            <span>My Profile</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/address">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <span>My Address</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/my-orders">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
+                            <span>My Orders</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/my-returns">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-undo"></i></div>
+                            <span>My Returns</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/wish-list">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-heart"></i></div>
+                            <span>My Wishlist</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/wallet">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-wallet"></i></div>
+                            <span>My Wallet</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="/referrals">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-users"></i></div>
+                            <span>Referrals</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/logout">
+                        <div class="menu-left">
+                            <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                            <span>Log out</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <i class="fas fa-home"></i> Profile > <strong>Referrals</strong>
+            </div>
+            
+            <div class="content-header">
+                <h1 class="welcome-title">My Referrals</h1>
+                <p style="color: #666; margin-top: 10px;">Share your referral code and both you and your friend earn ₹100 for each successful referral!</p>
+            </div>
+
+            <!-- Referral Statistics -->
+            <div class="referral-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number"><%= stats.totalReferrals %></div>
+                    <div class="stat-label">Total Referrals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number"><%= stats.successfulReferrals %></div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-number">₹<%= stats.totalRewards %></div>
+                    <div class="stat-label">Total Earned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-number">₹<%= walletBalance %></div>
+                    <div class="stat-label">Wallet Balance</div>
+                </div>
+            </div>
+
+            <!-- Referral Code Section -->
+            <div class="referral-code-section">
+                <h2 style="margin-bottom: 20px; color: #333;">
+                    <i class="fas fa-gift"></i> Your Referral Code
+                </h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Share this code with friends and family. When they sign up using your code, both of you will earn ₹100!
+                </p>
+
+                <div class="referral-code" id="referralCode">
+                    <% if (user && user.referralCode) { %>
+                        <%= user.referralCode %>
+                    <% } else { %>
+                        <span style="color: #999; font-style: italic;">Code not available</span>
+                    <% } %>
+                </div>
+
+                <div class="share-buttons">
+                    <button class="share-btn copy" onclick="copyReferralCode()">
+                        <i class="fas fa-copy"></i> Copy Code
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Referrals -->
+            <div class="recent-referrals">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 style="margin: 0; color: #333;">
+                        <i class="fas fa-history"></i> Recent Referrals
+                    </h2>
+                    <a href="/referrals/history" style="color: #667eea; text-decoration: none; font-weight: 500;">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <% if (recentReferrals && recentReferrals.length > 0) { %>
+                    <% recentReferrals.forEach(referral => { %>
+                        <div class="referral-item">
+                            <div class="referral-user">
+                                <div class="user-avatar">
+                                    <%= referral.referred.fullname.charAt(0).toUpperCase() %>
+                                </div>
+                                <div class="user-info">
+                                    <h4><%= referral.referred.fullname %></h4>
+                                    <p><%= referral.referred.email %></p>
+                                    <p>Joined: <%= new Date(referral.referred.createdAt).toLocaleDateString('en-IN') %></p>
+                                </div>
+                            </div>
+                            <div class="referral-reward">
+                                <div class="reward-amount">₹<%= referral.rewardAmount %></div>
+                                <div class="reward-date">
+                                    <%= new Date(referral.createdAt).toLocaleDateString('en-IN') %>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <% if (referral.status === 'Completed') { %>
+                                        <span class="status-badge status-completed">
+                                            <i class="fas fa-check"></i> Completed
+                                        </span>
+                                    <% } else if (referral.status === 'Pending') { %>
+                                        <span class="status-badge status-pending">
+                                            <i class="fas fa-clock"></i> Pending
+                                        </span>
+                                    <% } else { %>
+                                        <span class="status-badge status-failed">
+                                            <i class="fas fa-times"></i> Failed
+                                        </span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                        <h3 style="margin-bottom: 10px;">No referrals yet</h3>
+                        <p>Start sharing your referral code to earn rewards!</p>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Copy referral code to clipboard
+        function copyReferralCode() {
+            const referralCode = '<%= user && user.referralCode ? user.referralCode : "" %>';
+
+            if (!referralCode) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Referral code not available',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                return;
+            }
+
+            navigator.clipboard.writeText(referralCode).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Copied!',
+                    text: 'Referral code copied to clipboard',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = referralCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Copied!',
+                    text: 'Referral code copied to clipboard',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            });
+        }
+
+
+    </script>
+</body>
+</html>

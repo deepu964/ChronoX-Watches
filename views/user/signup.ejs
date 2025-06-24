@@ -259,7 +259,13 @@
             border: 1px solid #f5c6cb;
         }
         .error-message {
-            color: #dc3545; 
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            text-align: left;
+        }
+        .success-message {
+            color: #28a745;
             font-size: 0.9rem;
             margin-top: 5px;
             text-align: left;
@@ -403,7 +409,9 @@
             </div>
             
             <div class="form-group">
-                <input type="text" id="referral" name="referral" placeholder="Anyone has referred You? Claim the reward" class="form-input" optional>
+                <input type="text" id="referral" name="referredBy" placeholder="Enter referral code (Optional)" class="form-input" value="<%= referralCode %>">
+                <div id="error6" class="error-message"></div>
+                <div id="referral-success" class="success-message" style="display: none;"></div>
             </div>
             
             <div class="login-link">
@@ -434,8 +442,56 @@
         const error3 = document.getElementById('error3');
         const error4 = document.getElementById('error4');
         const error5 = document.getElementById('error5');
+        const error6 = document.getElementById('error6');
+        const referralSuccess = document.getElementById('referral-success');
+        const referralInput = document.getElementById('referral');
 
         const signfirm = document.getElementById('signfirm');
+
+        // Real-time referral code validation
+        let referralValidationTimeout;
+        referralInput.addEventListener('input', function() {
+            clearTimeout(referralValidationTimeout);
+            const referralCode = this.value.trim();
+
+            // Clear previous messages
+            error6.textContent = "";
+            referralSuccess.textContent = "";
+            referralSuccess.style.display = "none";
+
+            if (referralCode === "") {
+                return; // Don't validate empty input
+            }
+
+            referralValidationTimeout = setTimeout(async () => {
+                try {
+                    const userEmail = emailid.value.trim();
+                    const response = await fetch('/validate-referral-code', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            referralCode,
+                            userEmail: userEmail || null
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.valid) {
+                        referralSuccess.textContent = `✓ Valid referral code from ${data.referrerName}`;
+                        referralSuccess.style.display = "block";
+                        error6.textContent = "";
+                    } else {
+                        error6.textContent = data.message;
+                        referralSuccess.style.display = "none";
+                    }
+                } catch (error) {
+                    console.error('Error validating referral code:', error);
+                }
+            }, 500); // Debounce for 500ms
+        });
 
         signfirm.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -445,6 +501,7 @@
             error3.textContent = "";
             error4.textContent = "";
             error5.textContent = "";
+            error6.textContent = "";
 
             let isValid = true;
 

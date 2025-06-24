@@ -11,6 +11,7 @@ const returnController = require('../controller/user/returnController');
 const walletController = require('../controller/user/walletController');
 const pageController = require('../controller/user/pageController');
 const couponController = require('../controller/user/couponController');
+const referralController = require('../controller/user/referralController');
 const passport = require('passport');
 const router = express.Router();
 const checkBlocked = require('../middlewares/checkBlocked');
@@ -34,6 +35,7 @@ router.post('/newPass/:token', authController.newPass);
 
 router.get('/signup', authController.signUpPage);
 router.post('/signup', authController.signUp);
+router.post('/validate-referral-code', authController.validateReferralCode);
 
 router.get('/verify-otp', authController.getVerifyOtp);
 router.post('/verify-otp', authController.verifyOtp);
@@ -100,5 +102,11 @@ router.post('/request-return', isAuth, returnController.requestReturn);
 router.get('/my-returns', isAuth, returnController.getMyReturns);
 router.get('/wallet', isAuth, walletController.getWallet);
 router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
+
+// Referral Routes
+router.get('/referrals', isAuth, referralController.getReferralDashboard);
+router.get('/referrals/history', isAuth, referralController.getReferralHistory);
+router.get('/referrals/generate-link', isAuth, referralController.generateReferralLink);
+router.get('/referrals/earnings', isAuth, referralController.getReferralEarnings);
 
 module.exports = router;

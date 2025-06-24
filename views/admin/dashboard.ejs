@@ -6,7 +6,69 @@
     <title>ChronoX Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/dashboard.css?v=1.2">
+    <style>
+        /* Inline CSS for referral cards to ensure styling works */
+        .stats-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 20px !important;
+            margin-bottom: 30px !important;
+            align-items: stretch !important;
+        }
+
+        /* Referral-specific stat card styling */
+        .stat-card:nth-child(5) .stat-icon {
+            background-color: rgba(139, 69, 19, 0.2) !important;
+            color: #8b4513 !important;
+        }
+
+        .stat-card:nth-child(6) .stat-icon {
+            background-color: rgba(255, 165, 0, 0.2) !important;
+            color: #ff8c00 !important;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 1400px) {
+            .stats-grid {
+                grid-template-columns: repeat(6, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 1399px) and (min-width: 1201px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+
+            .stat-card {
+                padding: 15px !important;
+            }
+
+            .stat-icon {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 18px !important;
+                margin-right: 12px !important;
+            }
+
+            .stat-value {
+                font-size: 1.8rem !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Mobile Menu Toggle -->
@@ -58,6 +120,10 @@
             <a href="/admin/category-offers" class="nav-item">
                 <i class="fas fa-percent"></i>
                 <span>Category Offers</span>
+            </a>
+            <a href="/admin/referrals" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Referrals</span>
             </a>
         </div>
         
@@ -148,6 +214,35 @@
                     </div>
                     <div class="stat-label">Active Products</div>
                     <div class="stat-sublabel">Available for Sale</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalReferrals">
+                        <%= metrics ? metrics.totalReferrals.toLocaleString('en-IN') : '0' %>
+                    </div>
+                    <div class="stat-label">Total Referrals</div>
+                    <div class="stat-growth <%= metrics && metrics.referralGrowth >= 0 ? 'positive' : 'negative' %>">
+                        <i class="fas fa-arrow-<%= metrics && metrics.referralGrowth >= 0 ? 'up' : 'down' %>"></i>
+                        <%= metrics ? Math.abs(metrics.referralGrowth) : '0' %>% this month
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalReferralRewards">
+                        ₹<%= metrics ? metrics.totalReferralRewards.toLocaleString('en-IN') : '0' %>
+                    </div>
+                    <div class="stat-label">Referral Rewards</div>
+                    <div class="stat-sublabel">Total Paid Out</div>
                 </div>
             </div>
         </div>
@@ -482,7 +577,7 @@
                 <div class="performance-item">
                     <div class="rank">#${index + 1}</div>
                     <div class="item-image">
-                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/${product.images[0]?.public_id || 'placeholder' }"
+                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/${product.image?.public_id}.jpg"
                              alt="${product.name}" onerror="this.src='/images/placeholder-product.jpg'">
                     </div>
                     <div class="item-info">
