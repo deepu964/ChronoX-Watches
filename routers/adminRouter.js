@@ -23,6 +23,12 @@ router.get('/logout',adminController.logout);
 
 router.get('/dashboard',preventBackHistory,authMiddleware,adminController.getDashBoard);
 
+// Dashboard API Routes
+router.get('/dashboard/chart-data', authMiddleware, adminAuth, adminController.getChartData);
+router.get('/dashboard/top-products', authMiddleware, adminAuth, adminController.getTopProducts);
+router.get('/dashboard/top-categories', authMiddleware, adminAuth, adminController.getTopCategories);
+router.get('/dashboard/top-brands', authMiddleware, adminAuth, adminController.getTopBrands);
+
 router.get('/userlist',authMiddleware,userListController.userList);
 router.put('/userlist/block/:id',authMiddleware,userListController.blockUser);
 

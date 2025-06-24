@@ -81,6 +81,16 @@
             </div>
         </div>
         
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>Dashboard Overview</h1>
+            <div class="dashboard-actions">
+                <button class="refresh-btn" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -88,180 +98,514 @@
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value">5,423</div>
+                    <div class="stat-value" id="totalCustomers">
+                        <%= metrics ? metrics.totalCustomers.toLocaleString('en-IN') : '0' %>
+                    </div>
                     <div class="stat-label">Total Customers</div>
-                    <div class="stat-label">+10% this month</div>
+                    <div class="stat-growth <%= metrics && metrics.customerGrowth >= 0 ? 'positive' : 'negative' %>">
+                        <i class="fas fa-arrow-<%= metrics && metrics.customerGrowth >= 0 ? 'up' : 'down' %>"></i>
+                        <%= metrics ? Math.abs(metrics.customerGrowth) : '0' %>% this month
+                    </div>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value">1,893</div>
+                    <div class="stat-value" id="totalOrders">
+                        <%= metrics ? metrics.totalOrders.toLocaleString('en-IN') : '0' %>
+                    </div>
                     <div class="stat-label">Total Orders</div>
+                    <div class="stat-sublabel">Completed Orders</div>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-rupee-sign"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value">₹65,805</div>
+                    <div class="stat-value" id="totalSales">
+                        ₹<%= metrics ? metrics.totalSales.toLocaleString('en-IN') : '0' %>
+                    </div>
                     <div class="stat-label">Total Sales</div>
+                    <div class="stat-growth <%= metrics && metrics.salesGrowth >= 0 ? 'positive' : 'negative' %>">
+                        <i class="fas fa-arrow-<%= metrics && metrics.salesGrowth >= 0 ? 'up' : 'down' %>"></i>
+                        <%= metrics ? Math.abs(metrics.salesGrowth) : '0' %>% this month
+                    </div>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
+                    <i class="fas fa-box"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value">189</div>
-                    <div class="stat-label">Total Pending</div>
+                    <div class="stat-value" id="totalProducts">
+                        <%= metrics ? metrics.totalProducts.toLocaleString('en-IN') : '0' %>
+                    </div>
+                    <div class="stat-label">Active Products</div>
+                    <div class="stat-sublabel">Available for Sale</div>
                 </div>
             </div>
         </div>
-        
-        <!-- Sales Details -->
-        <div class="sales-details">
-            <h2 class="section-title">Sales Details</h2>
-            
-            <div class="sales-grid">
-                <div class="sales-card">
-                    <div class="sales-card-header">
-                        <div>
-                            <div class="sales-card-title">Sales Progress</div>
-                            <div class="sales-card-subtitle">This Quarter</div>
-                        </div>
-                        <i class="fas fa-ellipsis-v"></i>
+
+        <!-- Interactive Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="section-title">Sales Analytics</h2>
+                    <div class="chart-filters">
+                        <select id="chartPeriod" onchange="updateChart()">
+                            <option value="yearly">Yearly</option>
+                            <option value="monthly" selected>Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                        <input type="number" id="yearFilter" placeholder="Year" min="2020" max="2030" onchange="updateChart()">
+                        <input type="number" id="monthFilter" placeholder="Month" min="1" max="12" onchange="updateChart()" style="display:none;">
+                        <input type="date" id="dateFilter" onchange="updateChart()" style="display:none;">
                     </div>
-                    
-                    <div class="sales-card-body">
-                        <div class="progress-container">
-                            <div class="progress-circle">
-                                <canvas id="progressChart"></canvas>
-                                <div class="progress-value">75.55%</div>
-                            </div>
-                            <div class="progress-label">+10%</div>
-                        </div>
-                        
-                        <div class="success-message">
-                            You succeed earn ₹28963 today, its higher than yesterday
-                        </div>
-                        
-                        <div class="sales-metrics">
-                            <div class="metric">
-                                <div class="metric-label">Target</div>
-                                <div class="metric-value">₹30k <i class="fas fa-arrow-down down"></i></div>
-                            </div>
-                            
-                            <div class="metric">
-                                <div class="metric-label">Revenue</div>
-                                <div class="metric-value">₹16k <i class="fas fa-arrow-up up"></i></div>
-                            </div>
-                            
-                            <div class="metric">
-                                <div class="metric-label">Today</div>
-                                <div class="metric-value">₹28k <i class="fas fa-arrow-up up"></i></div>
-                            </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="chart-loading" id="chartLoading" style="display:none;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading chart data...
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Performance Lists -->
+        <div class="performance-section">
+            <div class="performance-header">
+                <h2 class="section-title">Top Performance</h2>
+                <div class="date-range-filter">
+                    <input type="date" id="fromDate" placeholder="From Date">
+                    <input type="date" id="toDate" placeholder="To Date">
+                    <button onclick="updateTopLists()" class="filter-btn">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </div>
+
+            <div class="performance-column">
+                <!-- Top Products -->
+                <div class="performance-card">
+                    <div class="performance-card-header">
+                        <h3><i class="fas fa-trophy"></i> Top 10 Best Selling Products</h3>
+                    </div>
+                    <div class="performance-card-body" id="topProductsList">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading products...
                         </div>
                     </div>
                 </div>
-                
-                <div class="sales-card">
-                    <div class="sales-card-header">
-                        <div class="sales-card-title">Activity</div>
-                        <div class="dropdown">
-                            <span>Month</span>
-                            <i class="fas fa-chevron-down"></i>
+
+                <!-- Top Categories -->
+                <div class="performance-card">
+                    <div class="performance-card-header">
+                        <h3><i class="fas fa-tags"></i> Top 10 Best Selling Categories</h3>
+                    </div>
+                    <div class="performance-card-body" id="topCategoriesList">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading categories...
                         </div>
                     </div>
-                    
-                    <div class="sales-card-body">
-                        <canvas id="activityChart" class="activity-chart"></canvas>
+                </div>
+
+                <!-- Top Brands -->
+                <div class="performance-card">
+                    <div class="performance-card-header">
+                        <h3><i class="fas fa-award"></i> Top 10 Best Selling Brands</h3>
+                    </div>
+                    <div class="performance-card-body" id="topBrandsList">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading brands...
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        let salesChart;
+
         // Menu Toggle for Mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
         });
-        
-        // Progress Chart
-        const progressCtx = document.getElementById('progressChart').getContext('2d');
-        const progressChart = new Chart(progressCtx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [75.55, 24.45],
-                    backgroundColor: [
-                        '#4f46e5',
-                        '#e5e7eb'
-                    ],
-                    borderWidth: 0,
-                    cutout: '80%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        enabled: false
-                    }
-                }
-            }
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSalesChart();
+            loadTopLists();
+
+            // Set current year as default
+            const currentYear = new Date().getFullYear();
+            document.getElementById('yearFilter').value = currentYear;
         });
-        
-        // Activity Chart
-        const activityCtx = document.getElementById('activityChart').getContext('2d');
-        const activityChart = new Chart(activityCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Activity',
-                    data: [100, 80, 120, 250, 180, 300, 200, 100, 280, 320, 350, 400],
-                    backgroundColor: '#4f46e5',
-                    borderRadius: 5,
-                    barThickness: 20
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            display: true,
-                            color: '#f3f4f6'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
+
+        // Initialize Sales Chart
+        function initializeSalesChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Sales (₹)',
+                        data: [],
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderColor: '#4f46e5',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4f46e5',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: false
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#4f46e5',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Sales: ₹' + context.parsed.y.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                color: '#f3f4f6'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
+            });
+
+            // Load initial chart data
+            updateChart();
+        }
+
+        // Update Chart based on filters
+        async function updateChart() {
+            const period = document.getElementById('chartPeriod').value;
+            const year = document.getElementById('yearFilter').value;
+            const month = document.getElementById('monthFilter').value;
+            const date = document.getElementById('dateFilter').value;
+
+            // Show/hide relevant filters
+            toggleFilters(period);
+
+            // Show loading
+            document.getElementById('chartLoading').style.display = 'block';
+
+            try {
+                const params = new URLSearchParams({ period });
+                if (year) params.append('year', year);
+                if (month) params.append('month', month);
+                if (date) params.append('date', date);
+
+                const response = await fetch(`/admin/dashboard/chart-data?${params}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    salesChart.data = result.data;
+                    salesChart.update('active');
+                } else {
+                    throw new Error(result.message || 'Failed to load chart data');
+                }
+            } catch (error) {
+                console.error('Error updating chart:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load chart data. Please try again.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            } finally {
+                document.getElementById('chartLoading').style.display = 'none';
             }
-        });
-        
+        }
+
+        // Toggle filter visibility based on period
+        function toggleFilters(period) {
+            const monthFilter = document.getElementById('monthFilter');
+            const dateFilter = document.getElementById('dateFilter');
+
+            monthFilter.style.display = 'none';
+            dateFilter.style.display = 'none';
+
+            if (period === 'monthly') {
+                monthFilter.style.display = 'inline-block';
+            } else if (period === 'daily') {
+                dateFilter.style.display = 'inline-block';
+            }
+        }
+
+        // Load Top Performance Lists
+        async function loadTopLists() {
+            await Promise.all([
+                loadTopProducts(),
+                loadTopCategories(),
+                loadTopBrands()
+            ]);
+        }
+
+        // Load Top Products
+        async function loadTopProducts() {
+            try {
+                const fromDate = document.getElementById('fromDate').value;
+                const toDate = document.getElementById('toDate').value;
+
+                const params = new URLSearchParams();
+                if (fromDate) params.append('fromDate', fromDate);
+                if (toDate) params.append('toDate', toDate);
+
+                const response = await fetch(`/admin/dashboard/top-products?${params}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTopProducts(result.data);
+                } else {
+                    throw new Error(result.message || 'Failed to load top products');
+                }
+            } catch (error) {
+                console.error('Error loading top products:', error);
+                document.getElementById('topProductsList').innerHTML =
+                    '<div class="error-state"><i class="fas fa-exclamation-triangle"></i> Failed to load products</div>';
+            }
+        }
+
+        // Load Top Categories
+        async function loadTopCategories() {
+            try {
+                const fromDate = document.getElementById('fromDate').value;
+                const toDate = document.getElementById('toDate').value;
+
+                const params = new URLSearchParams();
+                if (fromDate) params.append('fromDate', fromDate);
+                if (toDate) params.append('toDate', toDate);
+
+                const response = await fetch(`/admin/dashboard/top-categories?${params}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTopCategories(result.data);
+                } else {
+                    throw new Error(result.message || 'Failed to load top categories');
+                }
+            } catch (error) {
+                console.error('Error loading top categories:', error);
+                document.getElementById('topCategoriesList').innerHTML =
+                    '<div class="error-state"><i class="fas fa-exclamation-triangle"></i> Failed to load categories</div>';
+            }
+        }
+
+        // Load Top Brands
+        async function loadTopBrands() {
+            try {
+                const fromDate = document.getElementById('fromDate').value;
+                const toDate = document.getElementById('toDate').value;
+
+                const params = new URLSearchParams();
+                if (fromDate) params.append('fromDate', fromDate);
+                if (toDate) params.append('toDate', toDate);
+
+                const response = await fetch(`/admin/dashboard/top-brands?${params}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTopBrands(result.data);
+                } else {
+                    throw new Error(result.message || 'Failed to load top brands');
+                }
+            } catch (error) {
+                console.error('Error loading top brands:', error);
+                document.getElementById('topBrandsList').innerHTML =
+                    '<div class="error-state"><i class="fas fa-exclamation-triangle"></i> Failed to load brands</div>';
+            }
+        }
+
+        // Render Top Products
+        function renderTopProducts(products) {
+            const container = document.getElementById('topProductsList');
+
+            if (products.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i> No products found</div>';
+                return;
+            }
+
+            const html = products.map((product, index) => `
+                <div class="performance-item">
+                    <div class="rank">#${index + 1}</div>
+                    <div class="item-image">
+                        <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/${product.images[0]?.public_id || 'placeholder' }"
+                             alt="${product.name}" onerror="this.src='/images/placeholder-product.jpg'">
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">${product.name}</div>
+                        <div class="item-stats">
+                            <span class="quantity">Sold: ${product.totalQuantity}</span>
+                            <span class="revenue">Revenue: ₹${product.totalRevenue.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <a href="/admin/product/edit/${product._id}" class="view-btn">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // Render Top Categories
+        function renderTopCategories(categories) {
+            const container = document.getElementById('topCategoriesList');
+
+            if (categories.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i> No categories found</div>';
+                return;
+            }
+
+            const html = categories.map((category, index) => `
+                <div class="performance-item">
+                    <div class="rank">#${index + 1}</div>
+                    <div class="item-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">${category.name}</div>
+                        <div class="item-stats">
+                            <span class="quantity">Products Sold: ${category.totalQuantity}</span>
+                            <span class="revenue">Revenue: ₹${category.totalRevenue.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <a href="/admin/category" class="view-btn">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // Render Top Brands
+        function renderTopBrands(brands) {
+            const container = document.getElementById('topBrandsList');
+
+            if (brands.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i> No brands found</div>';
+                return;
+            }
+
+            const html = brands.map((brand, index) => `
+                <div class="performance-item">
+                    <div class="rank">#${index + 1}</div>
+                    <div class="item-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">${brand.name}</div>
+                        <div class="item-stats">
+                            <span class="quantity">Products Sold: ${brand.totalQuantity}</span>
+                            <span class="revenue">Revenue: ₹${brand.totalRevenue.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // Update Top Lists with date filter
+        function updateTopLists() {
+            loadTopLists();
+        }
+
+        // Refresh Dashboard
+        async function refreshDashboard() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            const originalText = refreshBtn.innerHTML;
+
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            refreshBtn.disabled = true;
+
+            try {
+                // Refresh all data
+                await Promise.all([
+                    updateChart(),
+                    loadTopLists()
+                ]);
+
+                // Reload page to refresh metrics
+                window.location.reload();
+
+            } catch (error) {
+                console.error('Error refreshing dashboard:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to refresh dashboard. Please try again.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            } finally {
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.disabled = false;
+            }
+        }
+
+
+
         // Hover effects for nav items
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
