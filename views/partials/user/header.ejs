@@ -4,46 +4,368 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chronox | Luxury Watches</title>
-    <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            background-color: #000;
+            color: #fff;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: fit-content;
+        }
+
+        a {
+            text-decoration: none;
+            list-style: none;
+        }
+
+        .cart {
+            position: relative;
+        }
+
+        .cart-badge {
+            background-color: rgb(253, 253, 254);
+            color: rgb(8, 8, 8);
+            padding: 2px 5px;
+            border-radius: 50%;
+            font-size: 8px;
+            font-weight: bold;
+            position: absolute;
+            left: 20px;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            flex-wrap: wrap;
+        }
+
+        .logo h2 {
+            font-size: clamp(18px, 3vw, 24px);
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-nav ul li {
+            margin: 0 15px;
+            border: none;
+        }
+
+        .main-nav ul li a {
+            color: #fff;
+            font-size: clamp(12px, 1.5vw, 14px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .main-nav ul li a:hover {
+            color: #ddd;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+        }
+
+        .icon-link {
+            color: #fff;
+            margin-left: clamp(15px, 2vw, 20px);
+            font-size: clamp(16px, 2vw, 18px);
+            transition: color 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: #ddd;
+        }
+
+        .auth-button {
+            margin-left: clamp(20px, 4vw, 50px);
+        }
+
+        .auth-button button {
+            padding: clamp(6px, 1vw, 7.5px) clamp(12px, 2vw, 15px);
+            background-color: #3d3c3c;
+            border: 1px solid transparent;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: clamp(12px, 1.5vw, 14px);
+            transition: all 0.3s ease;
+        }
+
+        .auth-button button:hover {
+            background-color: #555;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .header-container {
+                padding: 0 20px;
+            }
+            
+            .main-nav ul li {
+                margin: 0 10px;
+            }
+            
+            .auth-button {
+                margin-left: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 15px;
+                position: relative;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                order: 3;
+            }
+            
+            .logo {
+                order: 1;
+                flex: 1;
+            }
+            
+            .header-icons {
+                order: 2;
+                margin-right: 15px;
+            }
+            
+            .main-nav {
+                order: 4;
+                width: 100%;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background-color: #000;
+                border-top: 1px solid #333;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .main-nav.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .main-nav ul {
+                flex-direction: column;
+                padding: 20px 0;
+            }
+            
+            .main-nav ul li {
+                margin: 10px 0;
+                text-align: center;
+            }
+            
+            .main-nav ul li a {
+                display: block;
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+            
+            .auth-button {
+                order: 5;
+                width: 100%;
+                text-align: center;
+                margin: 15px 0 0 0;
+                padding: 0 15px;
+            }
+            
+            .auth-button button {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .icon-link {
+                margin-left: 15px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 12px 0;
+            }
+            
+            .header-container {
+                padding: 0 10px;
+            }
+            
+            .logo h2 {
+                font-size: 20px;
+            }
+            
+            .icon-link {
+                margin-left: 12px;
+                font-size: 16px;
+            }
+            
+            .main-nav ul li a {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+            
+            .auth-button button {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header-container {
+                padding: 0 8px;
+            }
+            
+            .logo h2 {
+                font-size: 18px;
+            }
+            
+            .icon-link {
+                margin-left: 10px;
+                font-size: 15px;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            header {
+                padding: 8px 0;
+            }
+            
+            .main-nav ul {
+                padding: 10px 0;
+            }
+            
+            .main-nav ul li {
+                margin: 5px 0;
+            }
+            
+            .main-nav ul li a {
+                padding: 8px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="header-container">
             <div class="logo">
                 <h2>ChronoX</h2>
-        
             </div>
-            <nav class="main-nav">
-                <ul style="list-style: none;">
+            
+            <div class="header-icons">
+                <a href="/wish-list" class="icon-link"><i class="fas fa-heart"></i></a>
+                <a href="/userProfile" class="icon-link"><i class="fas fa-user"></i></a>
+                <a href="/cart" class="icon-link cart"><i class="fas fa-shopping-cart"></i>
+                    <!-- <span class="cart-badge">1</span> -->
+                </a>
+            </div>
+            
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav class="main-nav" id="mobileNav">
+                <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="/shop">Shop</a></li>
                     <li><a href="/login">Collections</a></li>
-                    
                 </ul>
             </nav>
-            <div class="header-icons">
-                <a href="/wish-list" style="color:white;"><i class="fas fa-heart"></i></a>
-                <a href="/userProfile" class="icon-link"><i class="fas fa-user"></i></a>
-                <a href="/cart" class="icon-link cart"  ><i class="fas fa-shopping-cart"></i>
-                    <!-- <span class="cart-badge">1</span> -->
-                </a>
-                </div>
+            
             <% if (!user) { %>
-                
-                <div style="margin-left: 50px;">
-                   <a href="/login"><button style="padding: 7.5px;background-color: #3d3c3c; border: 1px solid transparent;color: white; border-radius: 5px;cursor: pointer;">Login</button></a>
+                <div class="auth-button">
+                   <a href="/login"><button>Login</button></a>
                 </div>
             <% } %>
             <% if (user) { %>
-                <div style="margin-left: 50px;">
-                   <a href="/logout"><button style="padding: 7.5px;background-color: #3d3c3c; border: 1px solid transparent;color: white; border-radius: 5px;cursor: pointer;">Logout</button></a>
+                <div class="auth-button">
+                   <a href="/logout"><button>Logout</button></a>
                 </div>
             <% } %>
-            </div>
-            
-            
         </div>
     </header>
+
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle i');
+            
+            nav.classList.toggle('active');
+            
+            if (nav.classList.contains('active')) {
+                toggle.classList.remove('fa-bars');
+                toggle.classList.add('fa-times');
+            } else {
+                toggle.classList.remove('fa-times');
+                toggle.classList.add('fa-bars');
+            }
+        }
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.main-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                const nav = document.getElementById('mobileNav');
+                const toggle = document.querySelector('.mobile-menu-toggle i');
+                
+                nav.classList.remove('active');
+                toggle.classList.remove('fa-times');
+                toggle.classList.add('fa-bars');
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+                const toggleIcon = document.querySelector('.mobile-menu-toggle i');
+                toggleIcon.classList.remove('fa-times');
+                toggleIcon.classList.add('fa-bars');
+            }
+        });
+    </script>
+</body>
+</html>

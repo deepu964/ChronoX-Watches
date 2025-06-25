@@ -5,7 +5,755 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronoX - Customer List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/userlist.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #3b82f6;
+            --primary-light: #dbeafe;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #e5e7eb;
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 80px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --red: #ef4444;
+            --green: #22c55e;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: clamp(15px, 3vw, 20px);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            font-size: clamp(20px, 3vw, 24px);
+            font-weight: 600;
+            color: var(--text-color);
+            text-align: center;
+        }
+        
+        .nav-items {
+            flex: 1;
+            padding: clamp(15px, 3vw, 20px) 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            margin-bottom: 5px;
+            cursor: pointer;
+            font-size: clamp(13px, 1.5vw, 14px);
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .nav-item i {
+            margin-right: clamp(8px, 2vw, 12px);
+            width: clamp(18px, 2.5vw, 20px);
+            text-align: center;
+            font-size: clamp(16px, 2vw, 18px);
+        }
+        
+        .sidebar-footer {
+            padding: clamp(15px, 3vw, 20px);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .account-btn, .logout-btn {
+            display: block;
+            width: 100%;
+            padding: clamp(8px, 1.5vw, 10px);
+            margin-bottom: 10px;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+        
+        .account-btn {
+            background-color: white;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .account-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .logout-btn {
+            background-color: #111827;
+            color: white;
+            border: none;
+        }
+        
+        .logout-btn:hover {
+            background-color: #000;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: clamp(15px, 3vw, 20px);
+            transition: var(--transition);
+            min-width: 0;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .page-title {
+            font-size: clamp(18px, 3vw, 20px);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .breadcrumb {
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb i {
+            margin: 0 8px;
+            font-size: 10px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 15px);
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        
+        .user-profile:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .user-avatar {
+            width: clamp(30px, 4vw, 36px);
+            height: clamp(30px, 4vw, 36px);
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: clamp(8px, 1.5vw, 10px);
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            font-size: clamp(13px, 1.5vw, 14px);
+        }
+        
+        .user-role {
+            font-size: clamp(11px, 1.2vw, 12px);
+            color: var(--text-secondary);
+        }
+        
+        /* Search and Filter */
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: clamp(15px, 3vw, 20px);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+            min-width: 250px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 15px) clamp(8px, 1.5vw, 10px) clamp(35px, 5vw, 40px);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: clamp(13px, 1.5vw, 14px);
+            transition: var(--transition);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: clamp(12px, 2vw, 15px);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+        
+        /* Customer Table */
+        .customer-table {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: clamp(15px, 3vw, 20px);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .customer-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .customer-table th,
+        .customer-table td {
+            padding: clamp(10px, 2vw, 15px);
+            font-size: clamp(12px, 1.5vw, 14px);
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .customer-table th {
+            background-color: #111827;
+            color: white;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .customer-table td {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .customer-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .customer-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .customer-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .customer-avatar {
+            width: clamp(30px, 4vw, 36px);
+            height: clamp(30px, 4vw, 36px);
+            border-radius: 4px;
+            background-color: #f3f4f6;
+            display: inline-block;
+            margin-right: clamp(8px, 1.5vw, 10px);
+            vertical-align: middle;
+            overflow: hidden;
+            flex-shrink: 0;
+        } 
+        
+        .customer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .customer-name {
+            display: inline-block;
+            vertical-align: middle;
+            font-weight: 500;
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: clamp(4px, 0.8vw, 5px) clamp(8px, 1.5vw, 10px);
+            border-radius: 4px;
+            font-size: clamp(10px, 1.2vw, 12px);
+            font-weight: 500;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        
+        .status-active {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--green);
+        }
+        
+        .status-blocked {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--red);
+        }
+        
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: clamp(40px, 6vw, 50px);
+            height: clamp(20px, 3vw, 24px);
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: clamp(14px, 2.5vw, 16px);
+            width: clamp(14px, 2.5vw, 16px);
+            left: clamp(3px, 0.5vw, 4px);
+            bottom: clamp(3px, 0.5vw, 4px);
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--red);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(clamp(18px, 3vw, 26px));
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .page-info {
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: var(--text-secondary);
+        }
+        
+        .page-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        
+        .page-btn {
+            width: clamp(28px, 4vw, 32px);
+            height: clamp(28px, 4vw, 32px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: clamp(12px, 1.5vw, 14px);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .page-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .page-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Menu Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: clamp(15px, 3vw, 20px);
+            left: clamp(15px, 3vw, 20px);
+            z-index: 20;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            width: clamp(35px, 5vw, 40px);
+            height: clamp(35px, 5vw, 40px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            font-size: clamp(14px, 2vw, 16px);
+        }
+        
+        /* Responsive Design */
+        
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .main-content {
+                padding: 30px;
+            }
+            
+            .customer-table th,
+            .customer-table td {
+                padding: 20px;
+            }
+        }
+        
+        /* Desktop */
+        @media (max-width: 1200px) {
+            .customer-table {
+                overflow-x: auto;
+            }
+            
+            .search-box {
+                min-width: 200px;
+            }
+        }
+        
+        /* Tablet Landscape */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+            
+            .sidebar .logo {
+                font-size: 18px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+                font-size: 18px;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
+            }
+            
+            .account-btn, .logout-btn {
+                padding: 8px 5px;
+                font-size: 11px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .user-profile {
+                align-self: flex-end;
+            }
+        }
+        
+        /* Tablet Portrait */
+        @media (max-width: 768px) {
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                max-width: none;
+                min-width: auto;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            
+            .page-controls {
+                justify-content: center;
+                margin-top: 10px;
+            }
+            
+            .customer-table table {
+                min-width: 500px;
+            }
+            
+            .customer-table th:nth-child(3),
+            .customer-table td:nth-child(3) {
+                display: none;
+            }
+        }
+        
+        /* Mobile Landscape */
+        @media (max-width: 640px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                width: var(--sidebar-width);
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding-top: 60px;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .user-avatar {
+                margin-right: 0;
+            }
+            
+            .customer-table table {
+                min-width: 450px;
+            }
+        }
+        
+        /* Mobile Portrait */
+        @media (max-width: 480px) {
+            .header {
+                margin-bottom: 20px;
+            }
+            
+            .page-title {
+                font-size: 16px;
+            }
+            
+            .breadcrumb {
+                font-size: 11px;
+            }
+            
+            .customer-table th:nth-child(4),
+            .customer-table td:nth-child(4) {
+                display: none;
+            }
+            
+            .customer-table table {
+                min-width: 350px;
+            }
+            
+            .page-controls {
+                gap: 1px;
+            }
+            
+            .page-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            
+            .search-box input {
+                padding: 8px 12px 8px 35px;
+            }
+        }
+        
+        /* Extra Small Mobile */
+        @media (max-width: 360px) {
+            .main-content {
+                padding: 10px;
+            }
+            
+            .customer-table th,
+            .customer-table td {
+                padding: 8px;
+            }
+            
+            .customer-table table {
+                min-width: 300px;
+            }
+            
+            .page-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+            
+            .switch {
+                width: 35px;
+                height: 18px;
+            }
+            
+            .slider:before {
+                height: 12px;
+                width: 12px;
+            }
+            
+            input:checked + .slider:before {
+                transform: translateX(17px);
+            }
+        }
+        
+        /* Landscape orientation for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .main-content {
+                padding-top: 50px;
+            }
+            
+            .menu-toggle {
+                top: 10px;
+                left: 10px;
+                width: 35px;
+                height: 35px;
+            }
+            
+            .sidebar-header {
+                padding: 10px;
+            }
+            
+            .nav-items {
+                padding: 10px 0;
+            }
+            
+            .nav-item {
+                padding: 8px 15px;
+            }
+            
+            .sidebar-footer {
+                padding: 10px;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .sidebar,
+            .menu-toggle,
+            .user-profile {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+            }
+            
+            .customer-table {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+            
+            .page-controls {
+                display: none;
+            }
+        }
+        
+        /* Hover Effects */
+        .nav-item i, .page-btn, .customer-avatar {
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-item:hover i {
+            transform: scale(1.1);
+        }
+        
+        .customer-table tr:hover .customer-avatar {
+            transform: scale(1.05);
+        }
+        
+        .page-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        /* Focus styles for accessibility */
+        .nav-item:focus,
+        .page-btn:focus,
+        .search-box input:focus,
+        .switch:focus-within {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+    </style>
 </head>
 <body>
     <!-- Mobile Menu Toggle -->
@@ -76,10 +824,10 @@
             <div>
                 <h1 class="page-title">CUSTOMER LIST</h1>
                 <div class="breadcrumb">
-                <a href="/admin/dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="/admin/userlist" style="text-decoration: none; color: gray;" >UserList</a>
-            </div>
+                    <a href="/admin/dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="/admin/userlist" style="text-decoration: none; color: gray;">UserList</a>
+                </div>
             </div>
             <div class="user-profile">
                 <div class="user-avatar">
@@ -91,6 +839,7 @@
                 </div>
             </div>
         </div>
+        
         <form action="userlist" method="get">
             <div class="search-filter">
                 <div class="search-box">
@@ -113,78 +862,73 @@
                     </tr>
                 </thead>
                 <tbody>
-                      <% user.forEach(element => { %>
+                    <% user.forEach(element => { %>
                         <tr>
                             <td>
-                            <div class="customer-avatar">
-                                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John">
-                            </div>
-                            <span class="customer-name"><%= element.fullname %></span>
-                        </td>
-                        <td><%= element.email %></td>
-                        <td><%= element.mobile %></td>
-                        <% if (element.isBlocked) { %>
-                         <td><span class="status-badge status-blocked">Blocked</span></td>
-                         <% } else { %>
-                          <td><span class="status-badge status-active">Active</span></td>
-                        <% } %>
-                        
-
-                        <td>
+                                <div class="customer-avatar">
+                                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John">
+                                </div>
+                                <span class="customer-name"><%= element.fullname %></span>
+                            </td>
+                            <td><%= element.email %></td>
+                            <td><%= element.mobile %></td>
+                            <% if (element.isBlocked) { %>
+                                <td><span class="status-badge status-blocked">Blocked</span></td>
+                            <% } else { %>
+                                <td><span class="status-badge status-active">Active</span></td>
+                            <% } %>
+                            <td>
                                 <label class="switch">
                                     <% if (element.isBlocked) { %>
-                                     <input type="checkbox" checked onclick="blockUnblock('<%=element._id %>')">
-                                     <% } else { %>
-                                      <input type="checkbox" onclick="blockUnblock('<%=element._id %>')">
+                                        <input type="checkbox" checked onclick="blockUnblock('<%=element._id %>')">
+                                    <% } else { %>
+                                        <input type="checkbox" onclick="blockUnblock('<%=element._id %>')">
                                     <% } %>
                                     <span class="slider"></span>
-                                
                                 </label>
-                        </td>
-                        
+                            </td>
                         </tr>
-                        <% }) %>
-                    
+                    <% }) %>
                 </tbody>
             </table>
         </div>
         
         <div class="pagination">
-        <div class="page-info">
-            Showing <%= (currentPage - 1) * limit + 1 %> -
-            <%= Math.min(currentPage * limit, totalUser) %> from <%= totalUser %>
-        </div>
+            <div class="page-info">
+                Showing <%= (currentPage - 1) * limit + 1 %> -
+                <%= Math.min(currentPage * limit, totalUser) %> from <%= totalUser %>
+            </div>
 
-        <div class="page-controls">
-            <!-- Previous Button -->
-            <% if (currentPage > 1) { %>
-            <a href="userlist?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-            <% } else { %>
-            <button class="page-btn" disabled>
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <% } %>
+            <div class="page-controls">
+                <!-- Previous Button -->
+                <% if (currentPage > 1) { %>
+                    <a href="userlist?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                <% } else { %>
+                    <button class="page-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                <% } %>
 
-            <!-- Page Numbers -->
-            <% for (let i = 1; i <= totalPage; i++) { %>
-            <a href="userlist?page=<%= i %>&search=<%= search %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
-                <%= i %>
-            </a>
-            <% } %>
+                
+                <% for (let i = 1; i <= totalPage; i++) { %>
+                    <a href="userlist?page=<%= i %>&search=<%= search %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
 
-            <!-- Next Button -->
-            <% if (currentPage < totalPage) { %>
-            <a href="userlist?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <% } else { %>
-            <button class="page-btn" disabled>
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <% } %>
-        </div>
+                
+                <% if (currentPage < totalPage) { %>
+                    <a href="userlist?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                <% } else { %>
+                    <button class="page-btn" disabled>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                <% } %>
+            </div>
         </div>
     </div>
     
@@ -194,39 +938,33 @@
             document.getElementById('sidebar').classList.toggle('active');
         });
         
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            
+            if (window.innerWidth <= 640 && 
+                !sidebar.contains(e.target) && 
+                !menuToggle.contains(e.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
         // Toggle switches
         const switches = document.querySelectorAll('.switch input');
         switches.forEach(switchEl => {
             switchEl.addEventListener('change', function() {
                 const row = this.closest('tr');
                 const statusBadge = row.querySelector('.status-badge');
-                const actionBtn = row.querySelector('.action-btn');
                 
                 if (this.checked) {
                     statusBadge.className = 'status-badge status-blocked';
                     statusBadge.textContent = 'Blocked';
-                    actionBtn.className = 'action-btn view';
-                    actionBtn.innerHTML = '<i class="fas fa-eye"></i>';
                 } else {
                     statusBadge.className = 'status-badge status-active';
                     statusBadge.textContent = 'Active';
-                    actionBtn.className = 'action-btn block';
-                    actionBtn.textContent = 'Block';
                 }
-            });
-        });
-        
-        // Block buttons
-        const blockButtons = document.querySelectorAll('.action-btn.block');
-        blockButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const switchInput = row.querySelector('.switch input');
-                switchInput.checked = true;
-                
-                // Trigger the change event
-                const event = new Event('change');
-                switchInput.dispatchEvent(event);
             });
         });
         
@@ -249,6 +987,7 @@
                 this.classList.add('active');
             });
         });
+        
         function blockUnblock(id){
             fetch(`/admin/userlist/block/${id}`,{
                 method:'put',
@@ -262,8 +1001,14 @@
                 }
             })
         }
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 640 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
-
-

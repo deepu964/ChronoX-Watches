@@ -2,18 +2,18 @@ const User = require('../../models/userSchema');
 const Referral = require('../../models/referralSchema');
 const Wallet = require('../../models/walletSchema');
 
-// Get user referral dashboard
+
 const getReferralDashboard = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
         
-        // Get user details with referral code
+       
         const user = await User.findById(userId);
         if (!user) {
             return res.redirect('/login');
         }
 
-        // Get user's referral statistics
+        
         const referralStats = await Referral.aggregate([
             { $match: { referrer: userId } },
             {
@@ -33,13 +33,13 @@ const getReferralDashboard = async (req, res, next) => {
             }
         ]);
 
-        // Get recent referrals
+       
         const recentReferrals = await Referral.find({ referrer: userId })
             .populate('referred', 'fullname email createdAt')
             .sort({ createdAt: -1 })
             .limit(10);
 
-        // Get user's wallet balance
+        
         const wallet = await Wallet.findOne({ user: userId });
 
         const stats = referralStats[0] || {
@@ -62,7 +62,7 @@ const getReferralDashboard = async (req, res, next) => {
     }
 };
 
-// Get referral history with pagination
+
 const getReferralHistory = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
@@ -98,7 +98,7 @@ const getReferralHistory = async (req, res, next) => {
     }
 };
 
-// Generate shareable referral link
+
 const generateReferralLink = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
@@ -129,7 +129,7 @@ const generateReferralLink = async (req, res, next) => {
     }
 };
 
-// Get referral rewards/earnings
+
 const getReferralEarnings = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
@@ -139,7 +139,7 @@ const getReferralEarnings = async (req, res, next) => {
             return res.redirect('/login');
         }
 
-        // Get detailed earnings breakdown
+        
         const earningsData = await Referral.aggregate([
             { $match: { referrer: userId, rewardGiven: true } },
             {
@@ -156,7 +156,7 @@ const getReferralEarnings = async (req, res, next) => {
             { $limit: 12 }
         ]);
 
-        // Get recent earnings transactions
+       
         const recentEarnings = await Referral.find({ 
             referrer: userId, 
             rewardGiven: true 
@@ -165,7 +165,7 @@ const getReferralEarnings = async (req, res, next) => {
         .sort({ rewardGivenAt: -1 })
         .limit(10);
 
-        // Get wallet transactions related to referrals
+        
         const wallet = await Wallet.findOne({ user: userId });
         let referralTransactions = [];
         
