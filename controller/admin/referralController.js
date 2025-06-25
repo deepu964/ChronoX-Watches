@@ -2,7 +2,7 @@ const User = require('../../models/userSchema');
 const Referral = require('../../models/referralSchema');
 const Wallet = require('../../models/walletSchema');
 
-// Get referral list with pagination and search
+
 const getReferralList = async (req, res, next) => {
     try {
         const search = req.query.search || "";
@@ -10,10 +10,10 @@ const getReferralList = async (req, res, next) => {
         const limit = 10;
         const skip = (page - 1) * limit;
 
-        // Build search query
+       
         let searchQuery = {};
         if (search) {
-            // Search in referrer and referred user details
+            
             const users = await User.find({
                 $or: [
                     { fullname: { $regex: search, $options: "i" } },
@@ -57,13 +57,13 @@ const getReferralList = async (req, res, next) => {
     }
 };
 
-// Get referral statistics for dashboard
+
 const getReferralStats = async (req, res, next) => {
     try {
         const stats = await Referral.getReferralStats();
         const topReferrers = await Referral.getTopReferrers(5);
         
-        // Get monthly referral data for chart
+       
         const monthlyData = await Referral.aggregate([
             {
                 $group: {
@@ -92,7 +92,7 @@ const getReferralStats = async (req, res, next) => {
     }
 };
 
-// Get referral details
+
 const getReferralDetails = async (req, res, next) => {
     try {
         const referralId = req.params.id;
@@ -107,10 +107,10 @@ const getReferralDetails = async (req, res, next) => {
             });
         }
 
-        // Get referrer's wallet info
+        
         const referrerWallet = await Wallet.findOne({ user: referral.referrer._id });
         
-        // Get all referrals made by this referrer
+      
         const referrerStats = await Referral.aggregate([
             { $match: { referrer: referral.referrer._id } },
             {
@@ -137,7 +137,7 @@ const getReferralDetails = async (req, res, next) => {
     }
 };
 
-// Update referral status (for failed referrals)
+
 const updateReferralStatus = async (req, res, next) => {
     try {
         const referralId = req.params.id;
@@ -148,7 +148,7 @@ const updateReferralStatus = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Referral not found' });
         }
 
-        // If changing from Failed to Completed, process the reward
+        
         if (referral.status === 'Failed' && status === 'Completed' && !referral.rewardGiven) {
             try {
                 const referrer = await User.findById(referral.referrer);
@@ -190,7 +190,7 @@ const updateReferralStatus = async (req, res, next) => {
     }
 };
 
-// Get referral analytics data
+
 const getReferralAnalytics = async (req, res, next) => {
     try {
         const { period = '30' } = req.query;
