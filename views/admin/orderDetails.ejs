@@ -5,370 +5,1259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronoX - Order Details</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/userlist.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #3b82f6;
+            --primary-light: #dbeafe;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #e5e7eb;
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 80px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --red: #ef4444;
+            --green: #22c55e;
+            --orange: #f59e0b;
+            --purple: #8b5cf6;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            position: fixed;
+            top: clamp(10px, 2vw, 15px);
+            left: clamp(10px, 2vw, 15px);
+            z-index: 1001;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: clamp(35px, 5vw, 40px);
+            height: clamp(35px, 5vw, 40px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            font-size: clamp(14px, 2vw, 16px);
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background-color: #f3f4f6;
+            transform: scale(1.05);
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: clamp(15px, 3vw, 20px);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            font-size: clamp(20px, 3vw, 24px);
+            font-weight: 600;
+            color: var(--text-color);
+            text-align: center;
+        }
+        
+        .nav-items {
+            flex: 1;
+            padding: clamp(15px, 3vw, 20px) 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            margin-bottom: 5px;
+            cursor: pointer;
+            font-size: clamp(13px, 1.5vw, 14px);
+            border-radius: 0 25px 25px 0;
+            margin-right: 10px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .nav-item i {
+            margin-right: clamp(8px, 2vw, 12px);
+            width: clamp(18px, 2.5vw, 20px);
+            text-align: center;
+            font-size: clamp(16px, 2vw, 18px);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover i {
+            transform: scale(1.2);
+        }
+        
+        .sidebar-footer {
+            padding: clamp(15px, 3vw, 20px);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .account-btn, .logout-btn {
+            display: block;
+            width: 100%;
+            padding: clamp(8px, 1.5vw, 10px);
+            margin-bottom: 10px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+        
+        .account-btn {
+            background-color: white;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .account-btn:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-2px);
+        }
+        
+        .logout-btn {
+            background-color: #111827;
+            color: white;
+            border: none;
+        }
+        
+        .logout-btn:hover {
+            background-color: #000;
+            transform: translateY(-2px);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: clamp(15px, 3vw, 20px);
+            transition: var(--transition);
+            width: calc(100% - var(--sidebar-width));
+            min-width: 0;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .page-title {
+            font-size: clamp(18px, 3vw, 20px);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .breadcrumb {
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb i {
+            margin: 0 8px;
+            font-size: 10px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 15px);
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        
+        .user-profile:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .user-avatar {
+            width: clamp(30px, 4vw, 36px);
+            height: clamp(30px, 4vw, 36px);
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: clamp(8px, 1.5vw, 10px);
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            font-size: clamp(13px, 1.5vw, 14px);
+        }
+        
+        .user-role {
+            font-size: clamp(11px, 1.2vw, 12px);
+            color: var(--text-secondary);
+        }
+
+        /* Back Button */
+        .back-btn {
+            background: #6b7280;
+            color: white;
+            text-decoration: none;
+            padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 15px);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(6px, 1vw, 8px);
+            margin-bottom: clamp(15px, 3vw, 20px);
+            font-size: clamp(12px, 1.5vw, 14px);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .back-btn:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+        
+        /* Order Details Container */
         .order-details-container {
             background: white;
-            border-radius: 10px;
-            padding: 30px;
-            margin: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: clamp(20px, 4vw, 30px);
+            margin: clamp(15px, 3vw, 20px) 0;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
         }
         
         .order-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            align-items: flex-start;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            padding-bottom: clamp(15px, 3vw, 20px);
             border-bottom: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .order-header h2 {
+            font-size: clamp(18px, 3vw, 22px);
+            margin-bottom: 5px;
+        }
+
+        .order-header p {
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: var(--text-secondary);
         }
         
         .order-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: clamp(15px, 3vw, 30px);
+            margin-bottom: clamp(20px, 4vw, 30px);
         }
         
         .info-section {
             background: #f8f9fa;
-            padding: 20px;
+            padding: clamp(15px, 3vw, 20px);
             border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .info-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
         }
         
         .info-section h3 {
-            margin: 0 0 15px 0;
+            margin: 0 0 clamp(10px, 2vw, 15px) 0;
             color: #333;
-            font-size: 16px;
+            font-size: clamp(14px, 2vw, 16px);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .info-section p {
-            margin: 5px 0;
+            margin: clamp(3px, 0.5vw, 5px) 0;
             color: #666;
+            font-size: clamp(12px, 1.5vw, 14px);
+            line-height: 1.4;
+        }
+
+        .info-section strong {
+            color: var(--text-color);
         }
         
+        /* Status Update */
         .status-update {
-            margin: 20px 0;
-            padding: 20px;
+            margin: clamp(15px, 3vw, 20px) 0;
+            padding: clamp(15px, 3vw, 20px);
             background: #f8f9fa;
             border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-update h3 {
+            margin-bottom: clamp(10px, 2vw, 15px);
+            font-size: clamp(14px, 2vw, 16px);
+        }
+
+        .status-controls {
+            display: flex;
+            gap: clamp(8px, 1.5vw, 10px);
+            align-items: center;
+            flex-wrap: wrap;
         }
         
         .status-select {
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-right: 10px;
-            font-size: 14px;
+            padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 15px);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: clamp(12px, 1.5vw, 14px);
+            background-color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
         .update-btn {
             background: #4f46e5;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: clamp(8px, 1.5vw, 10px) clamp(15px, 2.5vw, 20px);
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: clamp(12px, 1.5vw, 14px);
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
         }
         
         .update-btn:hover {
             background: #3730a3;
+            transform: translateY(-2px);
         }
         
+        /* Order Items */
         .order-items {
-            margin-top: 30px;
+            margin-top: clamp(20px, 4vw, 30px);
+        }
+
+        .order-items h3 {
+            margin-bottom: clamp(15px, 3vw, 20px);
+            font-size: clamp(16px, 2.5vw, 18px);
         }
         
         .item-card {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border: 1px solid #eee;
+            padding: clamp(12px, 2vw, 15px);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: clamp(12px, 2vw, 15px);
+            background: white;
+            transition: var(--transition);
+            gap: clamp(10px, 2vw, 15px);
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
         }
         
         .item-image {
-            width: 80px;
-            height: 80px;
+            width: clamp(60px, 10vw, 80px);
+            height: clamp(60px, 10vw, 80px);
             object-fit: cover;
             border-radius: 8px;
-            margin-right: 15px;
+            flex-shrink: 0;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
         }
         
         .item-details {
             flex: 1;
+            min-width: 0;
         }
         
         .item-name {
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: clamp(3px, 0.5vw, 5px);
+            font-size: clamp(13px, 1.5vw, 15px);
+            line-height: 1.3;
+        }
+
+        .item-details p {
+            margin: clamp(2px, 0.3vw, 3px) 0;
+            font-size: clamp(11px, 1.3vw, 13px);
+            color: var(--text-secondary);
         }
         
         .item-price {
             color: #4f46e5;
             font-weight: 600;
+            font-size: clamp(12px, 1.4vw, 14px);
         }
-        
-        .back-btn {
-            background: #6b7280;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+
+        /* Status Badge */
+        .status-badge {
             display: inline-block;
-            margin-bottom: 20px;
+            padding: clamp(4px, 0.8vw, 5px) clamp(8px, 1.5vw, 10px);
+            border-radius: 6px;
+            font-size: clamp(10px, 1.2vw, 12px);
+            font-weight: 500;
+            text-transform: uppercase;
+            white-space: nowrap;
+            text-align: center;
         }
         
-        .back-btn:hover {
-            background: #4b5563;
+        /* Order Status Badges */
+        .status-placed {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .status-shipped {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+        }
+
+        .status-out-for-delivery {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-delivered {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .status-cancelled {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        /* Return Status Badges */
+        .status-requested {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .status-under-review {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .status-approved {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-rejected {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .status-refunded {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        /* Return Section */
+        .return-section {
+            margin-top: clamp(20px, 4vw, 30px);
+            padding: clamp(15px, 3vw, 20px);
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .return-section h3 {
+            margin-bottom: clamp(15px, 3vw, 20px);
+            color: #333;
+            font-size: clamp(16px, 2.5vw, 18px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .return-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: clamp(10px, 2vw, 20px);
+            margin-bottom: clamp(15px, 3vw, 20px);
+        }
+
+        .return-info > div {
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+
+        .return-items {
+            margin-bottom: clamp(15px, 3vw, 20px);
+        }
+
+        .return-items > div {
+            margin: clamp(8px, 1.5vw, 10px) 0;
+            padding: clamp(8px, 1.5vw, 10px);
+            background: white;
+            border-radius: 5px;
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+
+        .return-actions {
+            display: flex;
+            gap: clamp(8px, 1.5vw, 10px);
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .return-actions textarea {
+            flex: 1;
+            min-width: 200px;
+            padding: clamp(8px, 1.5vw, 10px);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            resize: vertical;
+            font-size: clamp(12px, 1.5vw, 14px);
+            font-family: inherit;
+        }
+
+        .return-actions textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .refund-completed {
+            margin-top: clamp(12px, 2vw, 15px);
+            padding: clamp(12px, 2vw, 15px);
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+        }
+
+        .refund-completed h4 {
+            color: #155724;
+            margin-bottom: 5px;
+            font-size: clamp(14px, 2vw, 16px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refund-completed p {
+            color: #155724;
+            margin: 0;
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+
+        /* Responsive Design */
+
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .main-content {
+                padding: 30px;
+            }
+            
+            .order-details-container {
+                padding: 40px;
+            }
+        }
+
+        /* Desktop */
+        @media (max-width: 1200px) {
+            .order-info {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        /* Tablet Landscape */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+            
+            .sidebar .logo {
+                font-size: 18px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+                margin-right: 0;
+                border-radius: 0;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+                font-size: 18px;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
+            }
+            
+            .account-btn, .logout-btn {
+                padding: 8px 5px;
+                font-size: 11px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .user-profile {
+                align-self: flex-end;
+            }
+        }
+
+        /* Tablet Portrait */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: clamp(15px, 3vw, 20px);
+                width: 100%;
+                padding-top: 60px;
+            }
+            
+            .order-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .status-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .status-select {
+                margin-bottom: 10px;
+            }
+            
+            .return-actions {
+                flex-direction: column;
+            }
+            
+            .return-actions textarea {
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Mobile Landscape */
+        @media (max-width: 640px) {
+            .user-info {
+                display: none;
+            }
+            
+            .user-avatar {
+                margin-right: 0;
+            }
+            
+            .item-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .item-image {
+                align-self: center;
+            }
+            
+            .return-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Portrait */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 10px;
+                padding-top: 50px;
+            }
+            
+            .header {
+                margin-bottom: 15px;
+            }
+            
+            .page-title {
+                font-size: 16px;
+            }
+            
+            .breadcrumb {
+                font-size: 11px;
+            }
+            
+            .order-details-container {
+                padding: 15px;
+                margin: 10px 0;
+            }
+            
+            .order-header h2 {
+                font-size: 16px;
+            }
+            
+            .info-section {
+                padding: 12px;
+            }
+            
+            .status-update {
+                padding: 12px;
+            }
+            
+            .item-card {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Extra Small Mobile */
+        @media (max-width: 360px) {
+            .main-content {
+                padding: 8px;
+                padding-top: 45px;
+            }
+            
+            .order-details-container {
+                padding: 12px;
+            }
+            
+            .info-section h3 {
+                font-size: 13px;
+            }
+            
+            .info-section p {
+                font-size: 11px;
+            }
+            
+            .item-name {
+                font-size: 12px;
+            }
+            
+            .item-details p {
+                font-size: 10px;
+            }
+            
+            .status-badge {
+                padding: 3px 6px;
+                font-size: 9px;
+            }
+            
+            .update-btn {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .main-content {
+                padding-top: 45px;
+            }
+            
+            .menu-toggle {
+                top: 8px;
+                left: 8px;
+                width: 32px;
+                height: 32px;
+            }
+            
+            .sidebar-header {
+                padding: 10px;
+            }
+            
+            .nav-items {
+                padding: 10px 0;
+            }
+            
+            .nav-item {
+                padding: 8px 15px;
+            }
+            
+            .sidebar-footer {
+                padding: 10px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .sidebar,
+            .menu-toggle,
+            .sidebar-overlay,
+            .user-profile,
+            .status-update,
+            .return-actions {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+                width: 100%;
+            }
+            
+            .order-details-container {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        .nav-item:focus,
+        .back-btn:focus,
+        .status-select:focus,
+        .update-btn:focus,
+        .menu-toggle:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Loading and Animation States */
+        .order-details-container,
+        .info-section,
+        .item-card {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
     </style>
 </head>
 <body>
-    <!-- Mobile Menu Toggle -->
-    <button class="menu-toggle" id="menuToggle">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <span class="logo-text">ChronoX</span>
-            </div>
-        </div>
+    <div class="container">
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
         
-        <div class="nav-items">
-            <a href="/admin/dashboard" class="nav-item">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="/admin/product" class="nav-item">
-                <i class="fas fa-box"></i>
-                <span>Products</span>
-            </a>
-            <a href="/admin/orders" class="nav-item active">
-                <i class="fas fa-list"></i>
-                <span>Order List</span>
-            </a>
-            <a href="/admin/returns" class="nav-item">
-                <i class="fas fa-undo"></i>
-                <span>Returns</span>
-            </a>
-            <a href="/admin/userlist" class="nav-item">
-                <i class="fas fa-user"></i>
-                <span>Customer</span>
-            </a>
-            <a href="/admin/sales-report" class="nav-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Sales Report</span>
-            </a>
-            <a href="/admin/category" class="nav-item">
-                <i class="fas fa-tags"></i>
-                <span>Category</span>
-            </a>
-            <a href="/admin/coupon" class="nav-item">
-                <i class="fas fa-ticket-alt"></i>
-                <span>Coupons</span>
-            </a>
-            <a href="/admin/category-offers" class="nav-item">
-                <i class="fas fa-percent"></i>
-                <span>Category Offers</span>
-            </a>
-        </div>
-        
-        <div class="sidebar-footer">
-            <button class="account-btn">Account</button>
-            <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
-        </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="header">
-            <div>
-                <h1 class="page-title">ORDER DETAILS</h1>
-                <div class="breadcrumb">
-                    <a href="dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
-                    <i class="fas fa-chevron-right"></i>
-                    <a href="orders" style="text-decoration: none; color: gray;">Orders</a>
-                    <i class="fas fa-chevron-right"></i>
-                    <span>Order Details</span>
-                </div>
-            </div>
-            <div class="user-profile">
-                <div class="user-avatar">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
-                </div>
-                <div class="user-info">
-                    <div class="user-name">Deepak</div>
-                    <div class="user-role">Admin</div>
-                </div>
-            </div>
-        </div>
-        
-        <a href="/admin/orders" class="back-btn">
-            <i class="fas fa-arrow-left"></i> Back to Orders
-        </a>
-        
-        <div class="order-details-container">
-            <div class="order-header">
-                <div>
-                    <h2>Order #<%= order._id.toString().slice(-8) %></h2>
-                    <p>Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN') %></p>
-                </div>
-                <div>
-                    <span class="status-badge status-<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
-                        <%= order.status %>
-                    </span>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-text">ChronoX</span>
                 </div>
             </div>
             
-            <div class="order-info">
-                <div class="info-section">
-                    <h3><i class="fas fa-user"></i> Customer Information</h3>
-                    <p><strong>Name:</strong> <%= order.user.fullname %></p>
-                    <p><strong>Email:</strong> <%= order.user.email %></p>
-                    <p><strong>Phone:</strong> <%= order.user.mobile || 'N/A' %></p>
+            <div class="nav-items">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/orders" class="nav-item active">
+                    <i class="fas fa-list"></i>
+                    <span>Order List</span>
+                </a>
+                <a href="/admin/returns" class="nav-item">
+                    <i class="fas fa-undo"></i>
+                    <span>Returns</span>
+                </a>
+                <a href="/admin/userlist" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Customer</span>
+                </a>
+                <a href="/admin/sales-report" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales Report</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Category</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/category-offers" class="nav-item">
+                    <i class="fas fa-percent"></i>
+                    <span>Category Offers</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="account-btn">Account</button>
+                <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1 class="page-title">ORDER DETAILS</h1>
+                    <div class="breadcrumb">
+                        <a href="dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="orders" style="text-decoration: none; color: gray;">Orders</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Order Details</span>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Deepak</div>
+                        <div class="user-role">Admin</div>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="/admin/orders" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Orders
+            </a>
+            
+            <div class="order-details-container">
+                <div class="order-header">
+                    <div>
+                        <h2>Order #<%= order._id.toString().slice(-8) %></h2>
+                        <p>Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN') %></p>
+                    </div>
+                    <div>
+                        <span class="status-badge status-<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
+                            <%= order.status %>
+                        </span>
+                    </div>
                 </div>
                 
-                <div class="info-section">
-                    <h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
-                    <p><strong><%= order.address.fullName %></strong></p>
-                    <p><%= order.address.addressLine %></p>
-                    <p><%= order.address.city %>, <%= order.address.state %></p>
-                    <p>PIN: <%= order.address.pincode %></p>
-                    <p>Phone: <%= order.address.phone %></p>
+                <div class="order-info">
+                    <div class="info-section">
+                        <h3><i class="fas fa-user"></i> Customer Information</h3>
+                        <p><strong>Name:</strong> <%= order.user.fullname %></p>
+                        <p><strong>Email:</strong> <%= order.user.email %></p>
+                        <p><strong>Phone:</strong> <%= order.user.mobile || 'N/A' %></p>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
+                        <p><strong><%= order.address.fullName %></strong></p>
+                        <p><%= order.address.addressLine %></p>
+                        <p><%= order.address.city %>, <%= order.address.state %></p>
+                        <p>PIN: <%= order.address.pincode %></p>
+                        <p>Phone: <%= order.address.phone %></p>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
+                        <p><strong>Method:</strong> <%= order.paymentMethod %></p>
+                        <p><strong>Total Amount:</strong> ₹<%= order.totalAmount.toLocaleString('en-IN') %></p>
+                    </div>
                 </div>
                 
-                <div class="info-section">
-                    <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
-                    <p><strong>Method:</strong> <%= order.paymentMethod %></p>
-                    <p><strong>Total Amount:</strong> ₹<%= order.totalAmount.toLocaleString('en-IN') %></p>
+                <div class="status-update">
+                    <h3>Update Order Status</h3>
+                    <div class="status-controls">
+                        <select class="status-select" id="statusSelect">
+                            <option value="Placed" <%= order.status === 'Placed' ? 'selected' : '' %>>Placed</option>
+                            <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                            <option value="Out for Delivery" <%= order.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                            <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                            <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        </select>
+                        <button class="update-btn" onclick="updateStatus()">Update Status</button>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="status-update">
-                <h3>Update Order Status</h3>
-                <select class="status-select" id="statusSelect">
-                    <option value="Placed" <%= order.status === 'Placed' ? 'selected' : '' %>>Placed</option>
-                    <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                    <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                    <option value="Out for Delivery" <%= order.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
-                    <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                    <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                </select>
-                <button class="update-btn" onclick="updateStatus()">Update Status</button>
-            </div>
-            
-            <div class="order-items">
-                <h3>Order Items</h3>
-                <% order.items.forEach(item => { %>
-                    <div class="item-card">
-                        <% if (item.product && item.product.images && item.product.images.length > 0) { %>
-                            <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>"
-                                 alt="<%= item.product.name %>" class="item-image"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="item-image" style="display: none; background: #f0f0f0; align-items: center; justify-content: center; border: 1px solid #ddd;">
-                                <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
+                
+                <div class="order-items">
+                    <h3>Order Items</h3>
+                    <% order.items.forEach(item => { %>
+                        <div class="item-card">
+                            <% if (item.product && item.product.images && item.product.images.length > 0) { %>
+                                <div class="item-image">
+                                    <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_80,h_80,c_fill/<%= item.product.images[0].public_id %>"
+                                         alt="<%= item.product.name %>"
+                                         onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-image\' style=\'color: #ccc; font-size: 24px;\'></i>';">
+                                </div>
+                            <% } else { %>
+                                <div class="item-image">
+                                    <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
+                                </div>
+                            <% } %>
+                            <div class="item-details">
+                                <div class="item-name"><%= item.product ? item.product.name : 'Product not found' %></div>
+                                <p>Quantity: <%= item.quantity %></p>
+                                <p class="item-price">₹<%= item.price.toLocaleString('en-IN') %> each</p>
+                                <p><strong>Subtotal: ₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></strong></p>
                             </div>
-                        <% } else { %>
-                            <div class="item-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd;">
-                                <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <!-- Return Request Section -->
+                <% if (returnRequest) { %>
+                    <div class="return-section">
+                        <h3>
+                            <i class="fas fa-undo"></i> Return Request
+                        </h3>
+
+                        <div class="return-info">
+                            <div>
+                                <strong>Status:</strong>
+                                <span class="status-badge status-<%= returnRequest.status.toLowerCase().replace(/\s+/g, '-') %>">
+                                    <%= returnRequest.status %>
+                                </span>
+                            </div>
+                            <div><strong>Reason:</strong> <%= returnRequest.reason %></div>
+                            <div><strong>Refund Amount:</strong> ₹<%= returnRequest.totalRefundAmount.toLocaleString('en-IN') %></div>
+                            <div><strong>Requested:</strong> <%= new Date(returnRequest.requestedAt).toLocaleDateString('en-IN') %></div>
+                        </div>
+
+                        <% if (returnRequest.description) { %>
+                            <div style="margin-bottom: 15px;">
+                                <strong>Description:</strong> <%= returnRequest.description %>
                             </div>
                         <% } %>
-                        <div class="item-details">
-                            <div class="item-name"><%= item.product ? item.product.name : 'Product not found' %></div>
-                            <p>Quantity: <%= item.quantity %></p>
-                            <p class="item-price">₹<%= item.price.toLocaleString('en-IN') %> each</p>
-                            <p><strong>Subtotal: ₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></strong></p>
+
+                        <div class="return-items">
+                            <strong>Items to Return:</strong>
+                            <% returnRequest.items.forEach(item => { %>
+                                <div>
+                                    • <%= item.product.name %> - Qty: <%= item.quantity %> - ₹<%= (item.price * item.quantity).toLocaleString('en-IN') %>
+                                </div>
+                            <% }) %>
                         </div>
-                    </div>
-                <% }) %>
-            </div>
 
-            <!-- Return Request Section -->
-            <% if (returnRequest) { %>
-                <div class="return-section" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <h3 style="margin-bottom: 20px; color: #333;">
-                        <i class="fas fa-undo"></i> Return Request
-                    </h3>
-
-                    <div class="return-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
-                        <div>
-                            <strong>Status:</strong>
-                            <span class="status-badge status-<%= returnRequest.status.toLowerCase().replace(/\s+/g, '-') %>">
-                                <%= returnRequest.status %>
-                            </span>
-                        </div>
-                        <div><strong>Reason:</strong> <%= returnRequest.reason %></div>
-                        <div><strong>Refund Amount:</strong> ₹<%= returnRequest.totalRefundAmount.toLocaleString('en-IN') %></div>
-                        <div><strong>Requested:</strong> <%= new Date(returnRequest.requestedAt).toLocaleDateString('en-IN') %></div>
-                    </div>
-
-                    <% if (returnRequest.description) { %>
-                        <div style="margin-bottom: 15px;">
-                            <strong>Description:</strong> <%= returnRequest.description %>
-                        </div>
-                    <% } %>
-
-                    <div class="return-items" style="margin-bottom: 20px;">
-                        <strong>Items to Return:</strong>
-                        <% returnRequest.items.forEach(item => { %>
-                            <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
-                                • <%= item.product.name %> - Qty: <%= item.quantity %> - ₹<%= (item.price * item.quantity).toLocaleString('en-IN') %>
+                        <% if (returnRequest.status === 'Requested' || returnRequest.status === 'Under Review') { %>
+                            <div class="return-actions">
+                                <textarea id="adminNotes" placeholder="Admin notes (optional)"></textarea>
+                                <button class="update-btn" onclick="processReturn('approve')"
+                                        style="background: #28a745;">
+                                    <i class="fas fa-check"></i> Approve & Refund to Wallet
+                                </button>
+                                <button class="update-btn" onclick="processReturn('reject')"
+                                        style="background: #dc3545;">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
                             </div>
-                        <% }) %>
+                        <% } %>
+
+                        <% if (returnRequest.status === 'Refunded') { %>
+                            <div class="refund-completed">
+                                <h4>
+                                    <i class="fas fa-check-circle"></i> Refund Completed
+                                </h4>
+                                <p>
+                                    Refund of ₹<%= returnRequest.totalRefundAmount.toLocaleString('en-IN') %> has been credited to customer's wallet.
+                                    <% if (returnRequest.refundedAt) { %>
+                                        <br><small>Completed on: <%= new Date(returnRequest.refundedAt).toLocaleDateString('en-IN') %></small>
+                                    <% } %>
+                                </p>
+                            </div>
+                        <% } %>
+
+                        <% if (returnRequest.adminNotes) { %>
+                            <div style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 5px;">
+                                <strong>Admin Notes:</strong> <%= returnRequest.adminNotes %>
+                            </div>
+                        <% } %>
                     </div>
-
-                    <% if (returnRequest.status === 'Requested' || returnRequest.status === 'Under Review') { %>
-                        <div class="return-actions" style="display: flex; gap: 10px; align-items: center;">
-                            <textarea id="adminNotes" placeholder="Admin notes (optional)"
-                                      style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"></textarea>
-                            <button class="update-btn" onclick="processReturn('approve')"
-                                    style="background: #28a745; margin-left: 10px;">
-                                <i class="fas fa-check"></i> Approve & Refund to Wallet
-                            </button>
-                            <button class="update-btn" onclick="processReturn('reject')"
-                                    style="background: #dc3545;">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        </div>
-                    <% } %>
-
-                    <% if (returnRequest.status === 'Refunded') { %>
-                        <div class="refund-completed" style="margin-top: 15px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px;">
-                            <h4 style="color: #155724; margin-bottom: 5px;">
-                                <i class="fas fa-check-circle"></i> Refund Completed
-                            </h4>
-                            <p style="color: #155724; margin: 0;">
-                                Refund of ₹<%= returnRequest.totalRefundAmount.toLocaleString('en-IN') %> has been credited to customer's wallet.
-                                <% if (returnRequest.refundedAt) { %>
-                                    <br><small>Completed on: <%= new Date(returnRequest.refundedAt).toLocaleDateString('en-IN') %></small>
-                                <% } %>
-                            </p>
-                        </div>
-                    <% } %>
-
-                    <% if (returnRequest.adminNotes) { %>
-                        <div style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 5px;">
-                            <strong>Admin Notes:</strong> <%= returnRequest.adminNotes %>
-                        </div>
-                    <% } %>
-                </div>
-            <% } %>
+                <% } %>
+            </div>
         </div>
     </div>
 
     <script>
-        // Menu Toggle for Mobile
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+            
+            // Prevent body scroll when sidebar is open
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar on window resize if screen becomes larger
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+
+        // Prevent sidebar from closing when clicking inside it
+        sidebar.addEventListener('click', function(e) {
+            e.stopPropagation();
         });
         
         function updateStatus() {
@@ -486,7 +1375,7 @@
         }
         <% } %>
         
-        // Hover effects for nav items
+        // Navigation active state management
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             item.addEventListener('click', function() {
@@ -494,6 +1383,40 @@
                 this.classList.add('active');
             });
         });
+
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            // ESC key closes sidebar on mobile
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+
+        // Add touch swipe support for mobile sidebar
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (window.innerWidth <= 768) {
+                if (touchEndX < touchStartX - 50) {
+                    // Swipe left - close sidebar
+                    closeSidebar();
+                }
+                if (touchEndX > touchStartX + 50 && touchStartX < 50) {
+                    // Swipe right from left edge - open sidebar
+                    toggleSidebar();
+                }
+            }
+        }
     </script>
 </body>
 </html>

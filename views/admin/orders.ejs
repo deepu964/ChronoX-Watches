@@ -5,193 +5,1097 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronoX - Order Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/userlist.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #3b82f6;
+            --primary-light: #dbeafe;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #e5e7eb;
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 80px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --red: #ef4444;
+            --green: #22c55e;
+            --orange: #f59e0b;
+            --purple: #8b5cf6;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            position: fixed;
+            top: clamp(10px, 2vw, 15px);
+            left: clamp(10px, 2vw, 15px);
+            z-index: 1001;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: clamp(35px, 5vw, 40px);
+            height: clamp(35px, 5vw, 40px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            font-size: clamp(14px, 2vw, 16px);
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background-color: #f3f4f6;
+            transform: scale(1.05);
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: clamp(15px, 3vw, 20px);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            font-size: clamp(20px, 3vw, 24px);
+            font-weight: 600;
+            color: var(--text-color);
+            text-align: center;
+        }
+        
+        .nav-items {
+            flex: 1;
+            padding: clamp(15px, 3vw, 20px) 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            margin-bottom: 5px;
+            cursor: pointer;
+            font-size: clamp(13px, 1.5vw, 14px);
+            border-radius: 0 25px 25px 0;
+            margin-right: 10px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .nav-item i {
+            margin-right: clamp(8px, 2vw, 12px);
+            width: clamp(18px, 2.5vw, 20px);
+            text-align: center;
+            font-size: clamp(16px, 2vw, 18px);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover i {
+            transform: scale(1.2);
+        }
+        
+        .sidebar-footer {
+            padding: clamp(15px, 3vw, 20px);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .account-btn, .logout-btn {
+            display: block;
+            width: 100%;
+            padding: clamp(8px, 1.5vw, 10px);
+            margin-bottom: 10px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+        
+        .account-btn {
+            background-color: white;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .account-btn:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-2px);
+        }
+        
+        .logout-btn {
+            background-color: #111827;
+            color: white;
+            border: none;
+        }
+        
+        .logout-btn:hover {
+            background-color: #000;
+            transform: translateY(-2px);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: clamp(15px, 3vw, 20px);
+            transition: var(--transition);
+            width: calc(100% - var(--sidebar-width));
+            min-width: 0;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .page-title {
+            font-size: clamp(18px, 3vw, 20px);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .breadcrumb {
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb i {
+            margin: 0 8px;
+            font-size: 10px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 15px);
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        
+        .user-profile:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .user-avatar {
+            width: clamp(30px, 4vw, 36px);
+            height: clamp(30px, 4vw, 36px);
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: clamp(8px, 1.5vw, 10px);
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            font-size: clamp(13px, 1.5vw, 14px);
+        }
+        
+        .user-role {
+            font-size: clamp(11px, 1.2vw, 12px);
+            color: var(--text-secondary);
+        }
+        
+        /* Search and Filter */
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: clamp(15px, 3vw, 20px);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+            min-width: 250px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 15px) clamp(8px, 1.5vw, 10px) clamp(35px, 5vw, 40px);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: clamp(13px, 1.5vw, 14px);
+            transition: var(--transition);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: clamp(12px, 2vw, 15px);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: clamp(12px, 1.5vw, 14px);
+        }
+        
+        /* Customer Table */
+        .customer-table {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: clamp(15px, 3vw, 20px);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .customer-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .customer-table th,
+        .customer-table td {
+            padding: clamp(10px, 2vw, 15px);
+            font-size: clamp(12px, 1.5vw, 14px);
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .customer-table th {
+            background-color: #111827;
+            color: white;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .customer-table td {
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .customer-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .customer-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .customer-table tbody tr:hover {
+            background-color: #f9fafb;
+            transform: scale(1.01);
+        }
+        
+        /* Order specific styles */
+        .order-id {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #4f46e5;
+            font-size: clamp(11px, 1.3vw, 13px);
+        }
+
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .customer-name {
+            font-weight: 500;
+            font-size: clamp(12px, 1.4vw, 14px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .customer-email {
+            font-size: clamp(11px, 1.2vw, 12px);
+            color: #6b7280;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: clamp(4px, 0.8vw, 5px) clamp(8px, 1.5vw, 10px);
+            border-radius: 6px;
+            font-size: clamp(10px, 1.2vw, 12px);
+            font-weight: 500;
+            text-transform: uppercase;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        /* Order Status Badges */
+        .status-placed {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .status-shipped {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+        }
+
+        .status-out-for-delivery {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-delivered {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .status-cancelled {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        
+        /* Action Buttons */
+        .action-btn {
+            padding: clamp(4px, 0.8vw, 5px) clamp(8px, 1.5vw, 10px);
+            border-radius: 4px;
+            font-size: clamp(11px, 1.2vw, 12px);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: white;
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        
+        .action-btn:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .action-btn.view {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .action-btn.view:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .page-info {
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: var(--text-secondary);
+        }
+        
+        .page-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        
+        .page-btn {
+            width: clamp(28px, 4vw, 32px);
+            height: clamp(28px, 4vw, 32px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: clamp(12px, 1.5vw, 14px);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .page-btn:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-2px);
+        }
+        
+        .page-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive Design */
+
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .main-content {
+                padding: 30px;
+            }
+            
+            .customer-table th,
+            .customer-table td {
+                padding: 20px;
+            }
+        }
+
+        /* Desktop */
+        @media (max-width: 1200px) {
+            .customer-table {
+                overflow-x: auto;
+            }
+            
+            .search-box {
+                min-width: 200px;
+            }
+        }
+
+        /* Tablet Landscape */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+            
+            .sidebar .logo {
+                font-size: 18px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+                margin-right: 0;
+                border-radius: 0;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+                font-size: 18px;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
+            }
+            
+            .account-btn, .logout-btn {
+                padding: 8px 5px;
+                font-size: 11px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .user-profile {
+                align-self: flex-end;
+            }
+        }
+
+        /* Tablet Portrait */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: clamp(15px, 3vw, 20px);
+                width: 100%;
+                padding-top: 60px;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                max-width: none;
+                min-width: auto;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            
+            .page-controls {
+                justify-content: center;
+                margin-top: 10px;
+            }
+            
+            .customer-table table {
+                min-width: 600px;
+            }
+            
+            /* Hide some columns on tablet */
+            .customer-table th:nth-child(2),
+            .customer-table td:nth-child(2),
+            .customer-table th:nth-child(4),
+            .customer-table td:nth-child(4) {
+                display: none;
+            }
+        }
+
+        /* Mobile Landscape */
+        @media (max-width: 640px) {
+            .user-info {
+                display: none;
+            }
+            
+            .user-avatar {
+                margin-right: 0;
+            }
+            
+            .customer-table table {
+                min-width: 500px;
+            }
+            
+            /* Hide more columns on mobile landscape */
+            .customer-table th:nth-child(3),
+            .customer-table td:nth-child(3) {
+                display: none;
+            }
+        }
+
+        /* Mobile Portrait */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 10px;
+                padding-top: 50px;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+            }
+            
+            .page-title {
+                font-size: 16px;
+            }
+            
+            .breadcrumb {
+                font-size: 11px;
+            }
+            
+            .customer-table table {
+                min-width: 400px;
+            }
+            
+            .customer-table th,
+            .customer-table td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+            
+            .page-controls {
+                gap: 1px;
+            }
+            
+            .page-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            
+            .search-box input {
+                padding: 8px 12px 8px 35px;
+            }
+            
+            /* Show only essential columns on mobile */
+            .customer-table th:nth-child(5),
+            .customer-table td:nth-child(5) {
+                display: none;
+            }
+        }
+
+        /* Extra Small Mobile */
+        @media (max-width: 360px) {
+            .main-content {
+                padding: 8px;
+                padding-top: 45px;
+            }
+            
+            .customer-table th,
+            .customer-table td {
+                padding: 6px 4px;
+                font-size: 10px;
+            }
+            
+            .customer-table table {
+                min-width: 320px;
+            }
+            
+            .page-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+            
+            .status-badge {
+                padding: 2px 6px;
+                font-size: 9px;
+            }
+            
+            .action-btn {
+                padding: 3px 6px;
+                font-size: 10px;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .main-content {
+                padding-top: 45px;
+            }
+            
+            .menu-toggle {
+                top: 8px;
+                left: 8px;
+                width: 32px;
+                height: 32px;
+            }
+            
+            .sidebar-header {
+                padding: 10px;
+            }
+            
+            .nav-items {
+                padding: 10px 0;
+            }
+            
+            .nav-item {
+                padding: 8px 15px;
+            }
+            
+            .sidebar-footer {
+                padding: 10px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .sidebar,
+            .menu-toggle,
+            .sidebar-overlay,
+            .user-profile,
+            .search-filter {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+                width: 100%;
+            }
+            
+            .customer-table {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+            
+            .page-controls {
+                display: none;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        .nav-item:focus,
+        .page-btn:focus,
+        .search-box input:focus,
+        .action-btn:focus,
+        .menu-toggle:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Loading and Animation States */
+        .customer-table tbody tr {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        .sidebar::-webkit-scrollbar,
+        .customer-table::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track,
+        .customer-table::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb,
+        .customer-table::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover,
+        .customer-table::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
 </head>
 <body>
-    <!-- Mobile Menu Toggle -->
-    <button class="menu-toggle" id="menuToggle">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <span class="logo-text">ChronoX</span>
+    <div class="container">
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-text">ChronoX</span>
+                </div>
+            </div>
+            
+            <div class="nav-items">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/orders" class="nav-item active">
+                    <i class="fas fa-list"></i>
+                    <span>Order List</span>
+                </a>
+                <a href="/admin/returns" class="nav-item">
+                    <i class="fas fa-undo"></i>
+                    <span>Returns</span>
+                </a>
+                <a href="/admin/userlist" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Customer</span>
+                </a>
+                <a href="/admin/sales-report" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales Report</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Category</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/category-offers" class="nav-item">
+                    <i class="fas fa-percent"></i>
+                    <span>Category Offers</span>
+                </a>
+                <a href="/admin/referrals" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Referrals</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="account-btn">Account</button>
+                <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
             </div>
         </div>
         
-        <div class="nav-items">
-            <a href="/admin/dashboard" class="nav-item">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="/admin/product" class="nav-item">
-                <i class="fas fa-box"></i>
-                <span>Products</span>
-            </a>
-            <a href="/admin/orders" class="nav-item active">
-                <i class="fas fa-list"></i>
-                <span>Order List</span>
-            </a>
-            <a href="/admin/returns" class="nav-item">
-                <i class="fas fa-undo"></i>
-                <span>Returns</span>
-            </a>
-            <a href="/admin/userlist" class="nav-item">
-                <i class="fas fa-user"></i>
-                <span>Customer</span>
-            </a>
-            <a href="/admin/sales-report" class="nav-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Sales Report</span>
-            </a>
-            <a href="/admin/category" class="nav-item">
-                <i class="fas fa-tags"></i>
-                <span>Category</span>
-            </a>
-            <a href="/admin/coupon" class="nav-item">
-                <i class="fas fa-ticket-alt"></i>
-                <span>Coupons</span>
-            </a>
-            <a href="/admin/category-offers" class="nav-item">
-                <i class="fas fa-percent"></i>
-                <span>Category Offers</span>
-            </a>
-            <a href="/admin/referrals" class="nav-item">
-                <i class="fas fa-users"></i>
-                <span>Referrals</span>
-            </a>
-        </div>
-        
-        <div class="sidebar-footer">
-            <button class="account-btn">Account</button>
-            <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
-        </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="header">
-            <div>
-                <h1 class="page-title">ORDER MANAGEMENT</h1>
-                <div class="breadcrumb">
-                    <a href="dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
-                    <i class="fas fa-chevron-right"></i>
-                    <a href="orders" style="text-decoration: none; color: gray;">Orders</a>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1 class="page-title">ORDER MANAGEMENT</h1>
+                    <div class="breadcrumb">
+                        <a href="dashboard" style="text-decoration: none; color: gray;">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="orders" style="text-decoration: none; color: gray;">Orders</a>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Deepak</div>
+                        <div class="user-role">Admin</div>
+                    </div>
                 </div>
             </div>
-            <div class="user-profile">
-                <div class="user-avatar">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+            
+            <form action="orders" method="get">
+                <div class="search-filter">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" value="<%= search %>" name="search" placeholder="Search orders...">
+                        <a href="orders"><i class="fas fa-close" style="margin-left: 90%;"></i></a>
+                    </div>
                 </div>
-                <div class="user-info">
-                    <div class="user-name">Deepak</div>
-                    <div class="user-role">Admin</div>
-                </div>
-            </div>
-        </div>
-        
-        <form action="orders" method="get">
-            <div class="search-filter">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" value="<%= search %>" name="search" placeholder="Search orders...">
-                    <a href="orders"><i class="fas fa-close" style="margin-left: 90%;"></i></a>
-                </div>
-            </div>
-        </form>
-        
-        <div class="customer-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Date</th>
-                        <th>Customer</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% orders.forEach(order => { %>
+            </form>
+            
+            <div class="customer-table">
+                <table>
+                    <thead>
                         <tr>
-                            <td>
-                                <span class="order-id">#<%= order._id.toString().slice(-8) %></span>
-                            </td>
-                            <td>
-                                <%= new Date(order.createdAt).toLocaleDateString('en-IN') %>
-                            </td>
-                            <td>
-                                <div class="customer-info">
-                                    <span class="customer-name"><%= order.user.fullname %></span>
-                                    <span class="customer-email"><%= order.user.email %></span>
-                                </div>
-                            </td>
-                            <td>₹<%= order.totalAmount.toLocaleString('en-IN') %></td>
-                            <td>
-                                <span class="status-badge status-<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
-                                    <%= order.status %>
-                                </span>
-                            </td>
-                            <td>
-                                <a href="orders/<%= order._id %>" class="action-btn view">
-                                    <i class="fas fa-eye"></i> View
-                                </a>
-                            </td>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="pagination">
-            <div class="page-info">
-                Showing <%= (currentPage - 1) * limit + 1 %> -
-                <%= Math.min(currentPage * limit, total) %> from <%= total %>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td>
+                                    <span class="order-id">#<%= order._id.toString().slice(-8) %></span>
+                                </td>
+                                <td>
+                                    <%= new Date(order.createdAt).toLocaleDateString('en-IN') %>
+                                </td>
+                                <td>
+                                    <div class="customer-info">
+                                        <span class="customer-name"><%= order.user.fullname %></span>
+                                        <span class="customer-email"><%= order.user.email %></span>
+                                    </div>
+                                </td>
+                                <td>₹<%= order.totalAmount.toLocaleString('en-IN') %></td>
+                                <td>
+                                    <span class="status-badge status-<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
+                                        <%= order.status %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="orders/<%= order._id %>" class="action-btn view">
+                                        <i class="fas fa-eye"></i> <span>View</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
             </div>
+            
+            <div class="pagination">
+                <div class="page-info">
+                    Showing <%= (currentPage - 1) * limit + 1 %> -
+                    <%= Math.min(currentPage * limit, total) %> from <%= total %>
+                </div>
 
-            <div class="page-controls">
-                <!-- Previous Button -->
-                <% if (currentPage > 1) { %>
-                <a href="orders?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-                <% } else { %>
-                <button class="page-btn" disabled>
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <% } %>
+                <div class="page-controls">
+                    <!-- Previous Button -->
+                    <% if (currentPage > 1) { %>
+                    <a href="orders?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    <% } else { %>
+                    <button class="page-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <% } %>
 
-                <!-- Page Numbers -->
-                <% for (let i = 1; i <= totalPages; i++) { %>
-                <a href="orders?page=<%= i %>&search=<%= search %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
-                    <%= i %>
-                </a>
-                <% } %>
+                    <!-- Page Numbers -->
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="orders?page=<%= i %>&search=<%= search %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                        <%= i %>
+                    </a>
+                    <% } %>
 
-                <!-- Next Button -->
-                <% if (currentPage < totalPages) { %>
-                <a href="orders?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                <% } else { %>
-                <button class="page-btn" disabled>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <% } %>
+                    <!-- Next Button -->
+                    <% if (currentPage < totalPages) { %>
+                    <a href="orders?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <% } else { %>
+                    <button class="page-btn" disabled>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <% } %>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
-        // Menu Toggle for Mobile
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+            
+            // Prevent body scroll when sidebar is open
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar on window resize if screen becomes larger
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+
+        // Prevent sidebar from closing when clicking inside it
+        sidebar.addEventListener('click', function(e) {
+            e.stopPropagation();
         });
         
-        // Hover effects for nav items
+        // Navigation active state management
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             item.addEventListener('click', function() {
@@ -199,6 +1103,66 @@
                 this.classList.add('active');
             });
         });
+
+        // Add loading state to action buttons
+        const actionButtons = document.querySelectorAll('.action-btn');
+        actionButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                this.style.pointerEvents = 'none';
+                
+                // Restore button after 2 seconds (or when page loads)
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.pointerEvents = 'auto';
+                }, 2000);
+            });
+        });
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            // ESC key closes sidebar on mobile
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+
+        // Add touch swipe support for mobile sidebar
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (window.innerWidth <= 768) {
+                if (touchEndX < touchStartX - 50) {
+                    // Swipe left - close sidebar
+                    closeSidebar();
+                }
+                if (touchEndX > touchStartX + 50 && touchStartX < 50) {
+                    // Swipe right from left edge - open sidebar
+                    toggleSidebar();
+                }
+            }
+        }
     </script>
 </body>
 </html>

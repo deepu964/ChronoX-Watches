@@ -1,369 +1,1797 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Edit Category Offer</title>
-  <link rel="stylesheet" href="/css/categoryOffer.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="/js/notifications.js"></script>
-  <style>
-    .form-container {
-      background: white;
-      padding: 30px;
-      max-width: 600px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Edit Category Offer - ChronoX Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
-    .form-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .form-header h1 {
-      font-size: 24px;
-      color: var(--text-color);
-    }
-    
-    .back-button {
-      padding: 8px 16px;
-      background-color: #3b82f6;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: var(--transition);
-    }
-    
-    .back-button:hover {
-      background-color: #2563eb;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 500;
-      color: var(--text-color);
-    }
-    
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      font-size: 14px;
-      transition: var(--transition);
-    }
-    
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .error-msg {
-      color: #dc2626;
-      font-size: 12px;
-      margin-top: 5px;
-      display: block;
-      min-height: 16px;
-      font-weight: 500;
-    }
+    <style>
+        /* ===== MOBILE-FIRST CSS RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .form-group input.error,
-    .form-group select.error {
-      border-color: #dc2626;
-      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-    }
-    
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #111827;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: var(--transition);
-    }
-    
-    .submit-btn:hover {
-      background-color: #000;
-    }
-    
-    .submit-btn:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-  </style>
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Mobile-First Color System */
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --secondary-color: #6b7280;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+
+            /* Neutral Colors */
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            /* Mobile-First Layout Variables */
+            --sidebar-width-mobile: 280px;
+            --sidebar-width-tablet: 240px;
+            --sidebar-width-desktop: 280px;
+            --sidebar-collapsed: 0px;
+            --header-height-mobile: 56px;
+            --header-height-tablet: 64px;
+            --header-height-desktop: 80px;
+
+            /* Mobile-First Spacing */
+            --spacing-xs: 0.25rem;    /* 4px */
+            --spacing-sm: 0.5rem;     /* 8px */
+            --spacing-md: 0.75rem;    /* 12px */
+            --spacing-lg: 1rem;       /* 16px */
+            --spacing-xl: 1.25rem;    /* 20px */
+            --spacing-2xl: 1.5rem;    /* 24px */
+            --spacing-3xl: 2rem;      /* 32px */
+
+            /* Mobile-Optimized Border Radius */
+            --radius-xs: 0.125rem;    /* 2px */
+            --radius-sm: 0.25rem;     /* 4px */
+            --radius-md: 0.375rem;    /* 6px */
+            --radius-lg: 0.5rem;      /* 8px */
+            --radius-xl: 0.75rem;     /* 12px */
+            --radius-2xl: 1rem;       /* 16px */
+
+            /* Mobile-Optimized Shadows */
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            /* Mobile-First Transitions */
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Mobile-Optimized Z-Index Scale */
+            --z-base: 0;
+            --z-dropdown: 1000;
+            --z-sticky: 1020;
+            --z-fixed: 1030;
+            --z-modal-backdrop: 1040;
+            --z-modal: 1050;
+            --z-popover: 1060;
+            --z-tooltip: 1070;
+            --z-toast: 1080;
+
+            /* Mobile Touch Targets */
+            --touch-target-min: 44px;
+            --touch-target-comfortable: 48px;
+        }
+
+        /* ===== MOBILE-FIRST TYPOGRAPHY ===== */
+        html {
+            font-size: 14px; /* Mobile base font size */
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--gray-700);
+            background-color: var(--gray-50);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        /* Prevent horizontal scroll on mobile */
+        body.menu-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+
+        /* ===== MOBILE-FIRST LAYOUT STRUCTURE ===== */
+        .container {
+            display: flex;
+            min-height: 100vh;
+            min-height: 100dvh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== MOBILE MENU TOGGLE (ALWAYS VISIBLE ON MOBILE) ===== */
+        .mobile-menu-toggle {
+            position: fixed;
+            top: var(--spacing-lg);
+            left: var(--spacing-lg);
+            z-index: var(--z-fixed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--touch-target-comfortable);
+            height: var(--touch-target-comfortable);
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-md);
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .mobile-menu-toggle:active {
+            transform: scale(0.95);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mobile-menu-toggle:hover {
+            background: var(--gray-50);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-menu-toggle i {
+            font-size: 18px;
+            color: var(--gray-600);
+            transition: var(--transition-fast);
+        }
+
+        .mobile-menu-toggle.active i {
+            transform: rotate(90deg);
+        }
+
+        /* ===== MOBILE-FIRST SIDEBAR STYLES ===== */
+        .sidebar {
+            width: var(--sidebar-width-mobile);
+            background: var(--white);
+            border-right: 1px solid var(--gray-200);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: var(--z-fixed);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform var(--transition-normal);
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        /* Sidebar Backdrop for Mobile */
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: calc(var(--z-fixed) - 1);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-normal), visibility var(--transition-normal);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .sidebar-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-header {
+            padding: var(--spacing-2xl) var(--spacing-xl);
+            border-bottom: 1px solid var(--gray-200);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .logo-text {
+            color: var(--gray-800);
+        }
+
+        .nav-items {
+            flex: 1;
+            padding: var(--spacing-xl) 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            border-left: 3px solid transparent;
+            margin-bottom: var(--spacing-xs);
+            min-height: var(--touch-target-min);
+            position: relative;
+        }
+
+        .nav-item:active {
+            background: var(--gray-100);
+        }
+
+        .nav-item:hover {
+            background: var(--gray-50);
+            color: var(--gray-800);
+            border-left-color: var(--gray-300);
+        }
+
+        .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: var(--spacing-lg);
+            text-align: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .nav-item span {
+            font-size: 15px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .sidebar-footer {
+            padding: var(--spacing-xl);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            flex-shrink: 0;
+        }
+
+        .account-btn,
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            min-height: var(--touch-target-min);
+            text-decoration: none;
+            border: none;
+            font-size: 14px;
+        }
+
+        .account-btn {
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .account-btn:hover,
+        .account-btn:active {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .logout-btn {
+            background: var(--gray-900);
+            color: var(--white);
+        }
+
+        .logout-btn:hover,
+        .logout-btn:active {
+            background: var(--gray-800);
+        }
+
+        /* ===== MOBILE-FIRST MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            width: 100%;
+            padding: var(--spacing-xl);
+            padding-top: calc(var(--touch-target-comfortable) + var(--spacing-2xl));
+            background: var(--gray-50);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+
+        /* ===== MOBILE-FIRST FORM CONTAINER ===== */
+        .form-container {
+            background: var(--white);
+            padding: var(--spacing-xl);
+            max-width: 100%;
+            margin: 0 auto;
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+        }
+
+        .form-header {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+            align-items: flex-start;
+        }
+
+        .form-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition-fast);
+            min-height: var(--touch-target-min);
+            order: -1;
+            align-self: flex-start;
+        }
+
+        .back-button:active {
+            transform: scale(0.98);
+            background: var(--primary-dark);
+        }
+
+        .back-button:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ===== MOBILE-FIRST FORM STYLES ===== */
+        .form-group {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-lg);
+            font-size: 16px; /* Prevents zoom on iOS */
+            transition: var(--transition-fast);
+            background: var(--white);
+            min-height: var(--touch-target-comfortable);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right var(--spacing-lg) center;
+            background-repeat: no-repeat;
+            background-size: 16px 12px;
+            padding-right: 3rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* ===== FORM VALIDATION STYLES ===== */
+        .error-msg {
+            color: var(--danger-color);
+            font-size: 12px;
+            margin-top: var(--spacing-sm);
+            display: block;
+            min-height: 16px;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            background-color: #fef2f2;
+        }
+
+        .form-group input.success,
+        .form-group select.success {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* ===== MOBILE-FIRST SUBMIT BUTTON ===== */
+        .submit-btn {
+            width: 100%;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            background: var(--gray-900);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 16px;
+            transition: var(--transition-fast);
+            min-height: var(--touch-target-comfortable);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+            background: var(--gray-800);
+        }
+
+        .submit-btn:hover {
+            background: var(--gray-800);
+            box-shadow: var(--shadow-md);
+        }
+
+        .submit-btn:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+
+        .submit-btn .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVE BREAKPOINTS (PROGRESSIVE ENHANCEMENT) ===== */
+
+        /* Small Mobile Landscape (480px+) */
+        @media (min-width: 480px) {
+            .form-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .back-button {
+                order: 0;
+                align-self: auto;
+            }
+
+            .form-container {
+                padding: var(--spacing-2xl);
+            }
+        }
+
+        /* Tablet Portrait (576px+) */
+        @media (min-width: 576px) {
+            html {
+                font-size: 15px;
+            }
+
+            .main-content {
+                padding: var(--spacing-2xl);
+                padding-top: calc(var(--touch-target-comfortable) + var(--spacing-3xl));
+            }
+
+            .form-header h1 {
+                font-size: 24px;
+            }
+
+            .form-container {
+                max-width: 600px;
+                padding: var(--spacing-3xl);
+            }
+        }
+
+        /* Tablet Landscape (768px+) */
+        @media (min-width: 768px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
+
+            .sidebar {
+                transform: translateX(0);
+                width: var(--sidebar-width-tablet);
+                position: relative;
+                height: 100vh;
+            }
+
+            .sidebar-backdrop {
+                display: none;
+            }
+
+            .main-content {
+                padding-top: var(--spacing-2xl);
+            }
+
+            .form-header h1 {
+                font-size: 28px;
+            }
+        }
+
+        /* Desktop (992px+) */
+        @media (min-width: 992px) {
+            html {
+                font-size: 16px;
+            }
+
+            .sidebar {
+                width: var(--sidebar-width-desktop);
+            }
+
+            .main-content {
+                padding: var(--spacing-3xl);
+            }
+
+            .form-container {
+                max-width: 700px;
+            }
+        }
+
+        /* Large Desktop (1200px+) */
+        @media (min-width: 1200px) {
+            .main-content {
+                padding: 4rem;
+            }
+
+            .form-container {
+                max-width: 800px;
+            }
+        }
+
+        /* ===== ACCESSIBILITY & MOTION PREFERENCES ===== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .sidebar {
+                transition: none;
+            }
+        }
+
+        /* Focus styles for keyboard navigation */
+        .back-button:focus-visible,
+        .submit-btn:focus-visible,
+        .form-group input:focus-visible,
+        .form-group select:focus-visible,
+        .nav-item:focus-visible,
+        .mobile-menu-toggle:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --gray-100: #f0f0f0;
+                --gray-200: #e0e0e0;
+                --gray-300: #c0c0c0;
+                --border-color: #808080;
+            }
+        }
+
+        /* Landscape orientation adjustments for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .main-content {
+                padding: var(--spacing-lg);
+                padding-top: calc(var(--touch-target-comfortable) + var(--spacing-lg));
+            }
+
+            .form-container {
+                padding: var(--spacing-xl);
+            }
+
+            .form-header h1 {
+                font-size: 18px;
+            }
+
+            .sidebar-header {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .container {
+                min-height: -webkit-fill-available;
+            }
+
+            .sidebar {
+                height: -webkit-fill-available;
+            }
+
+            body {
+                min-height: -webkit-fill-available;
+            }
+        }
+
+        /* Android Chrome specific fixes */
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            .form-group input,
+            .form-group select {
+                font-size: 16px; /* Prevents zoom on Android */
+            }
+        }
+
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        /* Loading state animations */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">
-          <span class="logo-text">Chrono</span>X
-        </div>
-      </div>
+    <div class="container">
+        <!-- Mobile Menu Toggle (Always Visible on Mobile) -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+        </button>
 
-      <div class="nav-items">
-        <a href="/admin/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
-        <a href="/admin/product" class="nav-item"><i class="fas fa-box"></i> <span>Products</span></a>
-        <a href="/admin/orders" class="nav-item"><i class="fas fa-list"></i> <span>Order List</span></a>
-        <a href="/admin/userlist" class="nav-item"><i class="fas fa-user"></i> <span>Customer</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span>Sales</span></a>
-        <a href="/admin/category" class="nav-item"><i class="fas fa-tags"></i> <span>Category</span></a>
-        <a href="/admin/category-offers" class="nav-item active"><i class="fas fa-percent"></i> <span>Category Offers</span></a>
-        <a href="/admin/coupon" class="nav-item"><i class="fas fa-ticket-alt"></i> <span>Coupons</span></a>
-      </div>
+        <!-- Sidebar Backdrop for Mobile -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-      <div class="sidebar-footer">
-        <button class="account-btn">Account</button>
-        <a href="/admin/logout" style="text-decoration: none;"><button class="logout-btn">Logout</button></a>
-      </div>
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation" aria-hidden="true">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-text">Chrono</span>X
+                </div>
+            </div>
+
+            <!-- Navigation Items -->
+            <div class="nav-items">
+                <a href="/admin/dashboard" class="nav-item" aria-label="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item" aria-label="Products">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/orders" class="nav-item" aria-label="Order List">
+                    <i class="fas fa-list"></i>
+                    <span>Order List</span>
+                </a>
+                <a href="/admin/userlist" class="nav-item" aria-label="Customers">
+                    <i class="fas fa-user"></i>
+                    <span>Customer</span>
+                </a>
+                <a href="#" class="nav-item" aria-label="Sales">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/category" class="nav-item" aria-label="Categories">
+                    <i class="fas fa-tags"></i>
+                    <span>Category</span>
+                </a>
+                <a href="/admin/category-offers" class="nav-item active" aria-label="Category Offers" aria-current="page">
+                    <i class="fas fa-percent"></i>
+                    <span>Category Offers</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item" aria-label="Coupons">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <button class="account-btn" aria-label="Account settings">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Account</span>
+                </button>
+                <a href="/admin/logout" class="logout-btn" aria-label="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>Edit Category Offer</h1>
+                    <a href="/admin/category-offers" class="back-button" aria-label="Back to Category Offers">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        <span>Back to Offers</span>
+                    </a>
+                </div>
+
+                <form id="categoryOfferForm" novalidate>
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required aria-describedby="categoryError">
+                            <option value="">Select Category</option>
+                            <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                                <% categories.forEach(category => { %>
+                                    <option value="<%= category._id %>" <%= offer.category._id.toString() === category._id.toString() ? 'selected' : '' %>>
+                                        <%= category.name %>
+                                    </option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                        <div class="error-msg" id="categoryError" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="offerName">Offer Name *</label>
+                        <input 
+                            type="text" 
+                            id="offerName" 
+                            name="offerName" 
+                            value="<%= offer.offerName %>" 
+                            placeholder="Enter offer name" 
+                            required 
+                            aria-describedby="nameError"
+                            autocomplete="off"
+                            spellcheck="false"
+                        />
+                        <div class="error-msg" id="nameError" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="discount">Discount (%) *</label>
+                        <input 
+                            type="number" 
+                            id="discount" 
+                            name="discount" 
+                            value="<%= offer.discount %>" 
+                            placeholder="Enter discount percentage" 
+                            min="1" 
+                            max="99" 
+                            required 
+                            aria-describedby="discountError"
+                            inputmode="numeric"
+                        />
+                        <div class="error-msg" id="discountError" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startDate">Start Date *</label>
+                        <input 
+                            type="date" 
+                            id="startDate" 
+                            name="startDate" 
+                            value="<%= offer.startDate.toISOString().split('T')[0] %>" 
+                            required 
+                            aria-describedby="startDateError"
+                        />
+                        <div class="error-msg" id="startDateError" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">End Date *</label>
+                        <input 
+                            type="date" 
+                            id="endDate" 
+                            name="endDate" 
+                            value="<%= offer.endDate.toISOString().split('T')[0] %>" 
+                            required 
+                            aria-describedby="endDateError"
+                        />
+                        <div class="error-msg" id="endDateError" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" aria-describedby="submitHelp">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        <span>Update Category Offer</span>
+                    </button>
+                    <div id="submitHelp" class="sr-only">Click to update the category offer with the provided information</div>
+                </form>
+            </div>
+        </main>
     </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <div class="form-container">
-        <div class="form-header">
-          <h1>Edit Category Offer</h1>
-          <a href="/admin/category-offers" class="back-button">
-            <i class="fas fa-arrow-left"></i> Back to Offers
-          </a>
-        </div>
+    <!-- Screen Reader Only Content -->
+    <div class="sr-only" aria-live="polite" id="screenReaderAnnouncements"></div>
 
-        <form id="categoryOfferForm">
-          <div class="form-group">
-            <label for="category">Category *</label>
-            <select id="category" name="category" >
-              <option value="">Select Category</option>
-              <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
-                <% categories.forEach(category => { %>
-                  <option value="<%= category._id %>" <%= offer.category._id.toString() === category._id.toString() ? 'selected' : '' %>>
-                    <%= category.name %>
-                  </option>
-                <% }) %>
-              <% } %>
-            </select>
-            <div class="error-msg" id="categoryError"></div>
-          </div>
+    <script>
+        // ===== ENHANCED MOBILE-FIRST CATEGORY OFFER FORM =====
+        class MobileOptimizedCategoryOfferForm {
+            constructor() {
+                this.offerId = '<%= offer._id %>';
+                this.touchStartX = 0;
+                this.touchEndX = 0;
+                this.touchStartY = 0;
+                this.touchEndY = 0;
+                this.isScrolling = false;
+                this.resizeTimeout = null;
+                this.init();
+            }
 
-          <div class="form-group">
-            <label for="offerName">Offer Name *</label>
-            <input type="text" id="offerName" name="offerName" value="<%= offer.offerName %>" placeholder="Enter offer name"  />
-            <div class="error-msg" id="nameError"></div>
-          </div>
+            init() {
+                this.setupEventListeners();
+                this.setupMobileMenu();
+                this.setupFormValidation();
+                this.setupAccessibility();
+                this.setupPerformanceOptimizations();
+                this.detectMobileFeatures();
+            }
 
-          <div class="form-group">
-            <label for="discount">Discount (%) *</label>
-            <input type="number" id="discount" name="discount" value="<%= offer.discount %>" placeholder="Enter discount percentage" min="1" max="99"  />
-            <div class="error-msg" id="discountError"></div>
-          </div>
+            setupEventListeners() {
+                // Mobile menu toggle with enhanced touch support
+                const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                if (mobileMenuToggle) {
+                    mobileMenuToggle.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.toggleMobileMenu();
+                    });
 
-          <div class="form-group">
-            <label for="startDate">Start Date *</label>
-            <input type="date" id="startDate" name="startDate" value="<%= offer.startDate.toISOString().split('T')[0] %>"  />
-            <div class="error-msg" id="startDateError"></div>
-          </div>
+                    // Touch events for better mobile responsiveness
+                    mobileMenuToggle.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        mobileMenuToggle.style.transform = 'scale(0.95)';
+                    });
 
-          <div class="form-group">
-            <label for="endDate">End Date *</label>
-            <input type="date" id="endDate" name="endDate" value="<%= offer.endDate.toISOString().split('T')[0] %>"  />
-            <div class="error-msg" id="endDateError"></div>
-          </div>
+                    mobileMenuToggle.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        mobileMenuToggle.style.transform = '';
+                        this.toggleMobileMenu();
+                    });
+                }
 
-          <button type="submit" class="submit-btn">
-            <i class="fas fa-save"></i> Update Category Offer
-          </button>
-        </form>
-      </div>
-    </main>
-  </div>
+                // Enhanced backdrop handling
+                const backdrop = document.getElementById('sidebarBackdrop');
+                if (backdrop) {
+                    backdrop.addEventListener('click', () => this.closeMobileMenu());
+                    backdrop.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        this.closeMobileMenu();
+                    });
+                }
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('categoryOfferForm');
-      const offerId = '<%= offer._id %>';
+                // Improved window resize handling with debouncing
+                window.addEventListener('resize', () => {
+                    clearTimeout(this.resizeTimeout);
+                    this.resizeTimeout = setTimeout(() => {
+                        this.handleResize();
+                    }, 150);
+                });
 
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
+                // Enhanced keyboard navigation
+                document.addEventListener('keydown', (e) => this.handleKeyboardNavigation(e));
 
-        if (!validateForm()) {
-          return;
+                // Orientation change handling
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => {
+                        this.handleResize();
+                    }, 100);
+                });
+
+                // Visibility change handling for performance
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.pauseAnimations();
+                    } else {
+                        this.resumeAnimations();
+                    }
+                });
+            }
+
+            setupMobileMenu() {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebarBackdrop');
+                
+                if (sidebar) {
+                    // Enhanced touch support with gesture recognition
+                    sidebar.addEventListener('touchstart', (e) => {
+                        this.touchStartX = e.changedTouches[0].screenX;
+                        this.touchStartY = e.changedTouches[0].screenY;
+                        this.isScrolling = false;
+                    }, { passive: true });
+
+                    sidebar.addEventListener('touchmove', (e) => {
+                        if (!this.isScrolling) {
+                            const touchX = e.changedTouches[0].screenX;
+                            const touchY = e.changedTouches[0].screenY;
+                            const deltaX = Math.abs(touchX - this.touchStartX);
+                            const deltaY = Math.abs(touchY - this.touchStartY);
+                            
+                            // Determine if this is a horizontal swipe or vertical scroll
+                            if (deltaX > deltaY && deltaX > 10) {
+                                this.isScrolling = false;
+                                // Prevent vertical scrolling during horizontal swipe
+                                e.preventDefault();
+                            } else if (deltaY > deltaX) {
+                                this.isScrolling = true;
+                            }
+                        }
+                    }, { passive: false });
+
+                    sidebar.addEventListener('touchend', (e) => {
+                        if (!this.isScrolling) {
+                            this.touchEndX = e.changedTouches[0].screenX;
+                            this.touchEndY = e.changedTouches[0].screenY;
+                            this.handleSwipe();
+                        }
+                    }, { passive: true });
+
+                    // Prevent body scroll when sidebar is open
+                    sidebar.addEventListener('scroll', (e) => {
+                        e.stopPropagation();
+                    });
+                }
+            }
+
+            toggleMobileMenu() {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebarBackdrop');
+                const toggleBtn = document.getElementById('mobileMenuToggle');
+                
+                if (sidebar && backdrop && toggleBtn) {
+                    const isOpen = sidebar.classList.contains('active');
+                    
+                    if (isOpen) {
+                        this.closeMobileMenu();
+                    } else {
+                        this.openMobileMenu();
+                    }
+                }
+            }
+
+            openMobileMenu() {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebarBackdrop');
+                const toggleBtn = document.getElementById('mobileMenuToggle');
+                const body = document.body;
+                
+                if (sidebar && backdrop && toggleBtn) {
+                    sidebar.classList.add('active');
+                    backdrop.classList.add('active');
+                    toggleBtn.classList.add('active');
+                    body.classList.add('menu-open');
+                    
+                    // Update ARIA attributes
+                    sidebar.setAttribute('aria-hidden', 'false');
+                    toggleBtn.setAttribute('aria-expanded', 'true');
+                    
+                    // Update icon
+                    const icon = toggleBtn.querySelector('i');
+                    if (icon) {
+                        icon.className = 'fas fa-times';
+                    }
+                    
+                    // Focus management
+                    const firstNavItem = sidebar.querySelector('.nav-item');
+                    if (firstNavItem) {
+                        setTimeout(() => firstNavItem.focus(), 100);
+                    }
+                    
+                    // Announce to screen readers
+                    this.announceToScreenReader('Navigation menu opened');
+                }
+            }
+
+            closeMobileMenu() {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebarBackdrop');
+                const toggleBtn = document.getElementById('mobileMenuToggle');
+                const body = document.body;
+                
+                if (sidebar && backdrop && toggleBtn) {
+                    sidebar.classList.remove('active');
+                    backdrop.classList.remove('active');
+                    toggleBtn.classList.remove('active');
+                    body.classList.remove('menu-open');
+                    
+                    // Update ARIA attributes
+                    sidebar.setAttribute('aria-hidden', 'true');
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                    
+                    // Update icon
+                    const icon = toggleBtn.querySelector('i');
+                    if (icon) {
+                        icon.className = 'fas fa-bars';
+                    }
+                    
+                    // Return focus to toggle button
+                    toggleBtn.focus();
+                    
+                    // Announce to screen readers
+                    this.announceToScreenReader('Navigation menu closed');
+                }
+            }
+
+            handleSwipe() {
+                const differenceX = this.touchStartX - this.touchEndX;
+                const differenceY = Math.abs(this.touchStartY - this.touchEndY);
+                const isLeftSwipe = differenceX > 50;
+                const isHorizontalSwipe = Math.abs(differenceX) > differenceY;
+                
+                if (isLeftSwipe && isHorizontalSwipe) {
+                    this.closeMobileMenu();
+                }
+            }
+
+            handleResize() {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebarBackdrop');
+                const body = document.body;
+                
+                // Close mobile menu on larger screens
+                if (window.innerWidth >= 768) {
+                    if (sidebar) {
+                        sidebar.classList.remove('active');
+                        sidebar.setAttribute('aria-hidden', 'false');
+                    }
+                    if (backdrop) {
+                        backdrop.classList.remove('active');
+                    }
+                    if (body) {
+                        body.classList.remove('menu-open');
+                    }
+                    
+                    const toggleBtn = document.getElementById('mobileMenuToggle');
+                    if (toggleBtn) {
+                        toggleBtn.classList.remove('active');
+                        toggleBtn.setAttribute('aria-expanded', 'false');
+                        const icon = toggleBtn.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fas fa-bars';
+                        }
+                    }
+                }
+                
+                // Adjust viewport height for mobile browsers
+                this.adjustViewportHeight();
+            }
+
+            adjustViewportHeight() {
+                // Fix for mobile browsers with dynamic viewport
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            setupFormValidation() {
+                const form = document.getElementById('categoryOfferForm');
+                if (!form) return;
+
+                // Form submission handler
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.handleFormSubmit(e);
+                });
+
+                // Real-time validation setup
+                this.setupRealTimeValidation();
+                
+                // Date validation setup
+                this.setupDateValidation();
+            }
+
+            setupRealTimeValidation() {
+                // Category validation
+                const categorySelect = document.getElementById('category');
+                if (categorySelect) {
+                    categorySelect.addEventListener('change', () => {
+                        this.validateField('category');
+                    });
+                }
+
+                // Offer name validation
+                const offerNameInput = document.getElementById('offerName');
+                if (offerNameInput) {
+                    offerNameInput.addEventListener('input', this.debounce(() => {
+                        this.validateField('offerName');
+                    }, 300));
+
+                    offerNameInput.addEventListener('blur', () => {
+                        this.validateField('offerName');
+                    });
+                }
+
+                // Discount validation
+                const discountInput = document.getElementById('discount');
+                if (discountInput) {
+                    discountInput.addEventListener('input', this.debounce(() => {
+                        this.validateField('discount');
+                    }, 300));
+
+                    discountInput.addEventListener('blur', () => {
+                        this.validateField('discount');
+                    });
+                }
+
+                // Date validation
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+                
+                if (startDateInput) {
+                    startDateInput.addEventListener('change', () => {
+                        this.validateField('startDate');
+                        this.validateField('endDate'); // Re-validate end date
+                    });
+                }
+
+                if (endDateInput) {
+                    endDateInput.addEventListener('change', () => {
+                        this.validateField('endDate');
+                    });
+                }
+            }
+
+            setupDateValidation() {
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+
+                if (startDateInput && endDateInput) {
+                    startDateInput.addEventListener('change', () => {
+                        const startDate = startDateInput.value;
+                        if (startDate) {
+                            const nextDay = new Date(startDate);
+                            nextDay.setDate(nextDay.getDate() + 1);
+                            endDateInput.setAttribute('min', nextDay.toISOString().split('T')[0]);
+                        }
+                    });
+                }
+            }
+
+            validateField(fieldName) {
+                const field = document.getElementById(fieldName);
+                const errorElement = document.getElementById(`${fieldName}Error`);
+                
+                if (!field || !errorElement) return true;
+
+                let isValid = true;
+                let errorMessage = '';
+
+                // Clear previous state
+                field.classList.remove('error', 'success');
+                errorElement.textContent = '';
+
+                switch (fieldName) {
+                    case 'category':
+                        if (!field.value) {
+                            isValid = false;
+                            errorMessage = 'Please select a category';
+                        }
+                        break;
+
+                    case 'offerName':
+                        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
+                        const trimmedValue = field.value.trim();
+                        
+                        if (!trimmedValue) {
+                            isValid = false;
+                            errorMessage = 'Offer name is required';
+                        } else if (!nameRegex.test(trimmedValue)) {
+                            isValid = false;
+                            errorMessage = 'Offer name must be 3-50 characters, letters, spaces and hyphens only';
+                        }
+                        break;
+
+                    case 'discount':
+                        const discountValue = parseInt(field.value);
+                        
+                        if (!field.value) {
+                            isValid = false;
+                            errorMessage = 'Discount is required';
+                        } else if (isNaN(discountValue) || discountValue < 1 || discountValue > 99) {
+                            isValid = false;
+                            errorMessage = 'Discount must be between 1 and 99%';
+                        }
+                        break;
+
+                    case 'startDate':
+                        if (!field.value) {
+                            isValid = false;
+                            errorMessage = 'Start date is required';
+                        }
+                        break;
+
+                    case 'endDate':
+                        const startDateInput = document.getElementById('startDate');
+                        const startDate = new Date(startDateInput.value);
+                        const endDate = new Date(field.value);
+                        
+                        if (!field.value) {
+                            isValid = false;
+                            errorMessage = 'End date is required';
+                        } else if (startDateInput.value && endDate <= startDate) {
+                            isValid = false;
+                            errorMessage = 'End date must be after start date';
+                        }
+                        break;
+                }
+
+                // Update UI based on validation result
+                if (isValid) {
+                    field.classList.add('success');
+                } else {
+                    field.classList.add('error');
+                    errorElement.textContent = errorMessage;
+                    this.announceToScreenReader(`Validation error: ${errorMessage}`);
+                }
+
+                return isValid;
+            }
+
+            validateForm() {
+                const fields = ['category', 'offerName', 'discount', 'startDate', 'endDate'];
+                let isFormValid = true;
+
+                fields.forEach(fieldName => {
+                    const isFieldValid = this.validateField(fieldName);
+                    if (!isFieldValid) {
+                        isFormValid = false;
+                    }
+                });
+
+                return isFormValid;
+            }
+
+            async handleFormSubmit(e) {
+                e.preventDefault();
+
+                if (!this.validateForm()) {
+                    this.announceToScreenReader('Please fix the validation errors before submitting');
+                    return;
+                }
+
+                const form = e.target;
+                const formData = new FormData(form);
+                const submitBtn = form.querySelector('.submit-btn');
+                
+                // Show loading state
+                this.setSubmitButtonLoading(submitBtn, true);
+                this.announceToScreenReader('Updating category offer, please wait');
+
+                try {
+                    const response = await fetch(`/admin/category-offers/edit/${this.offerId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            category: formData.get('category'),
+                            offerName: formData.get('offerName'),
+                            discount: formData.get('discount'),
+                            startDate: formData.get('startDate'),
+                            endDate: formData.get('endDate')
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.showToast(data.message, 'success');
+                        this.announceToScreenReader('Category offer updated successfully');
+                        
+                        setTimeout(() => {
+                            window.location.href = '/admin/category-offers';
+                        }, 1500);
+                    } else {
+                        this.showToast(data.message, 'error');
+                        this.announceToScreenReader('Error updating category offer: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showToast('Error updating category offer. Please try again.', 'error');
+                    this.announceToScreenReader('Error updating category offer. Please try again.');
+                } finally {
+                    this.setSubmitButtonLoading(submitBtn, false);
+                }
+            }
+
+            setSubmitButtonLoading(button, isLoading) {
+                if (!button) return;
+
+                if (isLoading) {
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> <span>Updating...</span>';
+                    button.setAttribute('aria-label', 'Updating category offer, please wait');
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> <span>Update Category Offer</span>';
+                    button.setAttribute('aria-label', 'Update Category Offer');
+                }
+            }
+
+            showToast(message, type = 'success') {
+                // Create toast if it doesn't exist
+                let toast = document.getElementById('toast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'toast';
+                    toast.className = 'toast';
+                    toast.innerHTML = `
+                        <div class="toast-content">
+                            <i class="toast-icon" aria-hidden="true"></i>
+                            <span class="toast-message"></span>
+                        </div>
+                        <button class="toast-close" onclick="hideToast()" aria-label="Close notification">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                    `;
+                    document.body.appendChild(toast);
+                }
+
+                // Add toast styles if not present
+                if (!document.getElementById('toast-styles')) {
+                    const toastStyles = document.createElement('style');
+                    toastStyles.id = 'toast-styles';
+                    toastStyles.textContent = `
+                        .toast {
+                            position: fixed;
+                            top: var(--spacing-lg);
+                            left: var(--spacing-lg);
+                            right: var(--spacing-lg);
+                            z-index: var(--z-toast);
+                            background: var(--white);
+                            border: 1px solid var(--gray-200);
+                            border-radius: var(--radius-xl);
+                            box-shadow: var(--shadow-lg);
+                            padding: var(--spacing-lg);
+                            display: none;
+                            align-items: center;
+                            gap: var(--spacing-md);
+                            animation: toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        }
+                        
+                        @keyframes toastSlideIn {
+                            from { opacity: 0; transform: translateY(-20px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                        
+                        .toast.show { display: flex; }
+                        .toast.success { border-left: 4px solid var(--success-color); }
+                        .toast.error { border-left: 4px solid var(--danger-color); }
+                        
+                        .toast-content {
+                            display: flex;
+                            align-items: center;
+                            gap: var(--spacing-md);
+                            flex: 1;
+                        }
+                        
+                        .toast-icon { font-size: 16px; flex-shrink: 0; }
+                        .toast.success .toast-icon:before {
+                            content: "\\f00c";
+                            font-family: "Font Awesome 6 Free";
+                            font-weight: 900;
+                            color: var(--success-color);
+                        }
+                        .toast.error .toast-icon:before {
+                            content: "\\f00d";
+                            font-family: "Font Awesome 6 Free";
+                            font-weight: 900;
+                            color: var(--danger-color);
+                        }
+                        
+                        .toast-message {
+                            color: var(--gray-700);
+                            font-weight: 500;
+                            font-size: 14px;
+                            line-height: 1.4;
+                        }
+                        
+                        .toast-close {
+                            background: none;
+                            border: none;
+                            color: var(--gray-400);
+                            cursor: pointer;
+                            padding: var(--spacing-sm);
+                            border-radius: var(--radius-md);
+                            transition: var(--transition-fast);
+                            min-width: var(--touch-target-min);
+                            min-height: var(--touch-target-min);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            flex-shrink: 0;
+                        }
+                        
+                        .toast-close:hover, .toast-close:active {
+                            background: var(--gray-100);
+                            color: var(--gray-600);
+                        }
+                        
+                        @media (min-width: 576px) {
+                            .toast {
+                                left: auto;
+                                right: var(--spacing-xl);
+                                max-width: 400px;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(toastStyles);
+                }
+
+                toast.classList.remove('success', 'error', 'warning', 'info');
+                toast.classList.add(type);
+
+                const messageElement = toast.querySelector('.toast-message');
+                if (messageElement) {
+                    messageElement.textContent = message;
+                }
+
+                toast.classList.add('show');
+                toast.setAttribute('aria-hidden', 'false');
+                
+                this.announceToScreenReader(message);
+
+                setTimeout(() => {
+                    this.hideToast();
+                }, 5000);
+            }
+
+            hideToast() {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    toast.classList.remove('show');
+                    toast.setAttribute('aria-hidden', 'true');
+                }
+            }
+
+            setupAccessibility() {
+                // Enhanced keyboard navigation
+                this.setupKeyboardTraps();
+                this.setupFocusManagement();
+                this.setupScreenReaderSupport();
+            }
+
+            setupKeyboardTraps() {
+                // Trap focus in sidebar when open on mobile
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.addEventListener('keydown', (e) => {
+                        if (e.key === 'Tab' && window.innerWidth < 768 && sidebar.classList.contains('active')) {
+                            this.trapFocus(e, sidebar);
+                        }
+                    });
+                }
+            }
+
+            trapFocus(e, container) {
+                const focusableElements = container.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            }
+
+            setupFocusManagement() {
+                // Enhanced focus management for mobile
+                const focusableElements = document.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                
+                focusableElements.forEach(element => {
+                    element.addEventListener('focus', () => {
+                        // Ensure focused element is visible on mobile
+                        if (window.innerWidth < 768) {
+                            setTimeout(() => {
+                                element.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'nearest',
+                                    inline: 'nearest'
+                                });
+                            }, 100);
+                        }
+                    });
+                });
+            }
+
+            setupScreenReaderSupport() {
+                // Enhanced screen reader announcements
+                this.announcements = document.getElementById('screenReaderAnnouncements');
+                if (!this.announcements) {
+                    this.announcements = document.createElement('div');
+                    this.announcements.id = 'screenReaderAnnouncements';
+                    this.announcements.className = 'sr-only';
+                    this.announcements.setAttribute('aria-live', 'polite');
+                    this.announcements.setAttribute('aria-atomic', 'true');
+                    document.body.appendChild(this.announcements);
+                }
+            }
+
+            announceToScreenReader(message) {
+                if (this.announcements) {
+                    this.announcements.textContent = message;
+                    setTimeout(() => {
+                        this.announcements.textContent = '';
+                    }, 1000);
+                }
+            }
+
+            handleKeyboardNavigation(e) {
+                // Enhanced keyboard shortcuts
+                if (e.key === 'Escape') {
+                    if (document.getElementById('sidebar').classList.contains('active')) {
+                        this.closeMobileMenu();
+                    }
+                }
+                
+                // Menu toggle
+                if (e.key === 'm' && e.ctrlKey && window.innerWidth < 768) {
+                    e.preventDefault();
+                    this.toggleMobileMenu();
+                }
+            }
+
+            setupPerformanceOptimizations() {
+                // Passive event listeners for better scroll performance
+                document.addEventListener('scroll', this.throttle(() => {
+                    // Handle scroll-based optimizations
+                }, 16), { passive: true });
+            }
+
+            detectMobileFeatures() {
+                // Detect and adapt to mobile features
+                const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                const isAndroid = /Android/.test(navigator.userAgent);
+                
+                if (isTouchDevice) {
+                    document.body.classList.add('touch-device');
+                }
+                
+                if (isIOS) {
+                    document.body.classList.add('ios-device');
+                    this.setupIOSOptimizations();
+                }
+                
+                if (isAndroid) {
+                    document.body.classList.add('android-device');
+                    this.setupAndroidOptimizations();
+                }
+                
+                // Detect if device supports hover
+                if (window.matchMedia('(hover: hover)').matches) {
+                    document.body.classList.add('hover-support');
+                }
+            }
+
+            setupIOSOptimizations() {
+                // Fix iOS viewport issues
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 
+                        'width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover'
+                    );
+                }
+                
+                // Fix iOS scroll bounce
+                document.addEventListener('touchmove', (e) => {
+                    if (e.target.closest('.sidebar, .form-container')) {
+                        return;
+                    }
+                    e.preventDefault();
+                }, { passive: false });
+            }
+
+            setupAndroidOptimizations() {
+                // Android specific optimizations
+                const inputs = document.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', () => {
+                        // Prevent zoom on focus for Android
+                        if (input.style.fontSize !== '16px') {
+                            input.style.fontSize = '16px';
+                        }
+                    });
+                });
+            }
+
+            pauseAnimations() {
+                document.body.classList.add('animations-paused');
+            }
+
+            resumeAnimations() {
+                document.body.classList.remove('animations-paused');
+            }
+
+            // Utility Methods
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            throttle(func, limit) {
+                let inThrottle;
+                return function () {
+                    const args = arguments;
+                    const context = this;
+                    if (!inThrottle) {
+                        func.apply(context, args);
+                        inThrottle = true;
+                        setTimeout(() => (inThrottle = false), limit);
+                    }
+                };
+            }
         }
 
-        const formData = new FormData(form);
-        const submitBtn = form.querySelector('.submit-btn');
-        
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        // Global functions for compatibility
+        let categoryOfferForm;
 
-        try {
-          const response = await fetch(`/admin/category-offers/edit/${offerId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              category: formData.get('category'),
-              offerName: formData.get('offerName'),
-              discount: formData.get('discount'),
-              startDate: formData.get('startDate'),
-              endDate: formData.get('endDate')
-            })
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            showToast(data.message);
-            setTimeout(() => {
-              window.location.href = '/admin/category-offers';
-            }, 1500);
-          } else {
-            showToast(data.message, 'error');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          showToast('Error updating category offer', 'error');
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Category Offer';
+        function hideToast() {
+            if (categoryOfferForm) {
+                categoryOfferForm.hideToast();
+            }
         }
-      });
 
-      function validateForm() {
-        let isValid = true;
-
-        // Clear previous errors and remove error classes
-        document.querySelectorAll('.error-msg').forEach(msg => {
-          msg.textContent = '';
+        // Enhanced initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            categoryOfferForm = new MobileOptimizedCategoryOfferForm();
+            
+            // Add CSS class for JavaScript enabled
+            document.documentElement.classList.add('js-enabled');
+            
+            // Initialize viewport height fix
+            categoryOfferForm.adjustViewportHeight();
         });
-        document.querySelectorAll('.error').forEach(field => {
-          field.classList.remove('error');
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (categoryOfferForm) {
+                    categoryOfferForm.pauseAnimations();
+                }
+            } else {
+                if (categoryOfferForm) {
+                    categoryOfferForm.resumeAnimations();
+                }
+            }
         });
 
-        // Validate category
-        const category = document.getElementById('category');
-        if (!category.value) {
-          showError('categoryError', 'Please select a category', category);
-          isValid = false;
+        // Service Worker registration for PWA capabilities
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
         }
 
-        // Validate offer name
-        const offerName = document.getElementById('offerName');
-        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
-        if (!offerName.value.trim()) {
-          showError('nameError', 'Offer name is required', offerName);
-          isValid = false;
-        } else if (!nameRegex.test(offerName.value.trim())) {
-          showError('nameError', 'Offer name must be 3-50 characters, letters, spaces and hyphens only', offerName);
-          isValid = false;
-        }
-
-        // Validate discount
-        const discount = document.getElementById('discount');
-        const discountValue = parseInt(discount.value);
-        if (!discount.value) {
-          showError('discountError', 'Discount is required', discount);
-          isValid = false;
-        } else if (discountValue < 1 || discountValue > 99) {
-          showError('discountError', 'Discount must be between 1 and 99%', discount);
-          isValid = false;
-        }
-
-        // Validate dates
-        const startDate = document.getElementById('startDate');
-        const endDate = document.getElementById('endDate');
-        const start = new Date(startDate.value);
-        const end = new Date(endDate.value);
-
-        if (!startDate.value) {
-          showError('startDateError', 'Start date is required', startDate);
-          isValid = false;
-        }
-
-        if (!endDate.value) {
-          showError('endDateError', 'End date is required', endDate);
-          isValid = false;
-        } else if (end <= start) {
-          showError('endDateError', 'End date must be after start date', endDate);
-          isValid = false;
-        }
-
-        return isValid;
-      }
-
-      function showError(elementId, message, inputField) {
-        const errorElement = document.getElementById(elementId);
-        errorElement.textContent = message;
-        if (inputField) {
-          inputField.classList.add('error');
-        }
-      }
-
-      // Real-time validation
-      document.getElementById('category').addEventListener('change', function() {
-        if (this.value) {
-          this.classList.remove('error');
-          document.getElementById('categoryError').textContent = '';
-        }
-      });
-
-      document.getElementById('offerName').addEventListener('input', function() {
-        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
-        if (this.value.trim() && nameRegex.test(this.value.trim())) {
-          this.classList.remove('error');
-          document.getElementById('nameError').textContent = '';
-        }
-      });
-
-      document.getElementById('discount').addEventListener('input', function() {
-        const discountValue = parseInt(this.value);
-        if (this.value && discountValue >= 1 && discountValue <= 99) {
-          this.classList.remove('error');
-          document.getElementById('discountError').textContent = '';
-        }
-      });
-
-      document.getElementById('startDate').addEventListener('change', function() {
-        if (this.value) {
-          this.classList.remove('error');
-          document.getElementById('startDateError').textContent = '';
-        }
-      });
-
-      document.getElementById('endDate').addEventListener('change', function() {
-        const startDate = document.getElementById('startDate').value;
-        if (this.value && startDate && new Date(this.value) > new Date(startDate)) {
-          this.classList.remove('error');
-          document.getElementById('endDateError').textContent = '';
-        }
-      });
-
-      // Update end date minimum when start date changes
-      document.getElementById('startDate').addEventListener('change', function() {
-        const startDate = this.value;
-        if (startDate) {
-          const nextDay = new Date(startDate);
-          nextDay.setDate(nextDay.getDate() + 1);
-          document.getElementById('endDate').setAttribute('min', nextDay.toISOString().split('T')[0]);
-        }
-      });
-    });
-  </script>
+        // Add screen reader only styles
+        const srOnlyStyles = document.createElement('style');
+        srOnlyStyles.textContent = `
+            .animations-paused * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .js-enabled .no-js {
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(srOnlyStyles);
+    </script>
 </body>
 </html>
