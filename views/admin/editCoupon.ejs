@@ -14,89 +14,87 @@
         }
 
         :root {
-            --primary-color: #3b82f6;
-            --primary-light: #dbeafe;
-            --primary-dark: #1e40af;
-            --secondary-color: #111827;
-            --text-color: #333;
-            --text-secondary: #666;
-            --text-light: #999;
-            --border-color: #e5e7eb;
-            --background-light: #f9fafb;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #111827;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
             --white: #ffffff;
-            --error-color: #ef4444;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --sidebar-width: 240px;
+            --black: #000000;
+            --text-primary: #000000;
+            --text-secondary: #374151;
+            --sidebar-width: 280px;
             --sidebar-collapsed: 80px;
-            --transition: all 0.3s ease;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-            --border-radius: 8px;
-            --border-radius-lg: 12px;
-        }
-
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
         }
 
         body {
-            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--background-light);
-            color: var(--text-color);
-            min-height: 100vh;
-            overflow-x: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--white);
+            color: var(--text-primary);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
+        /* Container */
         .container {
             display: flex;
-            width: 100%;
             min-height: 100vh;
             position: relative;
+            background-color: var(--white);
         }
 
         /* Mobile Menu Toggle */
         .menu-toggle {
             position: fixed;
-            top: clamp(10px, 2vw, 15px);
-            left: clamp(10px, 2vw, 15px);
+            top: 1rem;
+            left: 1rem;
             z-index: 1001;
-            background-color: var(--white);
-            border: 1px solid var(--border-color);
+            background: var(--white);
+            border: 1px solid var(--gray-200);
             border-radius: var(--border-radius);
-            width: clamp(40px, 6vw, 45px);
-            height: clamp(40px, 6vw, 45px);
+            width: 2.5rem;
+            height: 2.5rem;
             display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            font-size: clamp(16px, 2.5vw, 18px);
+            box-shadow: var(--shadow-md);
             transition: var(--transition);
-            color: var(--text-color);
+            color: var(--text-primary);
         }
 
         .menu-toggle:hover {
-            background-color: #f3f4f6;
+            background: var(--gray-50);
             transform: scale(1.05);
-            box-shadow: var(--shadow-md);
         }
 
-        .menu-toggle:active {
-            transform: scale(0.95);
-        }
-
-        /* Sidebar Overlay for Mobile */
+        /* Sidebar Overlay */
         .sidebar-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
             opacity: 0;
@@ -108,11 +106,11 @@
             opacity: 1;
         }
 
-        /* Sidebar Styles */
+        /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
-            background-color: var(--white);
-            border-right: 1px solid var(--border-color);
+            background: var(--white);
+            border-right: 1px solid var(--gray-200);
             height: 100vh;
             position: fixed;
             left: 0;
@@ -122,759 +120,589 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-lg);
         }
 
+        /* Sidebar Header */
         .sidebar-header {
-            padding: clamp(15px, 3vw, 20px);
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--white);
         }
 
         .logo {
-            font-size: clamp(20px, 3vw, 24px);
-            font-weight: 700;
-            color: var(--white);
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
         }
 
+        .logo-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--white);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+        }
+
+        /* Navigation */
         .nav-items {
             flex: 1;
-            padding: clamp(15px, 3vw, 20px) 0;
+            padding: 1rem 0;
             overflow-y: auto;
+            background: var(--white);
+        }
+
+        .nav-group-label {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            padding: clamp(12px, 2.5vw, 15px) clamp(15px, 3vw, 20px);
+            padding: 0.75rem 1.5rem;
             color: var(--text-secondary);
             text-decoration: none;
             transition: var(--transition);
-            margin-bottom: 5px;
-            cursor: pointer;
-            font-size: clamp(13px, 1.5vw, 14px);
-            border-radius: 0 25px 25px 0;
-            margin-right: 10px;
+            margin: 0.125rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
             position: relative;
         }
 
-        .nav-item:hover, .nav-item.active {
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            border-left: 3px solid var(--primary-color);
-            transform: translateX(5px);
+        .nav-item:hover {
+            background: var(--gray-100);
+            color: var(--text-primary);
+            transform: translateX(0.125rem);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
         }
 
         .nav-item i {
-            margin-right: clamp(8px, 2vw, 12px);
-            width: clamp(18px, 2.5vw, 20px);
+            margin-right: 0.75rem;
+            width: 1.25rem;
             text-align: center;
-            font-size: clamp(16px, 2vw, 18px);
-            transition: transform 0.3s ease;
+            font-size: 1rem;
         }
 
-        .nav-item:hover i {
-            transform: scale(1.2);
-        }
-
+        /* Sidebar Footer */
         .sidebar-footer {
-            padding: clamp(15px, 3vw, 20px);
-            border-top: 1px solid var(--border-color);
-            flex-shrink: 0;
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            background: var(--white);
         }
 
-        .account-btn, .logout-btn {
+        .footer-btn {
             display: block;
             width: 100%;
-            padding: clamp(10px, 2vw, 12px);
-            margin-bottom: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
             border-radius: var(--border-radius);
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
-            font-size: clamp(12px, 1.5vw, 14px);
+            font-size: 0.875rem;
             border: none;
             text-decoration: none;
         }
 
         .account-btn {
-            background-color: var(--white);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-primary);
+            border: 1px solid var(--gray-200);
         }
 
         .account-btn:hover {
-            background-color: #f3f4f6;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
+            background: var(--gray-50);
+            transform: translateY(-0.125rem);
         }
 
         .logout-btn {
-            background-color: var(--secondary-color);
+            background: var(--secondary);
             color: var(--white);
         }
 
         .logout-btn:hover {
-            background-color: #000;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            background: var(--black);
+            transform: translateY(-0.125rem);
         }
 
         /* Main Content */
         .main-content {
             margin-left: var(--sidebar-width);
-            padding: clamp(15px, 3vw, 25px);
+            flex: 1;
             transition: var(--transition);
-            width: calc(100% - var(--sidebar-width));
-            min-width: 0;
             min-height: 100vh;
+            background: var(--white);
         }
 
         /* Header */
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: clamp(20px, 4vw, 30px);
-            flex-wrap: wrap;
-            gap: 15px;
             background: var(--white);
-            padding: clamp(15px, 3vw, 20px);
-            border-radius: var(--border-radius-lg);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .page-title {
-            font-size: clamp(20px, 3.5vw, 28px);
+            font-size: 1.5rem;
             font-weight: 600;
-            color: var(--text-color);
-            margin: 0;
+            color: var(--text-primary);
         }
 
-        .action-btn {
-            background: var(--primary-color);
-            color: var(--white);
-            border: none;
-            padding: clamp(10px, 2vw, 12px) clamp(16px, 3vw, 20px);
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: clamp(13px, 1.5vw, 14px);
-            font-weight: 500;
-            transition: var(--transition);
-            text-decoration: none;
+        .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--white);
+            color: var(--text-primary);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition);
         }
 
-        .action-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .back-btn:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+            transform: translateY(-0.125rem);
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--white);
+        }
+
+        .content-header {
+            margin-bottom: 2rem;
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .content-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: var(--gray-100);
+            color: var(--text-primary);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
         }
 
         /* Form Container */
         .form-container {
+            display: grid;
+            gap: 2rem;
+            max-width: 800px;
+        }
+
+        /* Card */
+        .card {
             background: var(--white);
-            border-radius: var(--border-radius-lg);
-            padding: clamp(20px, 4vw, 40px);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
             transition: var(--transition);
-            max-width: clamp(400px, 90vw, 700px);
-            margin: 0 auto;
         }
 
-        .form-container:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+        .card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-0.125rem);
         }
 
-        .form-title {
-            font-size: clamp(18px, 2.5vw, 24px);
+        .card-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            background: var(--white);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: clamp(20px, 4vw, 30px);
-            color: var(--text-color);
-            text-align: center;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 15px;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .card-content {
+            padding: 2rem;
+            background: var(--white);
         }
 
         /* Form Styles */
         .form-group {
-            margin-bottom: clamp(18px, 3vw, 25px);
-            position: relative;
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
-            display: block;
-            margin-bottom: clamp(6px, 1vw, 8px);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--text-color);
-            font-size: clamp(13px, 1.5vw, 14px);
+            color: var(--text-primary);
+            font-size: 0.875rem;
         }
 
         .form-input {
             width: 100%;
-            padding: clamp(12px, 2vw, 15px);
-            border: 2px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
             border-radius: var(--border-radius);
-            font-size: clamp(14px, 2vw, 16px);
+            font-size: 1rem;
             transition: var(--transition);
             background: var(--white);
-            color: var(--text-color);
-            font-family: inherit;
+            color: var(--text-primary);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: var(--primary-color);
+            border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .form-input:valid {
-            border-color: var(--success-color);
+            transform: translateY(-0.0625rem);
         }
 
         .form-input.error {
-            border-color: var(--error-color);
-            animation: shake 0.3s ease-in-out;
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-3px); }
-            75% { transform: translateX(3px); }
-        }
-
-        /* Error Messages */
         .error-message {
-            color: var(--error-color);
-            font-size: clamp(11px, 1.3vw, 12px);
-            margin-top: 5px;
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.375rem;
             display: none;
-            animation: fadeIn 0.3s ease-in-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .error-message.show {
+            display: block;
         }
 
-        /* Submit Button */
-        .submit-btn {
-            width: 100%;
-            padding: clamp(14px, 2.5vw, 18px);
-            background: linear-gradient(135deg, var(--secondary-color) 0%, #333 100%);
-            color: var(--white);
-            border: none;
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
             border-radius: var(--border-radius);
-            font-size: clamp(14px, 2vw, 16px);
+            font-size: 0.875rem;
             font-weight: 600;
+            text-decoration: none;
+            border: none;
             cursor: pointer;
-            margin-top: clamp(20px, 3vw, 25px);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .submit-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
         }
 
-        .submit-btn:hover::before {
-            left: 100%;
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-0.125rem);
+            box-shadow: var(--shadow-lg);
         }
 
-        .submit-btn:hover {
-            background: linear-gradient(135deg, #333 0%, #555 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
-        .submit-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-primary);
+            border: 1px solid var(--gray-300);
         }
 
-        .submit-btn:focus {
-            outline: 2px solid var(--primary-color);
-            outline-offset: 2px;
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
         }
 
-        /* Loading State */
-        .submit-btn.loading {
-            pointer-events: none;
-            opacity: 0.8;
+        .btn-black {
+            background: var(--secondary);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
         }
 
-        .submit-btn.loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
+        .btn-black:hover:not(:disabled) {
+            background: var(--black);
+            transform: translateY(-0.125rem);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .btn-full {
+            flex: 1;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 1rem;
+            height: 1rem;
             border: 2px solid transparent;
-            border-top: 2px solid var(--white);
+            border-top: 2px solid currentColor;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        /* Toast Notification */
+        /* Preview Card */
+        .preview-card {
+            border: 2px dashed var(--primary);
+            background: var(--white);
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .preview-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-value.discount {
+            color: var(--success);
+        }
+
+        .preview-value.expiry {
+            color: var(--error);
+        }
+
+        .coupon-code {
+            background: var(--gray-100);
+            color: var(--text-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
-            top: clamp(15px, 3vw, 20px);
-            right: clamp(15px, 3vw, 20px);
-            padding: clamp(12px, 2vw, 15px) clamp(16px, 3vw, 20px);
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            display: none;
+            box-shadow: var(--shadow-xl);
             z-index: 10000;
-            font-family: inherit;
             color: var(--white);
-            background-color: var(--success-color);
-            font-size: clamp(13px, 1.5vw, 14px);
-            max-width: clamp(250px, 80vw, 350px);
-            animation: slideInRight 0.3s ease-out;
+            font-weight: 500;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 400px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: var(--success);
         }
 
         .toast.error {
-            background-color: var(--error-color);
-        }
-
-        .toast.warning {
-            background-color: var(--warning-color);
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Input Icons */
-        .input-group {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: clamp(12px, 2vw, 15px);
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            font-size: clamp(14px, 2vw, 16px);
-            z-index: 1;
-            transition: var(--transition);
-        }
-
-        .input-group .form-input {
-            padding-left: clamp(40px, 6vw, 45px);
-        }
-
-        .input-group .form-input:focus + .input-icon {
-            color: var(--primary-color);
-            transform: translateY(-50%) scale(1.1);
+            background: var(--error);
         }
 
         /* Responsive Design */
-
-        /* Large Desktop */
-        @media (min-width: 1400px) {
-            .main-content {
-                padding: 40px;
-            }
-            
-            .form-container {
-                padding: 50px;
-                max-width: 800px;
-            }
-        }
-
-        /* Desktop */
-        @media (max-width: 1200px) {
-            .form-container {
-                max-width: 600px;
-            }
-        }
-
-        /* Tablet Landscape */
         @media (max-width: 1024px) {
             .sidebar {
                 width: var(--sidebar-collapsed);
             }
-            
-            .sidebar .logo {
-                font-size: 16px;
-                letter-spacing: 1px;
+
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
             }
-            
+
             .nav-item span {
                 display: none;
             }
-            
+
             .nav-item {
                 justify-content: center;
-                padding: 15px;
-                margin-right: 0;
-                border-radius: 0;
+                padding: 0.75rem;
             }
-            
+
             .nav-item i {
                 margin-right: 0;
-                font-size: 18px;
             }
-            
-            .main-content {
-                margin-left: var(--sidebar-collapsed);
-                width: calc(100% - var(--sidebar-collapsed));
-            }
-            
-            .account-btn, .logout-btn {
-                padding: 8px 5px;
-                font-size: 11px;
-            }
-            
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-                text-align: center;
+
+            .logo-text {
+                display: none;
             }
         }
 
-        /* Tablet Portrait */
         @media (max-width: 768px) {
             .menu-toggle {
                 display: flex;
             }
-            
+
             .sidebar {
                 transform: translateX(-100%);
                 width: var(--sidebar-width);
             }
-            
+
             .sidebar.active {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
-                width: 100%;
-                padding-top: clamp(60px, 10vw, 70px);
+                padding-top: 4rem;
             }
-            
-            .header {
-                margin-bottom: 20px;
-            }
-            
-            .form-container {
-                padding: 20px 15px;
-                margin: 0 10px;
-            }
-            
-            .form-title {
-                margin-bottom: 20px;
-            }
-            
-            .form-group {
-                margin-bottom: 20px;
-            }
-        }
 
-        /* Mobile Landscape */
-        @media (max-width: 640px) and (orientation: landscape) {
-            .main-content {
-                padding: 15px;
-                padding-top: 55px;
-            }
-            
-            .form-container {
-                padding: 15px;
-                margin: 0 5px;
-            }
-        }
-
-        /* Mobile Portrait */
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 10px;
-                padding-top: 55px;
-            }
-            
             .header {
-                padding: 15px;
-                margin-bottom: 15px;
+                padding: 1rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .card-header,
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .btn-group {
                 flex-direction: column;
-                gap: 10px;
             }
-            
-            .page-title {
-                font-size: 18px;
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 0.75rem;
             }
-            
-            .action-btn {
-                width: 100%;
-                justify-content: center;
+
+            .card-header,
+            .card-content {
+                padding: 1rem;
             }
-            
-            .form-container {
-                padding: 15px;
-                margin: 0 5px;
-                border-radius: 8px;
+
+            .content-title {
+                font-size: 1.5rem;
             }
-            
-            .form-title {
-                font-size: 16px;
-                margin-bottom: 15px;
-            }
-            
-            .form-group {
-                margin-bottom: 15px;
-            }
-            
+
             .form-input {
-                padding: 10px;
                 font-size: 16px; /* Prevents zoom on iOS */
             }
-            
-            .input-group .form-input {
-                padding-left: 35px;
-            }
-            
-            .input-icon {
-                left: 10px;
-                font-size: 14px;
-            }
-            
-            .submit-btn {
-                padding: 15px;
-                font-size: 14px;
-            }
-            
-            .toast {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                max-width: none;
-            }
         }
 
-        /* Extra Small Mobile */
-        @media (max-width: 360px) {
-            .main-content {
-                padding: 8px;
-                padding-top: 50px;
-            }
-            
-            .header {
-                padding: 12px;
-            }
-            
-            .form-container {
-                padding: 12px;
-                margin: 0 3px;
-            }
-            
-            .form-input {
-                padding: 8px;
-            }
-            
-            .input-group .form-input {
-                padding-left: 30px;
-            }
-            
-            .submit-btn {
-                padding: 12px;
-                font-size: 13px;
-                letter-spacing: 0.5px;
-            }
-        }
-
-        /* Landscape orientation for mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .main-content {
-                padding-top: 45px;
-            }
-            
-            .menu-toggle {
-                top: 8px;
-                left: 8px;
-                width: 35px;
-                height: 35px;
-            }
-            
-            .sidebar-header {
-                padding: 10px;
-            }
-            
-            .nav-items {
-                padding: 10px 0;
-            }
-            
-            .nav-item {
-                padding: 8px 15px;
-            }
-            
-            .sidebar-footer {
-                padding: 10px;
-            }
-        }
-
-        /* Print styles */
-        @media print {
-            .sidebar,
-            .menu-toggle,
-            .sidebar-overlay,
-            .action-btn,
-            .toast {
-                display: none;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 0;
-                width: 100%;
-            }
-            
-            .form-container {
-                box-shadow: none;
-                border: 1px solid #000;
-                break-inside: avoid;
-            }
-        }
-
-        /* Focus styles for accessibility */
+        /* Focus styles */
         .menu-toggle:focus,
         .nav-item:focus,
         .form-input:focus,
-        .submit-btn:focus,
-        .action-btn:focus {
-            outline: 2px solid var(--primary-color);
+        .btn:focus {
+            outline: 2px solid var(--primary);
             outline-offset: 2px;
-        }
-
-        /* High contrast mode */
-        @media (prefers-contrast: high) {
-            .form-container {
-                border-width: 2px;
-            }
-            
-            .form-input {
-                border-width: 2px;
-            }
-            
-            .submit-btn {
-                border: 2px solid currentColor;
-            }
-        }
-
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --text-color: #e5e7eb;
-                --text-secondary: #9ca3af;
-                --border-color: #374151;
-                --background-light: #111827;
-            }
-            
-            body {
-                background-color: var(--background-light);
-            }
-            
-            .form-container {
-                background: #1f2937;
-                border-color: var(--border-color);
-            }
-            
-            .form-input {
-                background: #374151;
-                color: var(--text-color);
-                border-color: var(--border-color);
-            }
-            
-            .logo {
-                color: var(--white);
-            }
-        }
-
-        /* Touch device optimizations */
-        @media (hover: none) and (pointer: coarse) {
-            .nav-item:hover,
-            .submit-btn:hover,
-            .action-btn:hover {
-                transform: none;
-            }
-            
-            .menu-toggle {
-                min-width: 44px;
-                min-height: 44px;
-            }
-            
-            .submit-btn {
-                min-height: 44px;
-            }
-        }
-
-        /* Custom scrollbar */
-        .sidebar::-webkit-scrollbar,
-        .main-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar::-webkit-scrollbar-track,
-        .main-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb,
-        .main-content::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover,
-        .main-content::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <!-- Mobile Menu Toggle -->
@@ -882,18 +710,19 @@
             <i class="fas fa-bars"></i>
         </button>
 
-        <!-- Sidebar Overlay for Mobile -->
+        <!-- Sidebar Overlay -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <span class="logo-text">Chrono</span>X
+                    <span class="logo-text" style="margin-left: 40px">ChronoX</span>
                 </div>
             </div>
-            
+
             <div class="nav-items">
+                <div class="nav-group-label">Navigation</div>
                 <a href="/admin/dashboard" class="nav-item">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
@@ -907,10 +736,10 @@
                     <span>Order List</span>
                 </a>
                 <a href="/admin/userlist" class="nav-item">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-users"></i>
                     <span>Customer</span>
                 </a>
-                <a href="/admin/sales" class="nav-item">
+                <a href="/admin/sales-report" class="nav-item">
                     <i class="fas fa-chart-line"></i>
                     <span>Sales</span>
                 </a>
@@ -927,80 +756,141 @@
                     <span>Category Offers</span>
                 </a>
             </div>
-            
+
             <div class="sidebar-footer">
-                <button class="account-btn">Account</button>
-                <button class="logout-btn">Logout</button>
+                <button class="footer-btn account-btn">
+                    <i class="fas fa-user"></i> Account
+                </button>
+                <button class="footer-btn logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
         </div>
 
         <!-- Main Content -->
         <div class="main-content">
+            <!-- Header -->
             <div class="header">
-                <h1 class="page-title">Edit Coupon</h1>
-                <a href="/admin/coupon" class="action-btn">
+                <div class="header-left">
+                    <h1 class="page-title">Edit Coupon</h1>
+                </div>
+                <a href="/admin/coupon" class="back-btn">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back to Coupons</span>
                 </a>
             </div>
 
-            <div class="form-container">
-                <h2 class="form-title">
-                    <i class="fas fa-edit"></i>
-                    Update Coupon Details
-                </h2>
-                
-                <form id="couponForm">
-                    <input type="hidden" id="couponId" value="sample-coupon-id">
+            <!-- Content -->
+            <div class="content">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Coupon</h2>
+                    <p class="content-description">Update the coupon details below</p>
+                    <div class="status-badge">
+                        <i class="fas fa-ticket-alt"></i>
+                        Active Coupon
+                    </div>
+                </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="couponName">Coupon Name *</label>
-                        <div class="input-group">
-                            <input type="text" id="couponName" class="form-input" 
-                                   placeholder="Enter coupon name" value="SUMMER2024" 
-                                   aria-describedby="couponNameError">
-                            <i class="fas fa-ticket-alt input-icon"></i>
+                <div class="form-container">
+                    <!-- Main Form Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <div class="card-icon">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                                Update Coupon Details
+                            </h3>
+                            <p class="card-description">Modify the coupon information and save your changes</p>
                         </div>
-                        <p id="couponNameError" class="error-message" role="alert"></p>
+                        <div class="card-content">
+                            <form id="couponForm">
+                                <input type="hidden" id="couponId" value="sample-coupon-id">
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="couponName">
+                                        <i class="fas fa-ticket-alt"></i>
+                                        Coupon Name *
+                                    </label>
+                                    <input type="text" id="couponName" class="form-input" 
+                                           placeholder="Enter coupon name" value="<%= coupon.name %>">
+                                    <div id="couponNameError" class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="discount">
+                                        <i class="fas fa-percentage"></i>
+                                        Discount (%) *
+                                    </label>
+                                    <input type="number" id="discount" class="form-input" 
+                                           placeholder="Enter discount percentage" value="<%= coupon.discount %>" 
+                                           min="1" max="100">
+                                    <div id="discountError" class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="expiryDate">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Expiry Date *
+                                    </label>
+                                    <input type="date" id="expiryDate" class="form-input" value="<%= coupon.expiryDate.toISOString().split('T')[0] %>">
+                                    <div id="expiryDateError" class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="minPurchase">
+                                        <i class="fas fa-rupee-sign"></i>
+                                        Minimum Purchase (₹) *
+                                    </label>
+                                    <input type="number" id="minPurchase" class="form-input" 
+                                           placeholder="Enter minimum purchase amount" value="<%= coupon.minPurchase %>" min="0">
+                                    <div id="minPurchaseError" class="error-message"></div>
+                                </div>
+
+                                <div class="btn-group">
+                                    <input type="hidden" id="couponid" value='<%= coupon._id %>'>
+                                    <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+                                        <i class="fas fa-save"></i>
+                                        Update Coupon
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="editCoupon('<%= coupon._id %>')">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="discount">Discount (%) *</label>
-                        <div class="input-group">
-                            <input type="number" id="discount" class="form-input" 
-                                   placeholder="Enter discount percentage" value="20" 
-                                   min="1" max="100" aria-describedby="discountError">
-                            <i class="fas fa-percentage input-icon"></i>
+                    Preview Card
+                    <div class="card preview-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <div class="card-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                Coupon Preview
+                            </h3>
                         </div>
-                        <p id="discountError" class="error-message" role="alert"></p>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="expiryDate">Expiry Date *</label>
-                        <div class="input-group">
-                            <input type="date" id="expiryDate" class="form-input" 
-                                   value="2024-12-31" aria-describedby="expiryDateError">
-                            <i class="fas fa-calendar-alt input-icon"></i>
+                        <div class="card-content">
+                            <div class="preview-item">
+                                <span class="preview-label">Code:</span>
+                                <span class="preview-value coupon-code" id="previewCode" ></span>
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Discount:</span>
+                                <span class="preview-value discount" id="previewDiscount"></span>
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Min. Purchase:</span>
+                                <span class="preview-value" id="previewMinPurchase"></span>
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Expires:</span>
+                                <span class="preview-value expiry" id="previewExpiry"></span>
+                            </div>
                         </div>
-                        <p id="expiryDateError" class="error-message" role="alert"></p>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="minPurchase">Minimum Purchase (₹) *</label>
-                        <div class="input-group">
-                            <input type="number" id="minPurchase" class="form-input" 
-                                   placeholder="Enter minimum purchase amount" value="500" 
-                                   min="0" aria-describedby="minPurchaseError">
-                            <i class="fas fa-rupee-sign input-icon"></i>
-                        </div>
-                        <p id="minPurchaseError" class="error-message" role="alert"></p>
-                    </div>
-
-                    <button type="submit" class="submit-btn" id="submitBtn">
-                        <i class="fas fa-save"></i>
-                        Update Coupon
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -1009,259 +899,142 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const form = document.getElementById('couponForm');
+  const couponId = form?.dataset.id;
 
-        function toggleSidebar() {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-            
-            // Prevent body scroll when sidebar is open
-            if (sidebar.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-        }
+  const couponNameInput = document.getElementById('couponName');
+  const discountInput = document.getElementById('discount');
+  const expiryDateInput = document.getElementById('expiryDate');
+  const minPurchaseInput = document.getElementById('minPurchase');
+  const submitBtn = document.getElementById('submitBtn');
 
-        function closeSidebar() {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+  const previewCode = document.getElementById('previewCode');
+  const previewDiscount = document.getElementById('previewDiscount');
+  const previewMinPurchase = document.getElementById('previewMinPurchase');
+  const previewExpiry = document.getElementById('previewExpiry');
 
-        menuToggle?.addEventListener('click', toggleSidebar);
-        sidebarOverlay?.addEventListener('click', closeSidebar);
+  expiryDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
 
-        // Close sidebar on window resize if screen becomes larger
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                closeSidebar();
-            }
-        });
+  // Toast
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
 
-        // Prevent sidebar from closing when clicking inside it
-        sidebar?.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
+  // Error display
+  function showError(id, msg) {
+    const el = document.getElementById(id + 'Error');
+    const input = document.getElementById(id);
+    if (el && input) {
+      el.textContent = msg;
+      el.classList.add('show');
+      input.classList.add('error');
+    }
+  }
 
-        // Navigation active state management
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                navItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+  function clearError(id) {
+    const el = document.getElementById(id + 'Error');
+    const input = document.getElementById(id);
+    if (el && input) {
+      el.classList.remove('show');
+      input.classList.remove('error');
+    }
+  }
 
-        // Form validation and submission
-        document.getElementById('couponForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+  // Validate inputs
+  function validateForm() {
+    let valid = true;
+    ['couponName', 'discount', 'expiryDate', 'minPurchase'].forEach(clearError);
 
-            const couponId = document.getElementById('couponId').value;
-            const couponName = document.getElementById('couponName').value.trim();
-            const discount = parseFloat(document.getElementById('discount').value);
-            const expiryDate = document.getElementById('expiryDate').value;
-            const minPurchase = parseFloat(document.getElementById('minPurchase').value);
+    const name = couponNameInput.value.trim();
+    if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(name)) {
+      showError('couponName', 'Start with letter, 3–50 characters allowed');
+      valid = false;
+    }
 
-            let isValid = true;
+    const discount = parseFloat(discountInput.value);
+    if (isNaN(discount) || discount <= 0 || discount > 100) {
+      showError('discount', 'Discount must be between 1 and 100');
+      valid = false;
+    }
 
-            // Clear previous errors
-            document.querySelectorAll('.error-message').forEach(error => {
-                error.style.display = 'none';
-                error.textContent = '';
-            });
+    const expiry = new Date(expiryDateInput.value);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    if (isNaN(expiry.getTime()) || expiry < today) {
+      showError('expiryDate', 'Expiry must be a future date');
+      valid = false;
+    }
 
-            document.querySelectorAll('.form-input').forEach(input => {
-                input.classList.remove('error');
-            });
+    const min = parseFloat(minPurchaseInput.value);
+    if (isNaN(min) || min < 0) {
+      showError('minPurchase', 'Minimum must be 0 or more');
+      valid = false;
+    }
 
-            // Validation functions
-            const showError = (fieldId, message) => {
-                const errorElement = document.getElementById(fieldId + 'Error');
-                const inputElement = document.getElementById(fieldId);
-                
-                if (errorElement && inputElement) {
-                    errorElement.textContent = message;
-                    errorElement.style.display = 'block';
-                    inputElement.classList.add('error');
-                    isValid = false;
-                }
-            };
+    return valid;
+  }
 
-            // Coupon name validation
-            if (!couponName) {
-                showError('couponName', 'Coupon name is required');
-            } else if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(couponName)) {
-                showError('couponName', 'Must start with a letter and be 3–50 characters long');
-            }
+  // Preview live update
+  function updatePreview() {
+    previewCode.textContent = couponNameInput.value || 'COUPON_NAME';
+    previewDiscount.textContent = (discountInput.value || '0') + '% OFF';
+    previewMinPurchase.textContent = '₹' + (minPurchaseInput.value || '0');
+    previewExpiry.textContent = expiryDateInput.value || 'Not set';
+  }
 
-            // Discount validation
-            if (isNaN(discount) || discount <= 0 || discount > 100) {
-                showError('discount', 'Discount must be between 1 and 100');
-            }
+  [couponNameInput, discountInput, expiryDateInput, minPurchaseInput].forEach(input => {
+    input.addEventListener('input', () => {
+      clearError(input.id);
+      updatePreview();
+    });
+  });
 
-            // Expiry date validation
-            if (!expiryDate) {
-                showError('expiryDate', 'Expiry date is required');
-            } else if (new Date(expiryDate) <= new Date()) {
-                showError('expiryDate', 'Expiry date must be in the future');
-            }
+  // Handle submit
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
-            // Minimum purchase validation
-            if (isNaN(minPurchase) || minPurchase < 0) {
-                showError('minPurchase', 'Minimum purchase must be 0 or more');
-            }
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Updating...';
+    
+    try {
+        const couponId = document.getElementById('couponid').value
+    console.log(couponId,"id")
+        console.log('heree22')
+      const res = await fetch(`/admin/coupon/edit/${couponId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: couponNameInput.value.trim(),
+          discount: parseFloat(discountInput.value),
+          expiryDate: expiryDateInput.value,
+          minPurchase: parseFloat(minPurchaseInput.value)
+        })
+      });
 
-            if (isValid) {
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.classList.add('loading');
+      const data = await res.json();
 
-                try {
-                    // Simulate API call
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    
-                    showToast('Coupon updated successfully!', 'success');
-                    
-                    setTimeout(() => {
-                        window.location.href = '/admin/coupon';
-                    }, 2000);
-                } catch (error) {
-                    showToast('Network error: Failed to update coupon', 'error');
-                } finally {
-                    submitBtn.classList.remove('loading');
-                }
-            }
-        });
+      if (data.success) {
+        showToast(data.message || 'Coupon updated!');
+        setTimeout(() => window.location.href = '/admin/coupon', 1500);
+      } else {
+        showToast(data.message || 'Update failed', 'error');
+      }
 
-        // Toast notification function
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast ${type}`;
-            toast.style.display = 'block';
-            
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
-        }
+    } catch (err) {
+      console.error(err);
+      showToast('Server error. Please try again.', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Coupon';
+    }
+  });
 
-        // Real-time validation
-        const inputs = document.querySelectorAll('.form-input');
-        inputs.forEach(input => {
-            input.addEventListener('blur', function() {
-                this.classList.remove('error');
-                
-                // Basic validation on blur
-                if (this.hasAttribute('required') && !this.value.trim()) {
-                    this.classList.add('error');
-                } else if (this.checkValidity()) {
-                    this.style.borderColor = 'var(--success-color)';
-                }
-            });
+  updatePreview();
+</script>
 
-            input.addEventListener('input', function() {
-                this.classList.remove('error');
-                
-                // Hide error message on input
-                const errorElement = document.getElementById(this.id + 'Error');
-                if (errorElement) {
-                    errorElement.style.display = 'none';
-                }
-            });
-        });
 
-        // Keyboard navigation support
-        document.addEventListener('keydown', function(e) {
-            // ESC key closes sidebar on mobile
-            if (e.key === 'Escape') {
-                if (sidebar.classList.contains('active')) {
-                    closeSidebar();
-                }
-            }
-            
-            // Ctrl+S to save form
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                document.getElementById('couponForm').dispatchEvent(new Event('submit'));
-            }
-        });
-
-        // Add touch swipe support for mobile sidebar
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        document.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        document.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            if (window.innerWidth <= 768) {
-                if (touchEndX < touchStartX - 50) {
-                    // Swipe left - close sidebar
-                    closeSidebar();
-                }
-                if (touchEndX > touchStartX + 50 && touchStartX < 50) {
-                    // Swipe right from left edge - open sidebar
-                    toggleSidebar();
-                }
-            }
-        }
-
-        // Auto-save draft functionality
-        let saveTimeout;
-        const formInputs = document.querySelectorAll('.form-input');
-        
-        formInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(() => {
-                    // Auto-save logic can be implemented here
-                    console.log('Auto-saving draft...');
-                }, 2000);
-            });
-        });
-
-        // Form change detection
-        let formChanged = false;
-        formInputs.forEach(input => {
-            input.addEventListener('change', () => {
-                formChanged = true;
-            });
-        });
-
-        // Warn user before leaving if form has changes
-        window.addEventListener('beforeunload', function(e) {
-            if (formChanged) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
-
-        // Set minimum date to today for expiry date
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('expiryDate').setAttribute('min', today);
-
-        // Add touch feedback for mobile devices
-        if ('ontouchstart' in window) {
-            const touchElements = document.querySelectorAll('.submit-btn, .action-btn, .nav-item');
-            touchElements.forEach(element => {
-                element.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.98)';
-                });
-                
-                element.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                });
-            });
-        }
-    </script>
 </body>
 </html>

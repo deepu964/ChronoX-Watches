@@ -9,6 +9,10 @@ const orderSchema = new mongoose.Schema({
     price: Number,
     discount: Number,
     paidPrice: Number,
+    
+    // ✅ 👇 NEW FIELD: discount share per item
+    discountShare: Number, // 👈 required for coupon refund calculation
+
     status: {
       type: String,
       enum: ['Placed', 'Pending', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
@@ -26,12 +30,20 @@ const orderSchema = new mongoose.Schema({
     state: String,
   },
   totalAmount: Number,
-  couponMinAmount:Number,
-  coupon:{
-    type:String,
-    code:String,
-    discountAmount:Number
+
+  // ✅ 👇 NEW FIELD: total before applying coupon (original cart total)
+  totalBeforeDiscount: Number, // 👈 used to split coupon across items
+
+  // ✅ 👇 These were already correct, just rename & adjust
+  couponMinAmount: Number, // 👈 required to check if coupon still valid after cancellation
+  coupon: {
+    type: String,       // 👈 example: "WELCOME10"
+    code: String,       // optional extra (can remove this if using above field)
+    
+    // ✅ 👇 Renamed properly
+    discountAmount: Number // 👈 total discount applied
   },
+
   shippingFee: Number,
   isPaid: { type: Boolean, default: false },
   paymentMethod: { type: String, enum: ['COD', 'ONLINE'] },
@@ -40,7 +52,7 @@ const orderSchema = new mongoose.Schema({
     enum: ['Pending', 'Paid', 'Failed'],
     default: 'Pending'
   },
-  razorpayOrderId: {type: String},
+  razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },
   status: {
     type: String,
@@ -51,4 +63,3 @@ const orderSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Order', orderSchema);
-

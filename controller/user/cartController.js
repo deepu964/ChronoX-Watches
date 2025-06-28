@@ -50,11 +50,13 @@ const getCart = async (req, res, next) => {
 
 
             const bestOffer = Math.max(productOffer, catDiscount);
+            console.log(bestOffer,'this is off')
             const discountedPrice = regularPrice - bestOffer;
 
 
             totalMRP += regularPrice * quantity;
             discount += bestOffer * quantity;
+            console.log(discount,'this is dis')
             grandTotal += discountedPrice * quantity;
         }
 

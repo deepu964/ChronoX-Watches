@@ -94,7 +94,7 @@ const editCoupon = async (req, res, next) => {
   try {
     let { name, discount, expiryDate, minPurchase } = req.body;
     const couponId = req.params.id;
-
+    
     const coupon = await couponSchema.findById(couponId);
     if (!coupon) {
       return res.status(404).json({ success: false, message: 'Coupon not found' });
@@ -154,7 +154,7 @@ const editCoupon = async (req, res, next) => {
         message: 'Minimum purchase must be 0 or more.'
       });
     }
-
+    
     
     await couponSchema.findByIdAndUpdate(couponId, {
       $set: {
@@ -165,6 +165,7 @@ const editCoupon = async (req, res, next) => {
       }
     });
 
+    
     return res.json({ success: true, message: 'Coupon updated successfully' });
 
   } catch (error) {

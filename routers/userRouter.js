@@ -103,7 +103,7 @@ router.get('/my-returns', isAuth, returnController.getMyReturns);
 router.get('/wallet', isAuth, walletController.getWallet);
 router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
 
-// Referral Routes
+
 router.get('/referrals', isAuth, referralController.getReferralDashboard);
 router.get('/referrals/history', isAuth, referralController.getReferralHistory);
 router.get('/referrals/generate-link', isAuth, referralController.generateReferralLink);
