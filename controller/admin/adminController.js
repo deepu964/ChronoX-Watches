@@ -36,8 +36,8 @@ const getDashBoard = async (req,res,next) => {
             return res.redirect('/admin')
         }
 
-        
         const metrics = await getDashboardMetrics();
+       
 
         res.render('admin/dashboard', { metrics,cloudName })
     } catch (error) {
@@ -46,7 +46,6 @@ const getDashBoard = async (req,res,next) => {
     }
 }
 
-// Dashboard Analytics Functions
 const getDashboardMetrics = async () => {
     try {
         const now = new Date();
@@ -54,7 +53,7 @@ const getDashboardMetrics = async () => {
         const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-        // Total customers
+        
         const totalCustomers = await User.countDocuments({ isBlocked: false });
         const lastMonthCustomers = await User.countDocuments({
             isBlocked: false,
@@ -67,13 +66,13 @@ const getDashboardMetrics = async () => {
         const customerGrowth = lastMonthCustomers > 0 ?
             ((thisMonthCustomers - lastMonthCustomers) / lastMonthCustomers * 100).toFixed(1) : 0;
 
-        // Total orders (only completed/paid orders)
+       
         const totalOrders = await Order.countDocuments({
             status: { $nin: ['Cancelled'] },
             paymentStatus: 'Paid'
         });
 
-        // Total sales (sum of paid orders)
+       
         const salesAggregation = await Order.aggregate([
             {
                 $match: {
@@ -92,7 +91,7 @@ const getDashboardMetrics = async () => {
 
         const totalSales = salesAggregation.length > 0 ? salesAggregation[0].totalSales : 0;
 
-        // Monthly sales comparison
+        
         const thisMonthSales = await Order.aggregate([
             {
                 $match: {
@@ -130,13 +129,13 @@ const getDashboardMetrics = async () => {
         const salesGrowth = lastMonthSalesAmount > 0 ?
             ((thisMonthSalesAmount - lastMonthSalesAmount) / lastMonthSalesAmount * 100).toFixed(1) : 0;
 
-        // Total products (only available products - isActive=false means available)
+        
         const totalProducts = await Product.countDocuments({
             isDeleted: false,
-            isActive: false // isActive=false means available in your schema
+            isActive: false 
         });
 
-        // Referral statistics
+       
         const referralStats = await Referral.getReferralStats();
         const thisMonthReferrals = await Referral.countDocuments({
             createdAt: { $gte: startOfMonth },
@@ -173,7 +172,6 @@ const getDashboardMetrics = async () => {
     }
 };
 
-// Get chart data for different time periods
 const getChartData = async (req, res, next) => {
     try {
         const { period, year, month, week } = req.query;
@@ -184,7 +182,7 @@ const getChartData = async (req, res, next) => {
 
         switch (period) {
             case 'yearly':
-                // Show monthly data for selected year or current year
+                
                 const selectedYear = year ? parseInt(year) : now.getFullYear();
                 const startOfYear = new Date(selectedYear, 0, 1);
                 const endOfYear = new Date(selectedYear, 11, 31, 23, 59, 59);
@@ -218,7 +216,7 @@ const getChartData = async (req, res, next) => {
                 break;
 
             case 'monthly':
-                // Show daily data for selected month
+                
                 const selectedMonth = month ? parseInt(month) - 1 : now.getMonth();
                 const selectedYearForMonth = year ? parseInt(year) : now.getFullYear();
                 const startOfMonth = new Date(selectedYearForMonth, selectedMonth, 1);
@@ -251,7 +249,7 @@ const getChartData = async (req, res, next) => {
                 break;
 
             case 'weekly':
-                // Show daily data for selected week
+                
                 const weekStart = week ? new Date(week) : new Date(now.setDate(now.getDate() - now.getDay()));
                 const weekEnd = new Date(weekStart);
                 weekEnd.setDate(weekStart.getDate() + 6);
@@ -284,7 +282,7 @@ const getChartData = async (req, res, next) => {
                 break;
 
             case 'daily':
-                // Show hourly data for selected day
+                
                 const selectedDate = req.query.date ? new Date(req.query.date) : new Date();
                 const startOfDay = new Date(selectedDate);
                 startOfDay.setHours(0, 0, 0, 0);
@@ -317,14 +315,14 @@ const getChartData = async (req, res, next) => {
                 break;
 
             default:
-                // Default to weekly view
+                
                 const defaultWeekStart = new Date(now.setDate(now.getDate() - now.getDay()));
                 const defaultWeekEnd = new Date(defaultWeekStart);
                 defaultWeekEnd.setDate(defaultWeekStart.getDate() + 6);
 
-                // Similar logic as weekly case
+                
                 labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                chartData = [0, 0, 0, 0, 0, 0, 0]; // Default empty data
+                chartData = [0, 0, 0, 0, 0, 0, 0]; 
         }
 
         res.json({
@@ -347,7 +345,6 @@ const getChartData = async (req, res, next) => {
     }
 };
 
-// Get Top 10 Best Selling Products
 const getTopProducts = async (req, res, next) => {
     try {
         const { fromDate, toDate } = req.query;
@@ -394,7 +391,7 @@ const getTopProducts = async (req, res, next) => {
             {
                 $match: {
                     'product.isDeleted': false,
-                    'product.isActive': false // isActive=false means available
+                    'product.isActive': false 
                 }
             },
             {
@@ -417,7 +414,6 @@ const getTopProducts = async (req, res, next) => {
     }
 };
 
-// Get Top 10 Best Selling Categories
 const getTopCategories = async (req, res, next) => {
     try {
         const { fromDate, toDate } = req.query;
@@ -453,7 +449,7 @@ const getTopCategories = async (req, res, next) => {
             {
                 $match: {
                     'product.isDeleted': false,
-                    'product.isActive': false // isActive=false means available
+                    'product.isActive': false 
                 }
             },
             {
@@ -501,7 +497,6 @@ const getTopCategories = async (req, res, next) => {
     }
 };
 
-// Get Top 10 Best Selling Brands
 const getTopBrands = async (req, res, next) => {
     try {
         const { fromDate, toDate } = req.query;
@@ -537,7 +532,7 @@ const getTopBrands = async (req, res, next) => {
             {
                 $match: {
                     'product.isDeleted': false,
-                    'product.isActive': false, // isActive=false means available
+                    'product.isActive': false, 
                     'product.brand': { $exists: true, $ne: null, $ne: '' }
                 }
             },

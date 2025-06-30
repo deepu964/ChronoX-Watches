@@ -62,7 +62,6 @@ const getReferralDashboard = async (req, res, next) => {
     }
 };
 
-
 const getReferralHistory = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
@@ -98,7 +97,6 @@ const getReferralHistory = async (req, res, next) => {
     }
 };
 
-
 const generateReferralLink = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
@@ -128,7 +126,6 @@ const generateReferralLink = async (req, res, next) => {
         });
     }
 };
-
 
 const getReferralEarnings = async (req, res, next) => {
     try {

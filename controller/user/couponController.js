@@ -35,8 +35,8 @@ const applyCoupon = async (req, res, next) => {
     const discountAmount = Math.round((grandTotal * coupon.discount) / 100);
     const minPurchase = coupon.minPurchase;
     
-    // coupon.user.push(userId);
-    // await coupon.save();
+    coupon.user.push(userId);
+    await coupon.save();
 
     req.session.coupon = {
       couponcode: coupon.couponcode,

@@ -23,8 +23,6 @@ router.post('/login',adminController.adminLogin);
 router.get('/logout',adminController.logout);
 
 router.get('/dashboard',preventBackHistory,authMiddleware,adminController.getDashBoard);
-
-// Dashboard API Routes
 router.get('/dashboard/chart-data', authMiddleware, adminAuth, adminController.getChartData);
 router.get('/dashboard/top-products', authMiddleware, adminAuth, adminController.getTopProducts);
 router.get('/dashboard/top-categories', authMiddleware, adminAuth, adminController.getTopCategories);
@@ -78,7 +76,7 @@ router.get('/sales-report', authMiddleware, adminAuth, salesController.getSalesR
 router.get('/sales-report/export-pdf', authMiddleware, adminAuth, salesController.exportSalesReportPDF);
 router.get('/sales-report/export-excel', authMiddleware, adminAuth, salesController.exportSalesReportExcel);
 
-// Referral Management Routes
+
 router.get('/referrals', authMiddleware, adminAuth, referralController.getReferralList);
 router.get('/referrals/stats', authMiddleware, adminAuth, referralController.getReferralStats);
 router.get('/referrals/details/:id', authMiddleware, adminAuth, referralController.getReferralDetails);

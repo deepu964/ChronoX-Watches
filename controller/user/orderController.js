@@ -128,7 +128,7 @@ const checkoutGetController = async (req, res, next) => {
     let subTotal = 0;
     let discount = 0;
     let cartItems = [];
-    let netTotal = 0; // 👈 total MRP (used for coupon calculation)
+    let netTotal = 0; 
 
     for (let item of cart.items) {
       const product = item.product;
@@ -149,7 +149,7 @@ const checkoutGetController = async (req, res, next) => {
 
       const finalPrice = regularPrice - bestOffer;
       const total = finalPrice * quantity;
-      const mrpTotal = regularPrice * quantity; // 👈 Total MRP for this item
+      const mrpTotal = regularPrice * quantity;
 
       subTotal += total;
       discount += bestOffer * quantity;
@@ -162,7 +162,7 @@ const checkoutGetController = async (req, res, next) => {
         quantity,
         price: finalPrice,
         total,
-        mrpTotal // 👈 Store MRP for coupon split
+        mrpTotal 
       });
     }
 
@@ -177,7 +177,7 @@ const checkoutGetController = async (req, res, next) => {
       subTotal,
       discount,
       grandTotal,
-      netTotal, // 👈 Used in order placement to set totalBeforeDiscount
+      netTotal, 
       coupons,
       discountAmount,
       couponAmount,
@@ -343,7 +343,7 @@ const placeOrder = async (req, res, next) => {
     const { paymentMethod, addressId, razorpayOrderId, paymentId, orderId } = req.body;
     const coupon = req.session.coupon || null;
 
-    // ✅ Razorpay Retry Logic
+    
     if (orderId) {
       const existingOrder = await Order.findById(orderId);
       if (!existingOrder) return res.status(400).json({ success: false, message: 'Order not found' });
@@ -378,7 +378,7 @@ const placeOrder = async (req, res, next) => {
       });
     }
 
-    // ✅ Normal New Order Flow
+   
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: 'Cart is empty' });
@@ -391,8 +391,8 @@ const placeOrder = async (req, res, next) => {
 
     const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
 
-    let totalBeforeDiscount = 0; // MRP total
-    let finalTotal = 0; // After product/category offers
+    let totalBeforeDiscount = 0; 
+    let finalTotal = 0; 
     const orderItems = [];
 
     for (const item of cart.items) {
@@ -448,7 +448,7 @@ const placeOrder = async (req, res, next) => {
     const couponMin = coupon?.minPurchase || 0;
     const totalAmount = couponAmount > 0 ? finalTotal - couponAmount : finalTotal;
 
-    // ✅ Distribute coupon discount across items
+   
     if (couponAmount > 0 && totalBeforeDiscount > 0) {
       for (let item of orderItems) {
         const itemMrp = item.price * item.quantity;
@@ -501,7 +501,6 @@ const placeOrder = async (req, res, next) => {
     next(err);
   }
 };
-
 
 const getRetry = async (req, res, next) => {
   try {
@@ -731,7 +730,7 @@ const cancelOrder = async (req, res, next) => {
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (order.status !== 'Placed') return res.status(400).json({ message: 'Order cannot be cancelled' });
 
-    // ✅ Update order status
+    
     order.status = 'Cancelled';
 
     for (const item of order.items) {
@@ -742,7 +741,7 @@ const cancelOrder = async (req, res, next) => {
 
         const { quantity, variantIndex } = item;
 
-        // ✅ Stock restore
+       
         const product = item.product;
         if (product && product.variants[variantIndex]) {
           product.variants[variantIndex].quantity += quantity;
@@ -751,7 +750,7 @@ const cancelOrder = async (req, res, next) => {
       }
     }
 
-    // ✅ Refund the total order amount directly
+    
     const totalRefund = order.totalAmount;
 
     if (order.paymentMethod === 'ONLINE' && order.isPaid && totalRefund > 0) {
@@ -852,9 +851,6 @@ const cancelOrderItem = async (req, res, next) => {
     next(err);
   }
 };
-
-
-
 
 const debugOrderIds = async (req, res, next) => {
   try {
