@@ -48,7 +48,7 @@ const getSalesReport = async (req, res, next) => {
       summary.totalAmount += order.totalAmount;
     });
 
-    
+  
     res.render('admin/salesReport', {
       orders,
       summary,
@@ -67,7 +67,6 @@ const getSalesReport = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const getDateRange = (type, fromDate, toDate) => {
   let startDate, endDate;
@@ -128,7 +127,6 @@ const getDateRange = (type, fromDate, toDate) => {
 
   return { startDate, endDate };
 };
-
 
 const exportSalesReportPDF = async (req, res, next) => {
   try {

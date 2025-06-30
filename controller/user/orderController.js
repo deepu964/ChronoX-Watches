@@ -343,11 +343,10 @@ const placeOrder = async (req, res, next) => {
     const { paymentMethod, addressId, razorpayOrderId, paymentId, orderId } = req.body;
     const coupon = req.session.coupon || null;
 
+    // ✅ Razorpay Retry Logic
     if (orderId) {
       const existingOrder = await Order.findById(orderId);
-      if (!existingOrder) {
-        return res.status(400).json({ success: false, message: 'Order not found' });
-      }
+      if (!existingOrder) return res.status(400).json({ success: false, message: 'Order not found' });
       if (existingOrder.user.toString() !== userId.toString()) {
         return res.status(403).json({ success: false, message: 'Unauthorized access to order' });
       }
@@ -357,9 +356,13 @@ const placeOrder = async (req, res, next) => {
       existingOrder.status = 'Placed';
       existingOrder.paymentStatus = 'Paid';
       existingOrder.isPaid = paymentMethod === 'ONLINE';
-      existingOrder.coupon = coupon?.discountAmount || 0;
-      existingOrder.couponMinAmount = coupon?.minPurchase || 0;
+      existingOrder.coupon = {
+        code: coupon?.code || '',
+        discountAmount: coupon?.discountAmount || 0
+      };
 
+      existingOrder.couponMinAmount = coupon?.minPurchase || 0;
+      console.log(existingOrder,'this is order')
       await existingOrder.save();
 
       const cart = await Cart.findOne({ user: userId });
@@ -375,6 +378,7 @@ const placeOrder = async (req, res, next) => {
       });
     }
 
+    // ✅ Normal New Order Flow
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: 'Cart is empty' });
@@ -406,7 +410,6 @@ const placeOrder = async (req, res, next) => {
       const quantity = item.quantity;
       const regularPrice = variant.regularPrice;
       const salePrice = variant.salePrice || regularPrice;
-
       const productOffer = regularPrice - salePrice;
 
       const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
@@ -427,10 +430,11 @@ const placeOrder = async (req, res, next) => {
       orderItems.push({
         product: product._id,
         quantity,
+        variantIndex: 0,
         price: regularPrice,
-        paidPrice: itemPaidPrice,
+        paidPrice: finalPrice,
         discount: bestOffer,
-        discountShare: 0 
+        discountShare: 0
       });
 
       totalBeforeDiscount += itemMrpTotal;
@@ -440,15 +444,11 @@ const placeOrder = async (req, res, next) => {
       await product.save();
     }
 
-    
     const couponAmount = coupon?.discountAmount || 0;
     const couponMin = coupon?.minPurchase || 0;
     const totalAmount = couponAmount > 0 ? finalTotal - couponAmount : finalTotal;
 
-    // ⚠️ Optional minimum check:
-    // if (totalAmount < 4000) return res.status(400).json({ success: false, message: 'Minimum order amount is 4000' });
-
-    // 💥 Calculate per-item coupon share
+    // ✅ Distribute coupon discount across items
     if (couponAmount > 0 && totalBeforeDiscount > 0) {
       for (let item of orderItems) {
         const itemMrp = item.price * item.quantity;
@@ -482,7 +482,9 @@ const placeOrder = async (req, res, next) => {
       paymentStatus: paymentMethod === 'ONLINE' ? 'Paid' : 'Pending'
     });
 
+    
     await order.save();
+    
     req.session.coupon = null;
 
     cart.items = [];
@@ -499,6 +501,7 @@ const placeOrder = async (req, res, next) => {
     next(err);
   }
 };
+
 
 const getRetry = async (req, res, next) => {
   try {
@@ -715,16 +718,21 @@ const cancelOrder = async (req, res, next) => {
     const cancelId = req.params.orderId;
     const userId = req.session.user._id;
 
-    const order = await Order.findOne({ _id: cancelId, user: userId }).populate({
-      path: 'user',
-      populate: { path: 'wallet' }
-    });
+    const order = await Order.findOne({ _id: cancelId, user: userId }).populate([
+      {
+        path: 'user',
+        populate: { path: 'wallet' }
+      },
+      {
+        path: 'items.product'
+      }
+    ]);
 
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (order.status !== 'Placed') return res.status(400).json({ message: 'Order cannot be cancelled' });
 
+    // ✅ Update order status
     order.status = 'Cancelled';
-    let refundTotal = 0;
 
     for (const item of order.items) {
       if (item.status === 'Placed') {
@@ -732,31 +740,38 @@ const cancelOrder = async (req, res, next) => {
         item.cancelledAt = new Date();
         item.cancelReason = 'Full order cancelled';
 
-        const product = await productSchema.findById(item.product);
-        if (product && product.variants.length > 0) {
-          const variant = product.variants[0];
-          variant.quantity += item.quantity;
+        const { quantity, variantIndex } = item;
+
+        // ✅ Stock restore
+        const product = item.product;
+        if (product && product.variants[variantIndex]) {
+          product.variants[variantIndex].quantity += quantity;
           await product.save();
         }
-
-        refundTotal += item.price * item.quantity;
       }
     }
 
-    // Refund to wallet
-    if (order.paymentMethod === 'ONLINE' && order.isPaid && refundTotal > 0) {
-      order.user.wallet.balance += refundTotal;
-      order.user.wallet.transactions.push({
-        type: 'credit',
-        amount: refundTotal,
-        description: `Refund for cancelled order: ${order._id.toString().slice(-8)}`,
-        orderId: order._id
-      });
-      await order.user.wallet.save();
+    // ✅ Refund the total order amount directly
+    const totalRefund = order.totalAmount;
+
+    if (order.paymentMethod === 'ONLINE' && order.isPaid && totalRefund > 0) {
+      let wallet = order.user.wallet;
+
+      if (!wallet) {
+        wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
+        await wallet.save();
+        order.user.wallet = wallet;
+      }
+
+      await wallet.addMoney(
+        totalRefund,
+        `Refund for cancelled order: ${order._id.toString().slice(-8)}`,
+        order._id
+      );
     }
 
     await order.save();
-    res.status(200).json({ message: 'Order cancelled successfully' });
+    res.status(200).json({ message: 'Order cancelled and refund issued to wallet' });
 
   } catch (error) {
     console.error("Cancel order error:", error);
@@ -767,71 +782,79 @@ const cancelOrder = async (req, res, next) => {
 const cancelOrderItem = async (req, res, next) => {
   try {
     const { orderId, itemId } = req.params;
-    const userId = req.session.user._id;
     const { reason } = req.body;
+    const userId = req.session.user._id;
 
     const order = await Order.findById(orderId).populate('items.product');
+    console.log(order)
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
-    if (order.user.toString() !== userId.toString()) return res.status(403).json({ success: false, message: 'Unauthorized' });
 
     const item = order.items.id(itemId);
-    if (!item || item.status !== 'Placed') return res.status(400).json({ success: false, message: 'Item cannot be cancelled' });
+    console.log(item,'thi is item');
+    if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
+    if (item.status === 'Cancelled') return res.status(400).json({ success: false, message: 'Already cancelled' });
 
-    // Mark item as cancelled
+    
     item.status = 'Cancelled';
-    item.cancelledAt = new Date();
-    item.cancelReason = reason || 'Cancelled by customer';
+    item.cancelReason = reason;
+    item.cancelDate = new Date();
 
-    // Update product stock
-    const product = await productSchema.findById(item.product._id);
-    if (product && product.variants.length > 0) {
-      const variant = product.variants[item.variantIndex || 0];
-      variant.quantity += item.quantity;
+    
+    const product = item.product;
+    const variantIndex = item.variantIndex;
+    if (product?.variants?.[variantIndex]) {
+      product.variants[variantIndex].quantity += item.quantity;
       await product.save();
     }
+    const paidPrice = Number(item.price) || 0;
+    const quantity = Number(item.quantity) || 1;
+    const itemTotal = paidPrice * quantity;
 
-    // Refund amount (simple)
-    const refundAmount = item.price * item.quantity;
 
-    // Cancel entire order if no remaining items
-    const activeItems = order.items.filter(i => i.status === 'Placed');
-    if (activeItems.length === 0) {
-      order.status = 'Cancelled';
+    let refundAmount = 0;
+  
+    if(order.coupon && order.totalAmount > order.couponMinAmount){
+        const refundingAmount = (itemTotal/order.totalAmount)*order.coupon.discountAmount;
+        refundAmount = itemTotal-refundingAmount;
+
+    }
+    
+    if (isNaN(refundAmount) || refundAmount <= 0) {
+      return res.status(500).json({ success: false, message: 'Refund calculation error' });
     }
 
+    
+    const user = await User.findById(userId).populate('wallet');
+    user.wallet.balance += refundAmount;
+    user.wallet.transactions.push({
+      type: 'credit',
+      amount: refundAmount,
+      description: `Refund for cancelled item - ${product?.name || 'product'}`,
+      orderId: order._id
+    });
+    await user.wallet.save();
+    await user.save();
+
+    
     await order.save();
 
-    // Refund to wallet
-    if (order.paymentMethod === 'ONLINE' && refundAmount > 0) {
-      let wallet = await Wallet.findOne({ user: userId });
-      if (!wallet) {
-        wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
-        await wallet.save();
-        await User.findByIdAndUpdate(userId, { wallet: wallet._id });
-      }
-
-      wallet.balance += refundAmount;
-      wallet.transactions.push({
-        type: 'credit',
-        amount: refundAmount,
-        description: `Refund for cancelled item: ${item.product.name}`,
-        orderId: order._id
-      });
-      await wallet.save();
+    
+    const allCancelled = order.items.every(i => i.status === 'Cancelled');
+    if (allCancelled) {
+      order.status = 'Cancelled';
+      await order.save();
     }
 
-    res.status(200).json({
-      success: true,
-      message: `Item cancelled. ₹${refundAmount} refunded to wallet.`,
-      refundAmount,
-      orderStatus: order.status
-    });
+    return res.status(200).json({ success: true, message: `Item cancelled and refund issued ${refundAmount}` });
 
-  } catch (error) {
-    console.error("Cancel item error:", error);
-    next(error);
+  } catch (err) {
+    console.error(err);
+    next(err);
   }
 };
+
+
+
 
 const debugOrderIds = async (req, res, next) => {
   try {

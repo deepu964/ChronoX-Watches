@@ -688,7 +688,9 @@
                     }
                 })
                 .then(res => {
+                   console.log('this is hrerer11')
                     if (res.ok) {
+                         console.log('this is hrerer')
                         Swal.fire('Cancelled!', 'Order cancelled successfully.', 'success')
                         .then(() => window.location.reload());
                     } else {

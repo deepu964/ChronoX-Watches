@@ -952,10 +952,10 @@
                         <th>Customer Name</th>
                         <th>Email</th>
                         <th>Price</th>
-                        <th>Category Offer</th>
+                        <!-- <th>Category Offer</th> -->
                         <th>Payment Method</th>
-                        <th>Discount</th>
-                        <th>Coupon</th>
+                        <!-- <th>Discount</th>
+                        <th>Coupon</th> -->
                         <th>Paid Amount</th>
                     </tr>
                 </thead>
@@ -967,10 +967,10 @@
                             <td><%= order.user?.fullname || 'N/A' %></td>
                             <td><%= order.user?.email || 'N/A' %></td>
                             <td>₹<%= (order.totalAmount + (order.discount || 0)).toLocaleString('en-IN') %></td>
-                            <td>₹<%= (order.categoryDiscount || 0).toLocaleString('en-IN') %></td>
+                            <!-- <td>₹<%= (order.categoryDiscount || 0).toLocaleString('en-IN') %></td> -->
                             <td><%= order.paymentMethod %></td>
-                            <td>₹<%= (order.discount || 0).toLocaleString('en-IN') %></td>
-                            <td>₹<%= (order.couponDiscount || 0).toLocaleString('en-IN') %></td>
+                            <!-- <td>₹<%= (order.discount || 0).toLocaleString('en-IN') %></td> -->
+                            <!-- <td>₹<%= (order.couponDiscount || 0).toLocaleString('en-IN') %></td> -->
                             <td>₹<%= order.totalAmount.toLocaleString('en-IN') %></td>
                         </tr>
                         <% }) %>
@@ -1065,8 +1065,8 @@
                     <tr>
                         <th>Total Orders</th>
                         <th>Total Sales Amount</th>
-                        <th>Total Discount</th>
-                        <th>Total Coupon Discount</th>
+                        <!-- <th>Total Discount</th>
+                        <th>Total Coupon Discount</th> -->
                         <th>Net Total Amount</th>
                     </tr>
                 </thead>
@@ -1074,8 +1074,8 @@
                     <tr>
                         <td id="totalOrders"><%= typeof summary !== 'undefined' ? summary.totalOrders : 0 %></td>
                         <td id="totalSales">₹<%= typeof summary !== 'undefined' ? summary.totalSales.toLocaleString('en-IN') : 0 %></td>
-                        <td id="totalDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalDiscount.toLocaleString('en-IN') : 0 %></td>
-                        <td id="totalCouponDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalCouponDiscount.toLocaleString('en-IN') : 0 %></td>
+                        <!-- <td id="totalDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalDiscount.toLocaleString('en-IN') : 0 %></td>
+                        <td id="totalCouponDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalCouponDiscount.toLocaleString('en-IN') : 0 %></td> -->
                         <td id="totalAmount" class="net-total">₹<%= typeof summary !== 'undefined' ? summary.totalAmount.toLocaleString('en-IN') : 0 %></td>
                     </tr>
                 </tbody>

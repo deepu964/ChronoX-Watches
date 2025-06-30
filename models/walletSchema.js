@@ -11,7 +11,7 @@ const transactionSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
-  description: {
+  description: { 
     type: String,
     required: true
   },
@@ -47,7 +47,7 @@ const walletSchema = new mongoose.Schema({
 });
 
 
-walletSchema.methods.addMoney = function(amount, description, orderId = null, returnId = null) {
+walletSchema.methods.addMoney = function (amount, description, orderId = null, returnId = null) {
   this.balance += amount;
   this.transactions.push({
     type: 'credit',
@@ -56,11 +56,11 @@ walletSchema.methods.addMoney = function(amount, description, orderId = null, re
     orderId,
     returnId
   });
-  return this.save();
+  return this.save(); 
 };
 
 
-walletSchema.methods.deductMoney = function(amount, description, orderId = null) {
+walletSchema.methods.deductMoney = function (amount, description, orderId = null) {
   if (this.balance < amount) {
     throw new Error('Insufficient wallet balance');
   }
@@ -71,7 +71,7 @@ walletSchema.methods.deductMoney = function(amount, description, orderId = null)
     description,
     orderId
   });
-  return this.save();
+  return this.save(); 
 };
 
 module.exports = mongoose.model('Wallet', walletSchema);

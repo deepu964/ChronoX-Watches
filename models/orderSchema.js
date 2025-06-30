@@ -10,8 +10,8 @@ const orderSchema = new mongoose.Schema({
     discount: Number,
     paidPrice: Number,
     
-    // ✅ 👇 NEW FIELD: discount share per item
-    discountShare: Number, // 👈 required for coupon refund calculation
+   
+    discountShare: Number,
 
     status: {
       type: String,
@@ -31,19 +31,13 @@ const orderSchema = new mongoose.Schema({
   },
   totalAmount: Number,
 
-  // ✅ 👇 NEW FIELD: total before applying coupon (original cart total)
-  totalBeforeDiscount: Number, // 👈 used to split coupon across items
+  totalBeforeDiscount: Number, 
 
-  // ✅ 👇 These were already correct, just rename & adjust
-  couponMinAmount: Number, // 👈 required to check if coupon still valid after cancellation
+  couponMinAmount: Number,
   coupon: {
-    type: String,       // 👈 example: "WELCOME10"
-    code: String,       // optional extra (can remove this if using above field)
-    
-    // ✅ 👇 Renamed properly
-    discountAmount: Number // 👈 total discount applied
-  },
-
+  code: { type: String},
+  discountAmount: { type: Number, default: 0 }
+},
   shippingFee: Number,
   isPaid: { type: Boolean, default: false },
   paymentMethod: { type: String, enum: ['COD', 'ONLINE'] },
