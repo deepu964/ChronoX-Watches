@@ -17,7 +17,7 @@
             <div class="addresses-container">
                 <% if (addresses && addresses.length > 0) { %>
                     <% addresses.forEach((address, index) => { %>
-                        <div class="address-card <%= address.isDefault ? 'default' : '' %>">
+                        <div style="height: fit-content;" class="address-card <%= address.isDefault ? 'default' : '' %>">
                             <div class="address-content">
                                 <div class="address-header">
                                     <h3><%= address.fullName %></h3>
@@ -58,7 +58,7 @@
                                     </button>
                                
                             </div>
-
+                           
                                 <div class="address-select">
                                     <input type="radio" name="selectedAddress" id="address<%= index %>"
                                         value="<%= address._id %>" <%= address.isDefault ? 'checked' : '' %>>
@@ -72,6 +72,9 @@
                         <button id="first-address-btn" class="btn btn-primary open-modal-btn" data-modal-id="addAddressModal">Add Your First Address</button>
                     </div>
                 <% } %>
+                <div class="no-addresses">
+                        <button id="first-address-btn" class="btn btn-primary open-modal-btn" data-modal-id="addAddressModal">Add New Address</button>
+                    </div>
             </div>
 
             <!-- Add/Edit Address Modal -->

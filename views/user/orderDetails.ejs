@@ -425,8 +425,8 @@
                     <div class="item-details">
                         <div class="item-name">
                             <%= item.product.name %>
-                            <span class="item-status status-<%= item.status.toLowerCase() %>">
-                                <%= item.status %>
+                            <!-- <span class="item-status status-<%= item.status.toLowerCase() %>">
+                                <%= order.status %> -->
                             </span>
                         </div>
                         <div class="item-info">
@@ -700,11 +700,11 @@
                                            data-max-qty="<%= item.quantity %>" checked>
                                     <label for="item_<%= index %>">
                                         <span class="item-name"><%= item.product.name %></span>
-                                        <% if (bestOffer) { %>
+                                        <!-- <% if (bestOffer) { %>
                                           <span class="item-price">₹<%= catDiscount-bestOffer %> each</span>
                                           <% } else { %>
                                             <span class="item-price">₹<%= catDiscount %> each</span>
-                                        <% } %>
+                                        <% } %> -->
                                        
                                     </label>
                                     <div class="quantity-selector">
@@ -718,9 +718,9 @@
                         </div>
                     </div>
 
-                    <div class="refund-summary">
+                    <!-- <div class="refund-summary">
                         <strong>Estimated Refund: ₹<span id="refundAmount">0</span></strong>
-                    </div>
+                    </div> -->
 
                     <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeReturnModal()">Cancel</button>

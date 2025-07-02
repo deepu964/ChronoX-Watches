@@ -10,7 +10,7 @@ const { nextTick } = require('process');
 const product = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 3;
+        const limit = 6;
         const search = req.query.search ? req.query.search.trim() : "";
         const category = req.query.category || 'all';
         
