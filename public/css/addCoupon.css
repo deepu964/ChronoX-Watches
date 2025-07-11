@@ -142,7 +142,7 @@ body {
 .main-content {
     margin-left: var(--sidebar-width);
     padding: 40px 20px;
-    width: 100%;
+    width: 200%;
     transition: var(--transition);
 }
 
@@ -179,7 +179,8 @@ form {
     padding: 30px;
     border-radius: 8px;
     box-shadow: var(--shadow);
-    max-width: 600px;
+    width: 100%;
+    height: max-content;
 }
 
 .form-group {

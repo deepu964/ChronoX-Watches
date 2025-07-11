@@ -157,8 +157,10 @@
                           </select>
                           <button type="submit" class="apply-btn" id="applyCouponBtn">Apply</button>
                           <input type="hidden" id="grandTotalValue" value="<%= grandTotal %>">
+                        
                         </div>
                         <div id="couponMessage" class="coupon-msg"></div>
+                        <div id="showCouponCode"></div>
                       </form>
                     </div>
 
@@ -236,52 +238,75 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const couponForm = document.getElementById("couponForm");
+  let appliedCouponCode = null; // Keep track of the currently applied coupon
 
-  couponForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    console.log("Coupon form submitted ✅");
+document.getElementById("couponForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const code = document.getElementById("couponSelect").value;
-    const grandTotalEl = document.getElementById("grandTotalValue");
-    const grandTotal = parseFloat(grandTotalEl.value);
+  const code = document.getElementById("couponSelect").value;
+  const grandTotalEl = document.getElementById("grandTotalValue");
+  const grandTotal = parseFloat(grandTotalEl.value);
+  const showCouponCode = document.getElementById("showCouponCode");
 
-    if (!code) {
-      showToast("Please select a coupon", "error");
-      return;
-    }
+  if (!code) {
+    showToast("Please select a coupon", "error");
+    return;
+  }
 
-    try {
-      const response = await fetch("/apply-coupon", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, grandTotal })
-      });
+  // ✅ Prevent reapplying the same coupon
+  if (appliedCouponCode === code) {
+    showToast("Coupon already applied", "error");
+    return;
+  }
 
-      const result = await response.json();
+  try {
+    const response = await fetch("/apply-coupon", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, grandTotal }),
+    });
 
-      if (result.success) {
-        document.getElementById("couponMessage").innerText = `Coupon Applied: ₹${result.discountAmount} off`;
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-        showToast(`Coupon Applied: ₹${result.discountAmount} off`, "success");
+    const result = await response.json();
 
-        const totalEl = document.querySelector(".summary-row.total span:last-child");
-        if (totalEl) {
-          const newTotal = grandTotal - result.discountAmount;
-          totalEl.innerText = `₹${newTotal.toFixed(2)}`;
-        }
+    if (result.success) {
+      appliedCouponCode = code; // 🔐 Save applied coupon code
 
-      } else {
-        document.getElementById("couponMessage").innerText = result.message;
-        showToast(result.message || "Invalid coupon", "error");
+      showToast(`Coupon Applied: ₹${result.discountAmount} off`, "success");
+      document.getElementById("couponMessage").innerText = `Coupon Applied: ₹${result.discountAmount} off`;
+      showCouponCode.innerText = `Coupon Code: ${code}`;
+      // Add coupon discount row
+      const discountRow = document.querySelector(".summary-row.discount");
+      if (discountRow && !document.querySelector(".summary-row.coupon-row")) {
+        const couponRow = document.createElement("div");
+        couponRow.className = "summary-row coupon-row";
+        couponRow.style.color = "green";
+        couponRow.innerHTML = `
+          <span style="display: flex; align-items: center;">Coupon</span>
+          <span style="margin-left: auto;">-₹${result.discountAmount}</span>
+          <button onclick="removeCoupon()" class="remove-coupon-btn" style="border: none; background-color: white; padding: 5px;">
+            <i class="fas fa-times" style="color: red;"></i>
+          </button>
+        `;
+        discountRow.insertAdjacentElement("afterend", couponRow);
       }
-    } catch (err) {
-      console.error("Coupon apply failed:", err);
-      showToast("Something went wrong", "error");
+
+      // Update total
+      const totalEl = document.querySelector(".summary-row.total span:last-child");
+      if (totalEl) {
+        const newTotal = grandTotal - result.discountAmount;
+        totalEl.innerText = `₹${newTotal.toFixed(2)}`;
+      }
+
+    } else {
+      document.getElementById("couponMessage").innerText = result.message;
+      showToast(result.message || "Invalid coupon", "error");
     }
-  });
+  } catch (err) {
+    console.error("Coupon apply failed:", err);
+    showToast("Something went wrong", "error");
+  }
+});
+
 
   function showToast(message, type = "success") {
     const toast = document.getElementById("toast");

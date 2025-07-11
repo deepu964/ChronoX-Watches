@@ -342,7 +342,8 @@ const placeOrder = async (req, res, next) => {
     const userId = req.session.user._id;
     const { paymentMethod, addressId, razorpayOrderId, paymentId, orderId } = req.body;
     const coupon = req.session.coupon || null;
-
+    
+    
     
     if (orderId) {
       const existingOrder = await Order.findById(orderId);
@@ -358,12 +359,14 @@ const placeOrder = async (req, res, next) => {
       existingOrder.isPaid = paymentMethod === 'ONLINE';
       existingOrder.coupon = {
         code: coupon?.code || '',
-        discountAmount: coupon?.discountAmount || 0
+        discountAmount: coupon?.discountAmount || 0,
+        maxDiscount: coupon?.maxDiscount || 0
+        
       };
-
+      
       existingOrder.couponMinAmount = coupon?.minPurchase || 0;
-      console.log(existingOrder,'this is order')
       await existingOrder.save();
+      
 
       const cart = await Cart.findOne({ user: userId });
       if (cart) {
@@ -436,7 +439,8 @@ const placeOrder = async (req, res, next) => {
         price: regularPrice,
         paidPrice: finalPrice,
         discount: bestOffer,
-        discountShare: 0
+        discountShare: 0,
+
       });
 
       totalBeforeDiscount += itemMrpTotal;
@@ -449,8 +453,8 @@ const placeOrder = async (req, res, next) => {
     const couponAmount = coupon?.discountAmount || 0;
     const couponMin = coupon?.minPurchase || 0;
     const totalAmount = couponAmount > 0 ? finalTotal - couponAmount : finalTotal;
-
-   
+    const CouponMaxDiscount = coupon?.maxDiscount || 0;
+    
     if (couponAmount > 0 && totalBeforeDiscount > 0) {
       for (let item of orderItems) {
         const itemMrp = item.price * item.quantity;
@@ -474,9 +478,11 @@ const placeOrder = async (req, res, next) => {
       couponMinAmount: couponMin,
       coupon: {
         code: coupon?.code || '',
-        discountAmount: couponAmount
+        discountAmount: couponAmount,
+        
+        
       },
-      paymentMethod,
+      
       razorpayPaymentId: paymentId || null,
       razorpayOrderId: razorpayOrderId || null,
       status: 'Placed',
@@ -486,7 +492,7 @@ const placeOrder = async (req, res, next) => {
 
     
     await order.save();
-    
+    console.log(order.coupon,'this is order');
     req.session.coupon = null;
 
     cart.items = [];
@@ -565,6 +571,7 @@ const getOrderSuccess = async (req, res, next) => {
     if (!order || order.user._id.toString() !== req.session.user._id.toString()) {
       return res.redirect('/shop');
     }
+    console.log(order.coupon,'this is order success page');
 
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
@@ -588,10 +595,11 @@ const getOrderDetails = async (req, res, next) => {
     const order = await Order.findById(orderId)
       .populate('items.product')
       .populate('user');
-
+    
     if (!order || order.user._id.toString() !== userId.toString()) {
       return res.status(404).render('user/404');
     }
+
 
     const returnRequest = await Return.findOne({ order: orderId, user: userId })
       .populate('items.product', 'name');
@@ -605,9 +613,12 @@ const getOrderDetails = async (req, res, next) => {
     let regularPrice = 0;
     let salePrice = 0;
     let catDiscount = 0;
+    let discountedPrice = 0;
+    let offerPer = 0;
 
-
+    offerPer = order.coupon. maxDiscount || 0;
     for (let item of order.items) {
+      
       const product = item.product;
       const quantity = item.quantity;
       const variant = product.variants[0];
@@ -617,23 +628,23 @@ const getOrderDetails = async (req, res, next) => {
 
       const productOffer = regularPrice - salePrice;
 
-
       const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
       if (catOffer && catOffer.discount) {
         catDiscount = (regularPrice * catOffer.discount) / 100;
       }
-      bestOffer = Math.max(productOffer, catDiscount);
-      const discountedPrice = regularPrice - bestOffer;
 
+      bestOffer = Math.max(productOffer, catDiscount);
+      discountedPrice = regularPrice - bestOffer;
+      
 
       totalMRP += regularPrice * quantity;
       discount += bestOffer * quantity;
-
-
       grandTotal += discountedPrice * quantity;
     }
 
     const finalTotal = grandTotal;
+
+
 
     res.render('user/orderDetails', {
       user: req.session.user,
@@ -641,9 +652,11 @@ const getOrderDetails = async (req, res, next) => {
       total: totalMRP - discount,
       totalMRP,
       order,
+      offerPer,
       returnRequest,
       discount,
       catDiscount,
+      discountedPrice,
       bestOffer,
       regularPrice,
       salePrice,

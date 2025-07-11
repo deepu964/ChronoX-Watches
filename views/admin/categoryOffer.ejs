@@ -24,7 +24,7 @@
         <a href="/admin/product" class="nav-item"><i class="fas fa-box"></i> <span>Products</span></a>
         <a href="/admin/orders" class="nav-item"><i class="fas fa-list"></i> <span>Order List</span></a>
         <a href="/admin/userlist" class="nav-item"><i class="fas fa-user"></i> <span>Customer</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span>Sales</span></a>
+        <a href="/admin/sales-report" class="nav-item"><i class="fas fa-chart-line"></i> <span>Sales</span></a>
         <a href="/admin/category" class="nav-item"><i class="fas fa-tags"></i> <span>Category</span></a>
         <a href="/admin/category-offers" class="nav-item active"><i class="fas fa-percent"></i> <span>Category Offers</span></a>
         <a href="/admin/coupon" class="nav-item"><i class="fas fa-ticket-alt"></i> <span>Coupons</span></a>
@@ -112,8 +112,59 @@
                 </tbody>
             </table>
         </div>
+        <!-- Pagination -->
+<% if (totalPage > 1) { %>
+  <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+    <% if (currentPage > 1) { %>
+      <a href="?page=<%= currentPage - 1 %>&search=<%= search %>" class="pagination-link">« Prev</a>
+    <% } %>
+
+    <% for (let i = 1; i <= totalPage; i++) { %>
+      <a href="?page=<%= i %>&search=<%= search %>" class="pagination-link <%= currentPage === i ? 'active' : '' %>">
+        <%= i %>
+      </a>
+    <% } %>
+
+    <% if (currentPage < totalPage) { %>
+      <a href="?page=<%= currentPage + 1 %>&search=<%= search %>" class="pagination-link">Next »</a>
+    <% } %>
+  </div>
+<% } %>
+
+<style>
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .pagination-link {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #f2f2f2;
+    color: #333;
+    border-radius: 4px;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    transition: all 0.2s;
+  }
+
+  .pagination-link:hover {
+    background-color: #ddd;
+  }
+
+  .pagination-link.active {
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #333;
+  }
+</style>
+
     </main>
   </div>
+  
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {

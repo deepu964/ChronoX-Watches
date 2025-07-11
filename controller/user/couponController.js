@@ -11,6 +11,16 @@ const applyCoupon = async (req, res, next) => {
       couponcode: code.trim().toUpperCase(),
       isActive: true
     });
+
+    const existCoupon = await couponSchema.findOne({
+      couponcode: code.trim().toUpperCase(),
+      isActive: true,
+      user: userId
+    });
+
+    if (existCoupon) {
+      return res.json({ success: false, message: "You already used this coupon" });
+    }
     
 
     if (!coupon) {
@@ -34,6 +44,7 @@ const applyCoupon = async (req, res, next) => {
 
     const discountAmount = Math.round((grandTotal * coupon.discount) / 100);
     const minPurchase = coupon.minPurchase;
+    const maxDiscount = coupon.discount;
     
     // coupon.user.push(userId);
     // await coupon.save();
@@ -41,9 +52,11 @@ const applyCoupon = async (req, res, next) => {
     req.session.coupon = {
       couponcode: coupon.couponcode,
       discountAmount,
-      minPurchase
-    };
+      minPurchase,
+      maxDiscount: coupon.discount
 
+    };
+    
     return res.json({ success: true, discountAmount });
   } catch (err) {
     console.log("Error applying coupon:", err);

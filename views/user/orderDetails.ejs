@@ -412,6 +412,7 @@
             </h3>
             
             <% order.items.forEach(item => { %>
+
                 <div class="order-item <%= item.status === 'Cancelled' ? 'cancelled-item' : '' %>">
                     <div class="item-image">
                         <% if (item.product.images && item.product.images.length > 0) { %>
@@ -429,10 +430,21 @@
                                 <%= order.status %> -->
                             </span>
                         </div>
-                        <div class="item-info">
-                            <span>Quantity: <%= item.quantity %></span>
-                            
-                        </div>
+                <div class="item-info">
+            <span>Quantity: <%= item.quantity %></span>
+
+            <% 
+            const unitPrice = Number(item?.product?.variants[0].salePrice) || 0;
+            const qty = Number(item?.quantity) || 0;
+            const total = unitPrice * qty;
+            const offerPercent = typeof offerPer === 'number' ? offerPer : 0;
+            const finalPrice = total * (1 - offerPercent / 100);
+
+            
+            %>
+
+            <span>Price: ₹<%= finalPrice.toFixed(2) %></span>
+            </div>
                         <% if (item.status === 'Cancelled' && item.cancelledAt) { %>
                             <div class="cancel-info">
                                 <small style="color: #dc3545;">
@@ -475,19 +487,20 @@
                     <span >Discount:</span>
                     <span >-₹<%= discount.toLocaleString() %></span>
                 </div>
-                <% if (order.coupon>0) { %>
-                 <div class="total-row" style="color:red">
-                    <span >Coupon:</span>
-                    <span >-₹<%= order.coupon%></span>
-                </div>
-                <% } %>
+                
+                 <% if (order.coupon.discountAmount>0) { %>
+                    <div class="total-row" style="color:red">
+                            <span>Coupon:</span>
+                            <span>-₹<%= order.coupon.discountAmount %></span>
+                    </div> 
+                <% } %> 
 
                 <% if (activeTotal > 0) { %>
                 
-                   <% if (order.coupon>0) { %>
+                   <% if (order.coupon.discountAmount >0) { %>
                         <div class="total-row">
                             <span>Total Amount:</span>
-                            <span>₹<%= grandTotal-order.coupon %></span>
+                            <span>₹<%= grandTotal-order.coupon.discountAmount %></span>
                         </div>
                         <% } else { %>
                         <div class="total-row">

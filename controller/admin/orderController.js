@@ -278,8 +278,6 @@ const getReturns = async (req, res, next) => {
             .sort({ requestedAt: -1 })
             .skip(skip)
             .limit(limit);
-
-            cosole.log(returns.order,'this is ')
            
         
         res.render('admin/returns', {
