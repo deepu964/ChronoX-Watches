@@ -457,15 +457,26 @@
                             </div>
                         <% } %>
                     </div>
-                    <div class="item-actions">
-                        
+                  <div class="item-actions">
+                        <% const isSingleItem = order.items.length === 1; %>
+
                         <% if (item.status === 'Placed' && order.status !== 'Cancelled') { %>
-                            <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
-                                <i class="fas fa-times"></i>
-                                Cancel Item
-                            </button>
+                            <% if (isSingleItem) { %>
+                                <script>
+                                    // Auto-cancel if only one item in the order
+                                    window.addEventListener('DOMContentLoaded', function () {
+                                        cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>');
+                                    });
+                                </script>
+                            <% } else { %>
+                                <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
+                                    <i class="fas fa-times"></i>
+                                    Cancel Item
+                                </button>
+                            <% } %>
                         <% } %>
                     </div>
+
                 </div>
             <% }) %>
 

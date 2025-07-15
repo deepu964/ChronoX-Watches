@@ -719,6 +719,7 @@
             border-radius: 10px;
             padding: 25px;
             margin-bottom: 20px;
+            width: 225%;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
         }
@@ -736,6 +737,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
+
         }
 
         .info-item {

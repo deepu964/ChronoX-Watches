@@ -328,6 +328,15 @@
             font-weight: 500;
             font-size: clamp(12px, 1.5vw, 14px);
         }
+        .email {
+            color: #010603;
+            font-size: clamp(12px, 1.5vw, 14px);
+            max-width: 120px;        /* Adjust as needed */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
         
         /* Status Badge */
         .status-badge {
@@ -871,7 +880,7 @@
                                 </div>
                                 <span class="customer-name"><%= element.fullname %></span>
                             </td>
-                            <td><%= element.email %></td>
+                            <td><div class="email"><%= element.email %></div></td>
                             <td><%= element.mobile %></td>
                             <% if (element.isBlocked) { %>
                                 <td><span class="status-badge status-blocked">Blocked</span></td>

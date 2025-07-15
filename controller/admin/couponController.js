@@ -57,7 +57,9 @@ const addCoupon = async (req,res,next) => {
     if(existsCoupon ){
          return res.status(400).json({success:false,message:"Coupon is already exists"});
     }
-
+    if( discount <= 0 || discount > 80){
+      return res.status(400).json({success:false, message:"Discount limit 1 to 80"})
+    }
     const newCoupon = new couponSchema({
         name,
         discount,
@@ -127,10 +129,10 @@ const editCoupon = async (req, res, next) => {
 
     
     discount = parseFloat(discount);
-    if (isNaN(discount) || discount <= 0 || discount > 100) {
+    if (isNaN(discount) || discount <= 0 || discount > 80) {
       return res.json({
         success: false,
-        message: 'Discount must be a number between 1 and 100.'
+        message: 'Discount must be a number between 1 and 80.'
       });
     }
 

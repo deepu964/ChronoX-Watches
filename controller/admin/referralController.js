@@ -57,7 +57,6 @@ const getReferralList = async (req, res, next) => {
     }
 };
 
-
 const getReferralStats = async (req, res, next) => {
     try {
         const stats = await Referral.getReferralStats();
@@ -91,7 +90,6 @@ const getReferralStats = async (req, res, next) => {
         res.status(500).json({ success: false, message: 'Failed to fetch referral statistics' });
     }
 };
-
 
 const getReferralDetails = async (req, res, next) => {
     try {
@@ -136,7 +134,6 @@ const getReferralDetails = async (req, res, next) => {
         next(error);
     }
 };
-
 
 const updateReferralStatus = async (req, res, next) => {
     try {
@@ -189,7 +186,6 @@ const updateReferralStatus = async (req, res, next) => {
         res.status(500).json({ success: false, message: 'Failed to update referral status' });
     }
 };
-
 
 const getReferralAnalytics = async (req, res, next) => {
     try {

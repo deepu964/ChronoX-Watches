@@ -37,7 +37,7 @@ const getShopPage = async (req, res) => {
         } = req.query;
 
         const page = parseInt(req.query.page) || 1;
-        const limit = 7;
+        const limit = 6;
         const skip = (page - 1) * limit;
 
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;

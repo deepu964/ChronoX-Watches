@@ -799,81 +799,80 @@ const cancelOrderItem = async (req, res, next) => {
     const { reason } = req.body;
     const userId = req.session.user._id;
 
+   
     const order = await Order.findById(orderId).populate('items.product');
-    
+   
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
-    const item = order.items.id(itemId);
     
+    const item = order.items.id(itemId);
     if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
     if (item.status === 'Cancelled') return res.status(400).json({ success: false, message: 'Already cancelled' });
 
-    
+
     item.status = 'Cancelled';
     item.cancelReason = reason;
     item.cancelDate = new Date();
 
-    
+   
     const product = item.product;
-    const variantIndex = item.variantIndex;
+    let variantIndex = item.variantIndex;
+    if (typeof variantIndex !== 'number') {
+      variantIndex = 0; 
+    }
+
     if (product?.variants?.[variantIndex]) {
       product.variants[variantIndex].quantity += item.quantity;
       await product.save();
     }
+
+    
     const paidPrice = Number(item.price) || 0;
     const quantity = Number(item.quantity) || 1;
     const itemTotal = paidPrice * quantity;
 
+    
+    let refundAmount = itemTotal;
+    let totalCost = (order.coupon.maxDiscount *order.coupon.discountAmount);
 
-    let refundAmount = 0;
-  
-    if(order.coupon && order.totalAmount > order.couponMinAmount){
-        const refundingAmount = (itemTotal/order.totalAmount)*order.coupon.discountAmount;
-        refundAmount = (itemTotal-refundingAmount).toFixed(2);
-      
-
+    if (order.coupon && order.totalAmount > order.couponMinAmount) {
+      const refundingAmount = (itemTotal/totalCost) * order.coupon.discountAmount;
+      refundAmount = itemTotal - refundingAmount;
     }
     
+    refundAmount = parseFloat(refundAmount.toFixed(2));
+
     if (isNaN(refundAmount) || refundAmount <= 0) {
       return res.status(500).json({ success: false, message: 'Refund calculation error' });
     }
 
     
     const user = await User.findById(userId).populate('wallet');
+    let wallet = user.wallet;
 
+    if (!wallet) {
+      wallet = new Wallet({
+        user: userId,
+        balance: 0,
+        transactions: []
+      });
+    }
 
-const numericRefund = Number(parseFloat(refundAmount).toFixed(2)); 
+    wallet.balance = parseFloat((wallet.balance + refundAmount).toFixed(2));
 
-let wallet = user.wallet;
+    wallet.transactions.push({
+      type: 'credit',
+      amount: refundAmount,
+      description: `Refund for cancelled item - ${product?.name || 'product'}`,
+      orderId: order._id
+    });
 
-if (!wallet) {
-  wallet = new Wallet({
-    user: userId,
-    balance: 0,
-    transactions: []
-  });
-}
+    if (!user.wallet) {
+      user.wallet = wallet._id;
+      await user.save();
+    }
 
-
-wallet.balance = parseFloat((wallet.balance + numericRefund).toFixed(2));
-
-wallet.transactions.push({
-  type: 'credit',
-  amount: numericRefund,
-  description: `Refund for cancelled item - ${product?.name || 'product'}`,
-  orderId: order._id
-});
-
-
-
-if (!user.wallet) {
-  user.wallet = wallet._id;
-  await user.save();
-}
-await wallet.save();
-
-
-    
+    await wallet.save();
     await order.save();
 
     
@@ -883,13 +882,18 @@ await wallet.save();
       await order.save();
     }
 
-    return res.status(200).json({ success: true, message: `Item cancelled and refund issued ${refundAmount}` });
+    return res.status(200).json({
+      success: true,
+      message: `Item cancelled and refund issued ₹${refundAmount}`
+    });
 
   } catch (err) {
     console.error(err);
     next(err);
   }
 };
+
+
 
 const debugOrderIds = async (req, res, next) => {
   try {

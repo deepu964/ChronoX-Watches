@@ -86,16 +86,18 @@ const getMyReturns = async (req, res, next) => {
             .lean())
             .filter(r => r.order);
 
-        
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-
+        
+    
         res.render('user/myReturns', {
             user: req.session.user,
             returns,
             cloudName,
             currentPage: page,
             totalPages,
-            totalReturns
+            totalReturns,
+            
+            
         });
     } catch (error) {
         console.error("My returns page error:", error);
@@ -103,7 +105,11 @@ const getMyReturns = async (req, res, next) => {
     }
 };
 
+
+
+
 module.exports = {
     requestReturn,
-    getMyReturns
+    getMyReturns,
+    
 };
