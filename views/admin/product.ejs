@@ -1812,7 +1812,7 @@
                         </form>
 
                         <!-- Category Filter -->
-                        <form method="get" action="/admin/product" class="filter-form">
+                        <form method="get" action="/admin/product/<%= categories._id %>" class="filter-form">
                             <% if (search) { %>
                                 <input type="hidden" name="search" value="<%= search %>">
                             <% } %>

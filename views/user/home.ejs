@@ -23,12 +23,12 @@
     <section class="product-section">
         <h2 class="section-title">New Arrivals</h2>
         <div class="product-grid">
-            <% if(locals.newArrivals && newArrivals.length > 0) { %>
-                <% newArrivals.forEach(function(product) { %>
+            <% if(locals.newProducts && newProducts.length > 0) { %>
+                <% newProducts.forEach(function(product) { %>
                     <div class="product-card">
                         <div class="product-image">
-                            <a href="/product/<%= product.id %>">
-                                <img src="<%= product.image %>" alt="<%= product.name %>">
+                            <a href="/productdetails/<%= product.id %>">
+                                <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/<%= product.images[0].public_id %>" alt="<%= product.name %>">
                             </a>
                         </div>
                         <div class="product-details">
@@ -43,9 +43,9 @@
                                 </span>
                             </div>
                             <div class="product-price">
-                                <span class="current-price">$<%= product.price.toFixed(2) %></span>
+                                <span class="current-price">₹<%= product.variants[0].salePrice %></span>
                                 <% if(product.originalPrice) { %>
-                                    <span class="original-price">$<%= product.originalPrice.toFixed(2) %></span>
+                                    <span class="original-price">$<%= product.variants[0].regularPrice %></span>
                                 <% } %>
                             </div>
                         </div>

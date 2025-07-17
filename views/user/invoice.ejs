@@ -285,7 +285,7 @@
             <td><%= order.user.fullname %></td>
             <td><%= item.product.name %></td>
             <td class="text-center"><%= item.quantity %></td>
-            <td class="text-right">₹<%= (item.price+item.discount)*item.quantity %></td>
+            <td class="text-right">₹<%= ((Number(item.price) + Number(item.discount)) * Number(item.quantity)).toFixed(2) %></td>
             <td class="text-right"><%= item.discount*item.quantity %></td>
             <!-- <td>-</td> -->
             <td><%= order.paymentMethod %></td>

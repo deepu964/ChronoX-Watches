@@ -9,8 +9,8 @@ const orderSchema = new mongoose.Schema({
     price: Number,
     discount: Number,
     paidPrice: Number,
-    
-   
+
+
     discountShare: Number,
 
     status: {
@@ -29,16 +29,17 @@ const orderSchema = new mongoose.Schema({
     pincode: String,
     state: String,
   },
+  addressId: { type: mongoose.Schema.Types.ObjectId, ref: 'Address' },
   totalAmount: Number,
 
-  totalBeforeDiscount: Number, 
+  totalBeforeDiscount: Number,
 
   couponMinAmount: Number,
   coupon: {
-  code: { type: String},
-  discountAmount: { type: Number, default: 0 },
-  maxDiscount: { type: Number, default: 0 },
-},
+    code: { type: String },
+    discountAmount: { type: Number, default: 0 },
+    maxDiscount: { type: Number, default: 0 },
+  },
   shippingFee: Number,
   isPaid: { type: Boolean, default: false },
   paymentMethod: { type: String, enum: ['COD', 'ONLINE'] },
@@ -47,6 +48,7 @@ const orderSchema = new mongoose.Schema({
     enum: ['Pending', 'Paid', 'Failed'],
     default: 'Pending'
   },
+  regularPrice:Number,
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },
   status: {

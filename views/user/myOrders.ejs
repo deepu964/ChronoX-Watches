@@ -477,6 +477,26 @@
                 align-items: flex-start;
             }
         }
+            .retry-payment-form {
+                margin: 10px 0;
+                }
+                .retry-btn {
+                background-color: #ffc107;
+                color: #000;
+                border: none;
+                }
+
+                .retry-button{
+                    width: fit-content;
+                    color: #faf5f5;
+                    font-size: small;
+                    background-color:#fc6304 ;
+                    height: 30px;
+                    border-radius: 15px;
+                    padding: 5px;
+                    border:none
+                }
+
     </style>
 </head>
 <body>
@@ -547,6 +567,15 @@
                                 <div class="order-status status-<%= order.status.toLowerCase() %>">
                                     <%= order.status %>
                                 </div>
+                                <div class="order-status-container">
+                                   <% if (order.paymentStatus === 'Pending' && order.paymentMethod === 'ONLINE' && order.status !== "Delivered") { %>
+                                    <input type="hidden" id="retry-<%= order._id %>" value="<%= order.addressId %>">
+                                    <input type="hidden" id="orderAmount-<%= order._id %>" value="<%= order.totalAmount %>">
+                                    <button class="retry-button" onclick="retryPayment('<%= order._id%>')">
+                                        Retry Payment
+                                    </button>
+                                <% } %>
+                                </div>
                                 <%
                                     const cancelledItems = order.items.filter(item => item.status === 'Cancelled');
                                     const activeItems = order.items.filter(item => item.status !== 'Cancelled');
@@ -559,6 +588,8 @@
                                 <% } %>
                             </div>
                         </div>
+                        
+                       
 
                         <div class="order-items">
                             <% order.items.slice(0, 3).forEach(item => { %>
@@ -592,10 +623,12 @@
                                 Total: ₹<%= order.totalAmount.toLocaleString() %>
                             </div>
                             <div class="order-actions">
-                                <a href="/download-invoice/<%= order.id %>" class="btn btn-primary">
+                               <% if (order.status === "Placed" || order.status === "Delivered") { %>
+                                 <a href="/download-invoice/<%= order.id %>" class="btn btn-primary">
                                     <i class="fas fa-eye"></i>
                                     Invoice
                                 </a>
+                               <% } %>
                                 <a href="/order-details/<%= order._id %>" class="btn btn-primary">
                                     <i class="fas fa-eye"></i>
                                     View Details
@@ -662,7 +695,7 @@
     </div>
 
     <%- include("../partials/user/footer") %>
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
 
 
@@ -703,6 +736,85 @@
                 });
             }
         }
+
+async function retryPayment(orderId) {
+    const addressIdInput = document.getElementById(`retry-${orderId}`);
+    const amountInput = document.getElementById(`orderAmount-${orderId}`);
+
+    if (!addressIdInput || !amountInput) {
+        return showToast("Missing address or amount input field");
+    }
+
+    const addressId = addressIdInput.value;
+    const amount = amountInput.value;
+
+    if (!amount || !orderId || !addressId) {
+        return showToast("Amount, orderId or address is missing");
+    }
+
+    try {
+        const response = await fetch('/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount,
+                orderId,
+                address: addressId
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return showToast(data.message || 'Failed to create Razorpay order');
+        }
+
+        const options = {
+            key: data.key,
+            amount: data.amount,
+            currency: data.currency,
+            name: "ChronoX",
+            description: "Order Payment",
+            order_id: data.orderId,
+            handler: async function (response) {
+                const result = await fetch('/payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        paymentMethod: 'ONLINE',
+                        razorpayOrderId: response.razorpay_order_id,
+                        paymentId: response.razorpay_payment_id,
+                        addressId: addressId,
+                        orderId: orderId
+                    })
+                });
+
+                const resData = await result.json();
+
+                if (resData.success) {
+                    window.location.href = `/order-success?orderId=${resData.orderId}`;
+                } else {
+                    window.location.href = `/retry-payment/${orderId}`;
+                }
+            },
+            prefill: {
+                name: "<%= user.fullName %>",
+                email: "<%= user.email %>",
+                contact: "<%= user.mobile %>"
+            },
+            theme: { color: "#3399cc" },
+            retry: { enabled: true, max_count: 3 }
+        };
+
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+
+    } catch (err) {
+        console.error(err);
+        showToast('Something went wrong. Try again.');
+    }
+}
+
 
     </script>
 </body>

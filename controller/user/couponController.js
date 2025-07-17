@@ -11,9 +11,10 @@ const applyCoupon = async (req, res, next) => {
       couponcode: code.trim().toUpperCase(),
       isActive: true
     });
-
+    
     const existCoupon = await couponSchema.findOne({
       couponcode: code.trim().toUpperCase(),
+
       isActive: true,
       user: userId
     });

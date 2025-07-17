@@ -8,9 +8,14 @@ const getWallet = async (req, res, next) => {
         const limit = 5;
 
         let wallet = await Wallet.findOne({ user: userId });
+
         if (!wallet) {
-            wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
-            await wallet.save();
+            wallet = await Wallet.findOneAndUpdate(
+                { user: userId },
+                { $setOnInsert: { balance: 0, transactions: [] } },
+                { new: true, upsert: true }
+            );
+
             await User.findByIdAndUpdate(userId, { wallet: wallet._id });
         }
 
@@ -21,7 +26,6 @@ const getWallet = async (req, res, next) => {
             .slice()
             .reverse()
             .slice((page - 1) * limit, page * limit);
-            
 
         res.render('user/wallet', {
             user: req.session.user,

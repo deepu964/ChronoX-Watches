@@ -45,7 +45,7 @@ const product = async (req, res, next) => {
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
         const categories = await categorySchema.find({ isListed: true })
-
+        
 
         res.render('admin/product', {
             products,
@@ -379,5 +379,7 @@ module.exports = {
     getProductDetails,
     addReview
 };
+
+
 
 

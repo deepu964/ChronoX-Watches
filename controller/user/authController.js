@@ -234,11 +234,11 @@ const verifyOtp = async (req, res) => {
             return res.redirect('/verify-otp?message=Invalid OTP. Please try again.');
         }
 
-        // OTP is valid
+       
         const referralCode = generateReferralCode(sessionUser.fullname);
 
         if (sessionUser.userId) {
-            // If it's an existing user (OTP for email change or other action)
+            
             await User.findByIdAndUpdate(sessionUser.userId, { isVerified: true });
 
             req.session.user = {
@@ -250,7 +250,7 @@ const verifyOtp = async (req, res) => {
             delete req.session.tempUser;
             return res.redirect('/?message=Account verified successfully');
         } else {
-            // New user registration
+            
             const newUser = new User({
                 fullname: sessionUser.fullname,
                 email: sessionUser.email,
@@ -263,17 +263,17 @@ const verifyOtp = async (req, res) => {
 
             const savedUser = await newUser.save();
 
-            // Reward the referrer with wallet credit
+         
             if (sessionUser.referredBy) {
                 const referrer = await User.findOne({ referralCode: sessionUser.referredBy });
                 if (referrer && referrer._id.toString() !== savedUser._id.toString()) {
                     try {
-                        // Additional validation checks
+                       
                         if (referrer.isBlocked) {
                             throw new Error('Referrer account is blocked');
                         }
 
-                        // Check if this referral already exists
+                        
                         const existingReferral = await Referral.findOne({
                             referrer: referrer._id,
                             referred: savedUser._id
@@ -282,7 +282,7 @@ const verifyOtp = async (req, res) => {
                         if (existingReferral) {
                             console.log('Referral record already exists, skipping reward');
                         } else {
-                            // Find or create wallet for referrer
+                            
                             let referrerWallet = await Wallet.findOne({ user: referrer._id });
                             if (!referrerWallet) {
                                 referrerWallet = new Wallet({ user: referrer._id, balance: 0, transactions: [] });
@@ -290,7 +290,7 @@ const verifyOtp = async (req, res) => {
                                 await User.findByIdAndUpdate(referrer._id, { wallet: referrerWallet._id });
                             }
 
-                            // Add ₹100 to referrer's wallet
+                           
                             const rewardAmount = 100;
                             await referrerWallet.addMoney(
                                 rewardAmount,
@@ -299,7 +299,7 @@ const verifyOtp = async (req, res) => {
                                 null
                             );
 
-                            // Add ₹100 to new user's wallet as well
+                            
                             let newUserWallet = await Wallet.findById(savedUser.wallet);
                             if (!newUserWallet) {
                                 newUserWallet = new Wallet({ user: savedUser._id, balance: 0, transactions: [] });
@@ -314,7 +314,7 @@ const verifyOtp = async (req, res) => {
                                 null
                             );
 
-                            // Create referral record
+                            
                             const referralRecord = new Referral({
                                 referrer: referrer._id,
                                 referred: savedUser._id,
@@ -331,7 +331,7 @@ const verifyOtp = async (req, res) => {
                         }
                     } catch (error) {
                         console.error('Error processing referral reward:', error);
-                        // Create failed referral record for tracking
+                        
                         try {
                             const failedReferralRecord = new Referral({
                                 referrer: referrer._id,
@@ -487,7 +487,7 @@ const newPass = async (req, res) => {
     }
 }
 
-// Validate referral code API endpoint
+
 const validateReferralCode = async (req, res) => {
     try {
         const { referralCode, userEmail } = req.body;
@@ -496,7 +496,7 @@ const validateReferralCode = async (req, res) => {
             return res.json({ valid: false, message: 'Referral code is required' });
         }
 
-        // Check if referral code format is valid (basic format check)
+        
         const codePattern = /^[a-zA-Z]{3}\d{4}$/;
         if (!codePattern.test(referralCode.trim())) {
             return res.json({ valid: false, message: 'Invalid referral code format' });
@@ -512,12 +512,12 @@ const validateReferralCode = async (req, res) => {
             return res.json({ valid: false, message: 'This referral code is not available' });
         }
 
-        // Prevent self-referral if email is provided
+        
         if (userEmail && referrer.email.toLowerCase() === userEmail.toLowerCase()) {
             return res.json({ valid: false, message: 'You cannot use your own referral code' });
         }
 
-        // Check if user has already been referred by someone else
+        
         if (userEmail) {
             const existingUser = await User.findOne({ email: userEmail.toLowerCase() });
             if (existingUser && existingUser.referredBy) {

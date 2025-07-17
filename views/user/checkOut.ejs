@@ -152,7 +152,11 @@
                           <select id="couponSelect" name="couponCode">
                             <option value="">Select Coupon</option>
                             <% coupons.forEach(coupon => { %>
-                              <option value="<%= coupon.couponcode %>"><%= coupon.couponcode %></option>
+                              <option value="<%= coupon.couponcode %>">
+                                <%= coupon.couponcode %>-
+                                <%= coupon.discount %> %off 
+                                (Min: ₹<%= coupon.minPurchase %>)
+                              </option>
                             <% }) %>
                           </select>
                           <button type="submit" class="apply-btn" id="applyCouponBtn">Apply</button>

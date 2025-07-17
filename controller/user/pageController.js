@@ -7,11 +7,12 @@ const getLoadHomePage = async (req, res) => {
     try {
         const category = await categorySchema.find({ isListed: true });
         const products = await productSchema.find({ isActive: false })
+        const newProducts = await productSchema.find({isActive: false}).sort({createdAt:-1}).limit(8)
         const user = req.session.user
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME
         res.render('user/home', {
             user, products, cloudName,
-            category
+            category,newProducts
         });
     } catch (error) {
         console.error("Home page error:", error);
@@ -160,7 +161,7 @@ const getProductDetails = async (req, res) => {
 
         const product = await productSchema.findById(id);
         const products = await productSchema.find({ isActive: false, isDeleted: false }).limit(4);
-
+        
         
         let userWishlist = [];
         if (userId) {

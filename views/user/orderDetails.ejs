@@ -412,7 +412,7 @@
             </h3>
             
             <% order.items.forEach(item => { %>
-
+                
                 <div class="order-item <%= item.status === 'Cancelled' ? 'cancelled-item' : '' %>">
                     <div class="item-image">
                         <% if (item.product.images && item.product.images.length > 0) { %>
@@ -439,8 +439,6 @@
             const total = unitPrice * qty;
             const offerPercent = typeof offerPer === 'number' ? offerPer : 0;
             const finalPrice = total * (1 - offerPercent / 100);
-
-            
             %>
 
             <span>Price: ₹<%= finalPrice.toFixed(2) %></span>
@@ -458,23 +456,12 @@
                         <% } %>
                     </div>
                   <div class="item-actions">
-                        <% const isSingleItem = order.items.length === 1; %>
-
-                        <% if (item.status === 'Placed' && order.status !== 'Cancelled') { %>
-                            <% if (isSingleItem) { %>
-                                <script>
-                                    // Auto-cancel if only one item in the order
-                                    window.addEventListener('DOMContentLoaded', function () {
-                                        cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>');
-                                    });
-                                </script>
-                            <% } else { %>
-                                <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
+                      <% if (order.status === "Placed") { %>
+                        <button class="btn btn-cancel-item" onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.product.name %>')">
                                     <i class="fas fa-times"></i>
                                     Cancel Item
-                                </button>
-                            <% } %>
-                        <% } %>
+                            </button>
+                    <% } %>
                     </div>
 
                 </div>
@@ -488,7 +475,6 @@
                     const activeTotal = activeItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                     const cancelledTotal = cancelledItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 %>
-
 
                 <div class="total-row">
                     <span>Grand Total:</span>
