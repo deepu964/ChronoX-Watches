@@ -19,7 +19,7 @@ const isAuth = require('../middlewares/userAuth');
 const productController = require('../controller/admin/productController');
 const invoice = require('../controller/user/invoiceController');
 
-router.get('/',checkBlocked, isAuth, pageController.getLoadHomePage);
+router.get('/',checkBlocked, pageController.getLoadHomePage);
 router.get('/PageNotFound', pageController.PageNotFound);
 
 router.get('/login', authController.loginPage);

@@ -31,7 +31,7 @@ router.get('/dashboard/top-brands', authMiddleware, adminAuth, adminController.g
 router.get('/userlist',authMiddleware,userListController.userList);
 router.put('/userlist/block/:id',authMiddleware,userListController.blockUser);
 
-router.get('/product',authMiddleware,adminAuth,productController.product);
+router.all('/product',authMiddleware,adminAuth,productController.product);
 router.put('/product/block/:id',authMiddleware,adminAuth,productController.blockedProduct)
 
 router.get('/addproduct',authMiddleware,adminAuth,productController.getproductAdd);
