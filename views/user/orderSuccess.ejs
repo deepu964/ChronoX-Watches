@@ -293,8 +293,14 @@
                 <span class="order-value"><%= new Date(order.createdAt).toLocaleDateString('en-IN') %></span>
             </div>
             <div class="order-info">
-                <span class="order-label">Payment Method:</span>
-                <span class="order-value"><%= order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment' %></span>
+               <span class="order-label">Payment Method:</span>
+                <% if (order.paymentMethod === "COD") { %>
+                    <span class="order-value">Cash on Delivery</span>
+                <% } else if (order.paymentMethod === "Wallet") { %>
+                    <span class="order-value">Wallet Payment</span>
+                <% } else { %>
+                    <span class="order-value">Online Payment</span>
+                <% } %> 
             </div>
             <div class="order-info">
                 <span class="order-label">Total Amount:</span>

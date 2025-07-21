@@ -44,10 +44,20 @@
                             <i class="fas fa-mobile-alt"></i>
                             <span>PhonePe/Google Pay/BHIM UPI</span>
                         </div> -->
-                        <div class="payment-option" onclick="selectPaymentMethod('wallet')">
+                        <!-- <div class="payment-option" onclick="selectPaymentMethod('wallet')">
                             <i class="fas fa-wallet"></i>
                             <span>Wallets</span>
-                        </div>
+                            <button class="wallet-btn">Wallet Pay</button>
+                        </div> -->
+                        <form id="place-order-form1" action="/payment" method="post">
+                            <div class="payment-option" onclick="selectPaymentMethod('wallet')">
+                                <i class="fas fa-wallet"></i>
+                                <input type="hidden" id="wallet" name="paymentMethod1" value="Wallet">
+                                <span>Wallets</span>
+                                 <input type="hidden" name="addressId" value="<%= addresses %>">
+                                <button type="submit" class="wallet-btn" >Wallet Pay</button>
+                            </div>
+                        </form>
                         <div class="payment-option" onclick="selectPaymentMethod('netbanking')">
                             <i class="fas fa-university"></i>
                             <span>Net Banking</span>
@@ -119,6 +129,7 @@
             document.querySelector('.payment-option').classList.add('selected');
             // Already set by default: but just to be sure
             document.getElementById('payment-method-input').value = 'COD';
+            document.getElementById('wallet').value = "Wallet";
         }
 
         // Handle form submission
@@ -173,72 +184,65 @@
             }
             
         });
-        // async function payNow(addressId) {
-        //     const amount = document.getElementById('orderAmount').value;
 
-        //     if (!amount || !addressId) {
-        //         return showToast("Amount or address is missing");
-        //     }
 
-        //     try {
-        //         const response = await fetch('/create-order', {
-        //             method: 'POST',
-        //             headers: { 'Content-Type': 'application/json' },
-        //             body: JSON.stringify({ amount, address: addressId })
-        //         });
+        document.getElementById('place-order-form1').addEventListener('submit', async function(e) {
+            e.preventDefault();
 
-        //         const data = await response.json();
+            const submitBtn = document.getElementById('confirm-order-btn');
+            const originalText = submitBtn.textContent;
 
-        //         if (!data.success) {
-        //             return showToast(data.message || 'Failed to create Razorpay order');
-        //         }
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
-        //         const options = {
-        //             key: data.key,
-        //             amount: data.amount,
-        //             currency: data.currency,
-        //             name: "ChronoX",
-        //             description: "Order Payment",
-        //             order_id: data.orderId,
-        //             paid:data.amount_paid,
-        //             handler: async function (response) {
-        //                 // Payment was successful – now place the order
-        //                 const result = await fetch('/payment', {
-        //                     method: 'POST',
-        //                     headers: { 'Content-Type': 'application/json' },
-        //                     body: JSON.stringify({
-        //                         paymentMethod: 'ONLINE',
-        //                         razorpayOrderId: response.razorpay_order_id,
-        //                         paymentId: response.razorpay_payment_id,
-        //                         addressId: addressId   
-        //                     })
-        //                 });
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('/payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        addressId: formData.get('addressId'),
+                        paymentMethod: formData.get('paymentMethod1')
+                    })
+                });
 
-        //                 const resData = await result.json();
-        //                 if (resData.success) {
-        //                     window.location.href = `/order-success?orderId=${resData.orderId}`;
-        //                 } else {
-        //                     window.location.href = `/retry-payment`;
-        //                 }
-        //             },
-        //             prefill: {
-        //                 name: "<%= user.fullName %>",
-        //                 email: "<%= user.email %>",
-        //                 contact: "<%= user.mobile %>"
-        //             },
-        //             theme: { color: "#3399cc" },
-        //             retry: { enabled: true, max_count: 3 }
-        //         };
+                const data = await response.json();
 
-        //         const razorpay = new Razorpay(options);
-        //         razorpay.open();
+                if (data.success) {
+                    // Redirect to success page
+                    window.location.href = data.redirectUrl || `/order-success?orderId=${data.orderId}`;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Order Failed',
+                        text: data.message || 'Failed to place order',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    confirmButtonColor: '#3085d6'
+                });
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+            
+        });
+          
 
-        //     } catch (err) {
-        //         console.error(err);
-        //         showToast('Something went wrong. Try again.');
-        //     }
-        // }
 
+
+
+ 
         async function payNow(addressId) {
     const amount = document.getElementById('orderAmount').value;
 

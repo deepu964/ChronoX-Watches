@@ -161,6 +161,11 @@
         <button class="back-btn">Back to Profile</button>
     </a>
 
+     <button id="add-amount-btn"
+    style="margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer;">
+    Add Amount
+  </button>
+
     <div class="wallet-container">
 
         <div class="wallet-header">
@@ -176,6 +181,7 @@
                 <i class="fas fa-history"></i> Transaction History
             </h2>
 
+            
             <% if (transactions && transactions.length > 0) { %>
                 <% transactions.forEach(transaction => { %>
                     <div class="transaction-item">
@@ -229,6 +235,94 @@
         </div>
     </div>
 </div>
+
+<!-- Add Amount Modal -->
+ <div id="addAmountModal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+    <div
+      style="background:white; padding:30px; border-radius:15px; width:90%; max-width:400px; text-align:center; position:relative;">
+      <h2 style="margin-bottom: 20px;">Add to Wallet</h2>
+      <input id="amountInput" type="number" placeholder="Enter amount" min="1"
+        style="width:100%; padding:10px; font-size:16px; border-radius:8px; border:1px solid #ccc;">
+      <p id="amountError" style="color:red; font-size:14px; margin-top:10px; display:none;"></p>
+      <button onclick="submitAmount()"
+        style="margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #16a34a; color: white; border: none; border-radius: 8px; cursor: pointer;">Add</button>
+      <button onclick="closeModal()"
+        style="margin-top: 10px; padding: 8px 16px; font-size: 14px; background-color: #ccc; color: black; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
+    </div>
+  </div>
+
+<div id="toast"
+    style="display:none; position:fixed; top:20px; right:20px; background:#16a34a; color:white; padding:12px 20px; border-radius:8px; z-index:99999; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+    Amount added successfully!
+  </div>
+
 <%- include("../partials/user/footer") %>
 </body>
+
+<script>
+  const modal = document.getElementById('addAmountModal');
+  const amountInput = document.getElementById('amountInput');
+  const errorEl = document.getElementById('amountError');
+  const toast = document.getElementById('toast');
+
+  document.getElementById('add-amount-btn').addEventListener('click', () => {
+    modal.style.display = 'flex';
+    amountInput.value = '';
+    errorEl.style.display = 'none';
+  });
+
+  function closeModal() {
+    modal.style.display = 'none';
+  }
+
+  function showToast(message) {
+    toast.innerText = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 3000);
+  }
+
+  function submitAmount() {
+    const amount = parseFloat(amountInput.value.trim());
+    if (isNaN(amount) || amount <= 0) {
+      errorEl.innerText = 'Please enter a valid positive amount.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    fetch('/wallet/add-amount', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ amount })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          
+          window.location.href = '/wallet?success=true';
+        } else {
+          errorEl.innerText = data.message || 'Failed to add amount';
+          errorEl.style.display = 'block';
+        }
+      })
+      .catch(() => {
+        errorEl.innerText = 'Something went wrong.';
+        errorEl.style.display = 'block';
+      });
+  }
+
+  // ✅ Show toast if success param in URL
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+      showToast('Amount added successfully!');
+    }
+  });
+</script>
+
+
 </html>

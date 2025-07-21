@@ -367,7 +367,13 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Payment Method:</span>
-                    <span class="detail-value"><%= order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment' %></span>
+                        <% if (order.paymentMethod === "COD") { %>
+                            <span class="detail-value">Cash on Delivery</span>
+                        <% } else if (order.paymentMethod === "Wallet") { %>
+                            <span class="detail-value">Wallet Payment</span>
+                        <% } else { %>
+                            <span class="detail-value">Online Payment</span>
+                        <% } %>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Order Status:</span>
@@ -439,6 +445,7 @@
             const total = unitPrice * qty;
             const offerPercent = typeof offerPer === 'number' ? offerPer : 0;
             const finalPrice = total * (1 - offerPercent / 100);
+            
             %>
 
             <span>Price: ₹<%= finalPrice.toFixed(2) %></span>

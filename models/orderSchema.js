@@ -42,7 +42,7 @@ const orderSchema = new mongoose.Schema({
   },
   shippingFee: Number,
   isPaid: { type: Boolean, default: false },
-  paymentMethod: { type: String, enum: ['COD', 'ONLINE'] },
+  paymentMethod: { type: String, enum: ['COD', 'ONLINE','Wallet'] },
   paymentStatus: {
     type: String,
     enum: ['Pending', 'Paid', 'Failed'],

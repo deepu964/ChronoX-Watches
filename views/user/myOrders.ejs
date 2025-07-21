@@ -803,7 +803,16 @@ async function retryPayment(orderId) {
                 contact: "<%= user.mobile %>"
             },
             theme: { color: "#3399cc" },
-            retry: { enabled: true, max_count: 3 }
+            retry: { enabled: true, max_count: 3 },
+            
+
+             modal: {
+                ondismiss: function () {
+                    window.location.href = `/retry-payment/${orderId}?addressId=${addressId}`;
+                }
+            }
+
+
         };
 
         const razorpay = new Razorpay(options);
@@ -814,7 +823,7 @@ async function retryPayment(orderId) {
         showToast('Something went wrong. Try again.');
     }
 }
-
+    
 
     </script>
 </body>

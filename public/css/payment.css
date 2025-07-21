@@ -63,7 +63,7 @@ body {
     color: white;
     background: blueviolet;
     padding: 5px;
-    margin-left: 457%;
+    margin-left: 440%;
     width: 100px;
     border-radius: 8px;
     border: none;
@@ -894,6 +894,17 @@ body {
 .payment-option.selected {
   border-color: green;
   background-color: #e9ffe9;
+}
+
+.wallet-btn{
+    width: fit-content;;
+    padding: 10px;
+    color: #eff2f0;
+    margin-left: 72%;
+    background-color:  blueviolet;
+    border: none;
+    border-radius: 10px;
+
 }
 
 

@@ -101,6 +101,7 @@ router.post('/create-order',isAuth, orderController.createRazorpayOrder);
 router.post('/request-return', isAuth, returnController.requestReturn);
 router.get('/my-returns', isAuth, returnController.getMyReturns);
 router.get('/wallet', isAuth, walletController.getWallet);
+router.post('/wallet/add-amount', isAuth, walletController.addAmount);
 router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
 
 
