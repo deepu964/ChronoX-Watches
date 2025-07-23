@@ -153,66 +153,6 @@ const getVerifyOtp = (req, res) => {
     }
 };
 
-// const verifyOtp = async (req, res) => {
-//     try {
-//         const { otp } = req.body;
-
-//         const sessionUser = req.session.tempUser;
-//         console.log("Session User:", sessionUser);
-//         if (!sessionUser) {
-//             return res.redirect('/signup?message=Session expired. Please sign up again.');
-//         }
-
-//         console.log("Session OTP:", sessionUser.otp);
-//         console.log("Submitted OTP:", otp);
-
-//         if (new Date() > sessionUser?.otpExpr) {
-//             delete sessionUser.otp
-//             return res.redirect('/verify-otp?message=OTP expired . Please try again.');
-//         }
-
-//         if (String(otp).trim() !== String(sessionUser.otp).trim()) {
-//             return res.redirect('/verify-otp?message=Invalid OTP. Please try again.');
-//         }
-
-//         if (sessionUser.userId) {
-//             await User.findByIdAndUpdate(sessionUser.userId, { isVerified: true });
-
-//             req.session.user = {
-//                 _id: sessionUser.userId,
-//                 email: sessionUser.email,
-//                 fullname: sessionUser.fullname
-//             };
-
-//             delete req.session.tempUser;
-//             return res.redirect('/?message=Account created successfully');
-//         } else {
-//             const newUser = new User({
-//                 fullname: sessionUser.fullname,
-//                 email: sessionUser.email,
-//                 password: sessionUser.password,
-//                 mobile: sessionUser.mobile,
-//                 isVerified: true
-//             });
-
-//             const savedUser = await newUser.save();
-
-//             req.session.user = {
-//                 _id: savedUser._id,
-//                 email: savedUser.email,
-//                 fullname: savedUser.fullname
-//             };
-
-//             delete req.session.tempUser;
-//             return res.redirect('/?message=Account created successfully');
-//         }
-
-//     } catch (error) {
-//         console.error("OTP verification error:", error);
-//         return res.redirect('/verify-otp?message=Verification failed: ' + error.message);
-//     }
-// };
-
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
