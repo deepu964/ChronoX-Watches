@@ -15,6 +15,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    width: 100%;
 }
 
 /* Header */
@@ -51,12 +52,14 @@ body {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 30px;
+    width: 100%;
 }
 
 .payment-main {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 30px;
+    width: 100%;
 }
 
 .payment-btn{
@@ -76,6 +79,7 @@ body {
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 100%;
 }
 
 /* Section Headers */
@@ -464,6 +468,7 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 100%;
 }
 
 .price-details h3 {
@@ -764,15 +769,205 @@ body {
     100% { transform: scale(1); }
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .main-content, .payment-main {
+/* ===== COMPREHENSIVE RESPONSIVE DESIGN ===== */
+
+/* Large Desktop (1200px and up) */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1400px;
+        padding: 30px;
+    }
+    
+    .payment-main {
+        gap: 40px;
+    }
+    
+    .left-section, .payment-left {
+        padding: 30px;
+    }
+    
+    .price-details {
+        padding: 30px;
+    }
+    
+    .payment-option {
+        padding: 18px;
+        font-size: 16px;
+    }
+    
+    .place-order-btn, .continue-shopping-btn {
+        padding: 18px;
+        font-size: 18px;
+    }
+    
+    .wallet-btn {
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+    
+    .payment-btn {
+        padding: 8px 12px;
+        font-size: 16px;
+        width: 120px;
+    }
+}
+
+/* Desktop (992px to 1199px) */
+@media (max-width: 1199px) and (min-width: 992px) {
+    .container {
+        max-width: 1100px;
+        padding: 25px;
+    }
+    
+    .payment-main {
+        gap: 35px;
+    }
+    
+    .left-section, .payment-left {
+        padding: 25px;
+    }
+    
+    .price-details {
+        padding: 25px;
+    }
+    
+    .payment-option {
+        padding: 16px;
+    }
+    
+    .wallet-btn {
+        margin-left: 65%;
+    }
+}
+
+/* Tablet Landscape (768px to 991px) */
+@media (max-width: 991px) and (min-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .payment-main {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .left-section, .payment-left {
+        padding: 20px;
+    }
+    
+    .price-details {
+        padding: 20px;
+    }
+    
+    .payment-option {
+        padding: 15px;
+        font-size: 15px;
+    }
+    
+    .payment-option i {
+        font-size: 16px;
+    }
+    
+    .wallet-btn {
+        margin-left: 60%;
+        padding: 10px 14px;
+    }
+    
+    .payment-btn {
+        margin-left: 350%;
+        width: 110px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .modal-content {
+        width: 85%;
+        margin: 8% auto;
+    }
+    
+    .delivery-check {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+}
+
+/* Tablet Portrait (576px to 767px) */
+@media (max-width: 767px) and (min-width: 576px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .payment-main {
         grid-template-columns: 1fr;
         gap: 20px;
     }
     
-    .container {
+    .left-section, .payment-left {
+        padding: 18px;
+    }
+    
+    .price-details {
+        padding: 18px;
+    }
+    
+    .payment-option {
+        padding: 14px;
+        font-size: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .payment-option i {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+    
+    .wallet-btn {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    .payment-btn {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
         padding: 10px;
+        font-size: 14px;
+    }
+    
+    .place-order-btn, .continue-shopping-btn {
+        padding: 14px;
+        font-size: 15px;
+    }
+    
+    .price-row {
+        font-size: 13px;
+    }
+    
+    .price-row.total {
+        font-size: 15px;
+    }
+    
+    .section-header h3 {
+        font-size: 15px;
+    }
+    
+    .offer-item {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .modal-content {
+        width: 90%;
+        margin: 5% auto;
     }
     
     .delivery-check {
@@ -790,38 +985,70 @@ body {
     .item-card {
         flex-direction: column;
         text-align: center;
+        padding: 12px;
     }
     
     .item-image {
         align-self: center;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-content {
-        margin: 5% auto;
-        width: 95%;
-    }
-    
-    .confirmation-card {
-        padding: 40px 20px;
-        margin: 20px;
-    }
-    
-    .confirmation-card h1 {
-        font-size: 24px;
+        width: 70px;
+        height: 90px;
     }
 }
 
-@media (max-width: 480px) {
-    .coupon-input {
-        flex-direction: column;
+/* Mobile Large (480px to 575px) */
+@media (max-width: 575px) and (min-width: 480px) {
+    .container {
+        padding: 12px;
     }
     
-    .payment-logos {
-        justify-content: center;
+    .payment-main {
+        gap: 15px;
+    }
+    
+    .left-section, .payment-left {
+        padding: 15px;
+        border-radius: 6px;
+    }
+    
+    .price-details {
+        padding: 15px;
+        border-radius: 6px;
+    }
+    
+    .payment-option {
+        padding: 12px;
+        font-size: 13px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    
+    .payment-option i {
+        font-size: 16px;
+    }
+    
+    .wallet-btn {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+        padding: 10px;
+        font-size: 13px;
+        border-radius: 6px;
+    }
+    
+    .payment-btn {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+        padding: 8px;
+        font-size: 13px;
+        border-radius: 6px;
+    }
+    
+    .place-order-btn, .continue-shopping-btn {
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 6px;
     }
     
     .price-row {
@@ -830,6 +1057,560 @@ body {
     
     .price-row.total {
         font-size: 14px;
+    }
+    
+    .section-header {
+        margin-bottom: 12px;
+    }
+    
+    .section-header h3 {
+        font-size: 14px;
+    }
+    
+    .section-header i {
+        font-size: 16px;
+    }
+    
+    .offer-item {
+        padding: 8px;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .show-more {
+        font-size: 12px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 3% auto;
+        border-radius: 6px;
+    }
+    
+    .modal-header {
+        padding: 15px;
+    }
+    
+    .modal-header h3 {
+        font-size: 16px;
+    }
+    
+    .coupon-input {
+        padding: 15px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .coupon-input input {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .check-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .confirmation-card {
+        padding: 30px 15px;
+        margin: 15px;
+        border-radius: 8px;
+    }
+    
+    .confirmation-card h1 {
+        font-size: 20px;
+    }
+    
+    .confirmation-message {
+        font-size: 14px;
+    }
+    
+    .success-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 20px;
+    }
+    
+    .success-icon i {
+        font-size: 30px;
+    }
+}
+
+/* Mobile Small (320px to 479px) */
+@media (max-width: 479px) {
+    .container {
+        padding: 8px;
+    }
+    
+    .payment-main {
+        gap: 12px;
+    }
+    
+    .left-section, .payment-left {
+        padding: 12px;
+        border-radius: 4px;
+    }
+    
+    .price-details {
+        padding: 12px;
+        border-radius: 4px;
+    }
+    
+    .payment-option {
+        padding: 10px;
+        font-size: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        border-radius: 4px;
+    }
+    
+    .payment-option i {
+        font-size: 14px;
+    }
+    
+    .wallet-btn {
+        margin-left: 0;
+        margin-top: 6px;
+        width: 100%;
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+    
+    .payment-btn {
+        margin-left: 0;
+        margin-top: 6px;
+        width: 100%;
+        padding: 6px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+    
+    .place-order-btn, .continue-shopping-btn {
+        padding: 10px;
+        font-size: 13px;
+        border-radius: 4px;
+    }
+    
+    .price-row {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+    
+    .price-row.total {
+        font-size: 13px;
+        padding-top: 8px;
+    }
+    
+    .section-header {
+        margin-bottom: 10px;
+    }
+    
+    .section-header h3 {
+        font-size: 13px;
+    }
+    
+    .section-header i {
+        font-size: 14px;
+    }
+    
+    .offer-item {
+        padding: 6px;
+        font-size: 11px;
+        margin-bottom: 6px;
+        border-radius: 4px;
+    }
+    
+    .show-more {
+        font-size: 11px;
+        gap: 3px;
+    }
+    
+    .modal-content {
+        width: 98%;
+        margin: 2% auto;
+        border-radius: 4px;
+    }
+    
+    .modal-header {
+        padding: 12px;
+    }
+    
+    .modal-header h3 {
+        font-size: 14px;
+    }
+    
+    .close-modal {
+        font-size: 18px;
+    }
+    
+    .coupon-input {
+        padding: 12px;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .coupon-input input {
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+    
+    .check-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+    
+    .coupon-details {
+        padding: 12px;
+    }
+    
+    .coupon-card {
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+    }
+    
+    .coupon-code {
+        padding: 3px 6px;
+        font-size: 11px;
+        border-radius: 3px;
+        margin-bottom: 6px;
+    }
+    
+    .coupon-info p {
+        font-size: 11px;
+        margin-bottom: 3px;
+    }
+    
+    .apply-coupon-btn {
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+    
+    .confirmation-card {
+        padding: 20px 10px;
+        margin: 10px;
+        border-radius: 6px;
+    }
+    
+    .confirmation-card h1 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    
+    .confirmation-message {
+        font-size: 13px;
+        margin-bottom: 25px;
+    }
+    
+    .success-icon {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 15px;
+    }
+    
+    .success-icon i {
+        font-size: 24px;
+    }
+    
+    .payment-logos {
+        justify-content: center;
+        gap: 6px;
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .payment-logos img {
+        height: 20px;
+    }
+    
+    .help-section {
+        margin-top: 15px;
+        font-size: 12px;
+    }
+    
+    .item-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 8px;
+        border-radius: 4px;
+    }
+    
+    .item-image {
+        align-self: center;
+        width: 60px;
+        height: 80px;
+        border-radius: 4px;
+    }
+    
+    .item-details h4 {
+        font-size: 14px;
+        margin-bottom: 3px;
+    }
+    
+    .item-category {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+    
+    .item-specs {
+        font-size: 11px;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+    
+    .current-price {
+        font-size: 14px;
+    }
+    
+    .original-price {
+        font-size: 12px;
+    }
+    
+    .discount {
+        font-size: 10px;
+    }
+    
+    .delivery-info {
+        font-size: 10px;
+    }
+}
+
+/* Extra Small Mobile (below 320px) */
+@media (max-width: 319px) {
+    .container {
+        padding: 5px;
+    }
+    
+    .payment-main {
+        gap: 8px;
+    }
+    
+    .left-section, .payment-left {
+        padding: 8px;
+    }
+    
+    .price-details {
+        padding: 8px;
+    }
+    
+    .payment-option {
+        padding: 8px;
+        font-size: 11px;
+    }
+    
+    .wallet-btn {
+        padding: 6px;
+        font-size: 11px;
+    }
+    
+    .payment-btn {
+        padding: 5px;
+        font-size: 11px;
+    }
+    
+    .place-order-btn, .continue-shopping-btn {
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    .price-row {
+        font-size: 10px;
+    }
+    
+    .price-row.total {
+        font-size: 12px;
+    }
+    
+    .section-header h3 {
+        font-size: 12px;
+    }
+    
+    .offer-item {
+        padding: 5px;
+        font-size: 10px;
+    }
+    
+    .modal-content {
+        width: 99%;
+        margin: 1% auto;
+    }
+    
+    .confirmation-card {
+        padding: 15px 8px;
+        margin: 8px;
+    }
+    
+    .confirmation-card h1 {
+        font-size: 16px;
+    }
+    
+    .confirmation-message {
+        font-size: 12px;
+    }
+    
+    .success-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .success-icon i {
+        font-size: 20px;
+    }
+}
+
+/* Landscape orientation adjustments for mobile devices */
+@media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        padding: 10px;
+    }
+    
+    .payment-main {
+        gap: 15px;
+    }
+    
+    .left-section, .payment-left {
+        padding: 12px;
+    }
+    
+    .price-details {
+        padding: 12px;
+    }
+    
+    .payment-option {
+        padding: 8px;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .wallet-btn {
+        margin-left: 50%;
+        margin-top: 0;
+        width: auto;
+        padding: 6px 12px;
+    }
+    
+    .payment-btn {
+        margin-left: 200%;
+        margin-top: 0;
+        width: auto;
+        padding: 5px 10px;
+    }
+    
+    .modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+        margin: 2% auto;
+    }
+    
+    .confirmation-card {
+        padding: 20px 15px;
+    }
+    
+    .success-icon {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .item-image {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+    
+    .payment-logos img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Print styles */
+@media print {
+    .container {
+        max-width: none;
+        margin: 0;
+        padding: 1rem;
+    }
+    
+    .payment-main {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .modal {
+        display: none !important;
+    }
+    
+    .wallet-btn,
+    .payment-btn,
+    .place-order-btn,
+    .continue-shopping-btn {
+        display: none;
+    }
+    
+    .payment-option {
+        break-inside: avoid;
+        border: 1px solid #000;
+    }
+    
+    .price-details {
+        break-inside: avoid;
+        border: 1px solid #000;
+    }
+}
+
+/* Focus and accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .payment-option {
+        min-height: 44px;
+        padding: 12px;
+    }
+    
+    .wallet-btn,
+    .payment-btn,
+    .place-order-btn,
+    .continue-shopping-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .payment-option:hover {
+        background: #f8f9fa;
+    }
+    
+    .place-order-btn:hover,
+    .continue-shopping-btn:hover {
+        transform: none;
+    }
+    
+    .close-modal {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .show-more {
+        min-height: 44px;
+        padding: 8px;
     }
 }
 
