@@ -896,22 +896,22 @@
                 <div class="filter-group">
                     <label>Report Type:</label>
                     <select id="reportType">
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
-                        <option value="custom">Custom Date Range</option>
+                        <option value="daily" <%= type === 'daily' ? 'selected' : '' %>>Daily</option>
+                        <option value="weekly" <%= type === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                        <option value="monthly" <%= type === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                        <option value="yearly" <%= type === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                        <option value="custom" <%= type === 'custom' ? 'selected' : '' %>>Custom Date Range</option>
                     </select>
                 </div>
                 
                 <div class="filter-group" id="customDateGroup" style="display: none;">
                     <label>From Date:</label>
-                    <input type="date" id="fromDate">
+                    <input type="date" id="fromDate" value="<%= fromDate %>">
                 </div>
                 
                 <div class="filter-group" id="customDateGroup2" style="display: none;">
                     <label>To Date:</label>
-                    <input type="date" id="toDate">
+                    <input type="date" id="toDate" value="<%= toDate %>">
                 </div>
              
                 <div class="filter-group">
@@ -954,8 +954,8 @@
                         <th>Price</th>
                         <!-- <th>Category Offer</th> -->
                         <th>Payment Method</th>
-                        <!-- <th>Discount</th>
-                        <th>Coupon</th> -->
+                         <th>Discount</th>
+                        <!-- <th>Coupon</th> --> 
                         <th>Paid Amount</th>
                     </tr>
                 </thead>
@@ -969,7 +969,7 @@
                             <td>₹<%= (order.totalAmount + (order.discount || 0)).toLocaleString('en-IN') %></td>
                             <!-- <td>₹<%= (order.categoryDiscount || 0).toLocaleString('en-IN') %></td> -->
                             <td><%= order.paymentMethod %></td>
-                            <!-- <td>₹<%= (order.discount || 0).toLocaleString('en-IN') %></td> -->
+                            <td>₹<%= (order.coupon.discountAmount || 0).toLocaleString('en-IN') %></td>
                             <!-- <td>₹<%= (order.couponDiscount || 0).toLocaleString('en-IN') %></td> -->
                             <td>₹<%= order.totalAmount.toLocaleString('en-IN') %></td>
                         </tr>
@@ -1074,8 +1074,8 @@
                     <tr>
                         <td id="totalOrders"><%= typeof summary !== 'undefined' ? summary.totalOrders : 0 %></td>
                         <td id="totalSales">₹<%= typeof summary !== 'undefined' ? summary.totalSales.toLocaleString('en-IN') : 0 %></td>
-                        <!-- <td id="totalDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalDiscount.toLocaleString('en-IN') : 0 %></td>
-                        <td id="totalCouponDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalCouponDiscount.toLocaleString('en-IN') : 0 %></td> -->
+                         <!-- <td id="totalDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalDiscount.toLocaleString('en-IN') : 0 %></td> -->
+                        <!-- <td id="totalCouponDiscount">₹<%= typeof summary !== 'undefined' ? summary.totalCouponDiscount.toLocaleString('en-IN') : 0 %></td> -->
                         <td id="totalAmount" class="net-total">₹<%= typeof summary !== 'undefined' ? summary.totalAmount.toLocaleString('en-IN') : 0 %></td>
                     </tr>
                 </tbody>
