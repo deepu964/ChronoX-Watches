@@ -10,30 +10,30 @@ const getSalesReport = async (req, res, next) => {
 
     const { type, fromDate, toDate } = req.query;
 
-    // Get date range for filtering
+    
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
     console.log("FILTER RANGE:", startDate, endDate);
 
-    // Build filter object - ensure we're filtering correctly
+    
     const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' }
     };
 
-    // Get total count for pagination
+
     const totalOrders = await orderSchema.countDocuments(filter);
     const totalPages = Math.ceil(totalOrders / limit);
 
-    // Get paginated orders - sorted by latest first (descending order by createdAt)
+  
     const orders = await orderSchema.find(filter)
       .populate('user', 'fullname email')
-      .sort({ createdAt: -1 }) // Latest orders first
+      .sort({ createdAt: -1 }) 
       .skip(skip)
       .limit(limit);
 
-    // Get all orders for summary calculation (not paginated)
+   
     const allOrders = await orderSchema.find(filter)
-      .sort({ createdAt: -1 }); // Consistent sorting
+      .sort({ createdAt: -1 }); 
 
     const summary = {
       totalOrders,
@@ -76,7 +76,7 @@ const getDateRange = (type, fromDate, toDate) => {
 
   switch (type) {
     case 'daily':
-      // Today's orders only
+      
       startDate = new Date(now);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date(now);
@@ -84,9 +84,9 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     case 'weekly':
-      // Current week (Monday to Sunday)
+      
       const currentDay = now.getDay(); 
-      const diff = currentDay === 0 ? 6 : currentDay - 1; // Monday = 0, Sunday = 6
+      const diff = currentDay === 0 ? 6 : currentDay - 1; 
       startDate = new Date(now);
       startDate.setDate(now.getDate() - diff);
       startDate.setHours(0, 0, 0, 0);
@@ -95,7 +95,7 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     case 'monthly':
-      // Current month
+      
       startDate = new Date(now.getFullYear(), now.getMonth(), 1);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -103,7 +103,7 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     case 'yearly':
-      // Current year
+      
       startDate = new Date(now.getFullYear(), 0, 1);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date(now.getFullYear(), 11, 31);
@@ -117,9 +117,9 @@ const getDateRange = (type, fromDate, toDate) => {
         endDate = new Date(toDate);
         endDate.setHours(23, 59, 59, 999);
       } else {
-        // Default to last 7 days if custom dates not provided
+        
         startDate = new Date(now);
-        startDate.setDate(now.getDate() - 6); // Last 7 days including today
+        startDate.setDate(now.getDate() - 6); 
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date(now);
         endDate.setHours(23, 59, 59, 999);
@@ -127,7 +127,7 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     default:
-      // Default to weekly if no type specified
+      
       const defaultCurrentDay = now.getDay(); 
       const defaultDiff = defaultCurrentDay === 0 ? 6 : defaultCurrentDay - 1;
       startDate = new Date(now);
@@ -145,7 +145,7 @@ const exportSalesReportPDF = async (req, res, next) => {
     const { type, fromDate, toDate } = req.query;
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    // Get all filtered orders for export with product details
+    
     const orders = await orderSchema.find({
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' }
@@ -154,7 +154,7 @@ const exportSalesReportPDF = async (req, res, next) => {
     .populate('items.product', 'productName')
     .sort({ createdAt: -1 });
 
-    // Calculate summary with proper discount handling
+    
     const summary = {
       totalOrders: orders.length,
       totalSales: 0,
@@ -164,7 +164,7 @@ const exportSalesReportPDF = async (req, res, next) => {
       totalProducts: 0
     };
 
-    // Prepare detailed product data
+    
     const productDetails = [];
 
     orders.forEach(order => {
@@ -194,7 +194,7 @@ const exportSalesReportPDF = async (req, res, next) => {
           orderDate: order.createdAt
         });
         
-        // Update summary
+        
         summary.totalProducts += quantity;
         summary.totalSales += originalPrice * quantity;
         summary.totalDiscount += totalItemDiscount * quantity;
@@ -218,19 +218,19 @@ const exportSalesReportPDF = async (req, res, next) => {
 
     doc.pipe(res);
 
-    // Header
+   
     doc.fontSize(24).fillColor('#111827').text('ChronoX', { align: 'center' });
     doc.fontSize(18).fillColor('#3b82f6').text('Detailed Sales Report', { align: 'center' });
     doc.moveDown(0.5);
 
-    // Report info
+
     doc.fontSize(12).fillColor('#666666');
     doc.text(`Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)}`, { align: 'center' });
     doc.text(`Period: ${startDate.toLocaleDateString('en-IN')} - ${endDate.toLocaleDateString('en-IN')}`, { align: 'center' });
     doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`, { align: 'center' });
     doc.moveDown(1);
 
-    // Summary
+    
     doc.fontSize(16).fillColor('#111827').text('Summary', { underline: true });
     doc.moveDown(0.5);
 
@@ -256,12 +256,12 @@ const exportSalesReportPDF = async (req, res, next) => {
     doc.y = summaryStartY + 120;
     doc.moveDown(1);
 
-    // Product Details Table
+   
     doc.fontSize(16).fillColor('#111827').text('Product Details', { underline: true });
     doc.moveDown(0.5);
 
     if (productDetails.length > 0) {
-      // Table header
+     
       const tableTop = doc.y;
       doc.rect(30, tableTop, 780, 25).fill('#f3f4f6').stroke('#e5e7eb');
 
@@ -280,12 +280,12 @@ const exportSalesReportPDF = async (req, res, next) => {
       let currentY = tableTop + 35;
       
       productDetails.forEach((item, index) => {
-        // Check if we need a new page
+
         if (currentY > 520) { 
           doc.addPage();
           currentY = 50;
           
-          // Redraw header on new page
+          
           doc.rect(30, currentY - 25, 780, 25).fill('#f3f4f6').stroke('#e5e7eb');
           doc.fontSize(9).fillColor('#111827');
           const newHeaderY = currentY - 17;
@@ -300,7 +300,7 @@ const exportSalesReportPDF = async (req, res, next) => {
           doc.text('Payment', 540, newHeaderY);
         }
 
-        // Alternate row colors
+        
         if (index % 2 === 0) {
           doc.rect(30, currentY - 5, 780, 20).fill('#f9fafb').stroke();
         }
@@ -322,7 +322,7 @@ const exportSalesReportPDF = async (req, res, next) => {
       doc.fontSize(14).fillColor('#666666').text('No products found for the selected period.', { align: 'center' });
     }
 
-    // Footer
+    
     doc.fontSize(8).fillColor('#999999');
     doc.text(`Report generated by ChronoX Admin Panel | ${new Date().toLocaleString('en-IN')}`, 30, doc.page.height - 30, { align: 'center' });
 
@@ -339,7 +339,7 @@ const exportSalesReportExcel = async (req, res, next) => {
     const { type, fromDate, toDate } = req.query;
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    // Get all filtered orders for export with product details
+   
     const orders = await orderSchema.find({
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' }
@@ -348,7 +348,7 @@ const exportSalesReportExcel = async (req, res, next) => {
     .populate('items.product', 'productName')
     .sort({ createdAt: -1 });
 
-    // Calculate summary with proper discount handling
+  
     const summary = {
       totalOrders: orders.length,
       totalSales: 0,
@@ -358,7 +358,6 @@ const exportSalesReportExcel = async (req, res, next) => {
       totalProducts: 0
     };
 
-    // Prepare detailed product data
     const productDetails = [];
 
     orders.forEach(order => {
@@ -388,7 +387,7 @@ const exportSalesReportExcel = async (req, res, next) => {
           orderDate: order.createdAt.toLocaleDateString('en-IN')
         });
         
-        // Update summary
+       
         summary.totalProducts += quantity;
         summary.totalSales += originalPrice * quantity;
         summary.totalDiscount += totalItemDiscount * quantity;
@@ -401,7 +400,7 @@ const exportSalesReportExcel = async (req, res, next) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Detailed Sales Report');
 
-    // Set column widths and headers
+    
     worksheet.columns = [
       { header: 'Order ID', key: 'orderId', width: 15 },
       { header: 'Customer Name', key: 'customerName', width: 20 },
@@ -416,18 +415,18 @@ const exportSalesReportExcel = async (req, res, next) => {
       { header: 'Order Date', key: 'orderDate', width: 15 }
     ];
 
-    // Title
+    
     worksheet.mergeCells('A1:K1');
     worksheet.getCell('A1').value = 'ChronoX Detailed Sales Report';
     worksheet.getCell('A1').font = { size: 16, bold: true };
     worksheet.getCell('A1').alignment = { horizontal: 'center' };
 
-    // Report info
+    
     worksheet.mergeCells('A2:K2');
     worksheet.getCell('A2').value = `Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)} | Period: ${startDate.toLocaleDateString('en-IN')} - ${endDate.toLocaleDateString('en-IN')}`;
     worksheet.getCell('A2').alignment = { horizontal: 'center' };
 
-    // Summary section
+    
     worksheet.addRow([]);
     worksheet.addRow(['SUMMARY']);
     worksheet.getCell('A4').font = { bold: true, size: 14 };
@@ -439,21 +438,21 @@ const exportSalesReportExcel = async (req, res, next) => {
     worksheet.addRow(['Total Coupon Discount', `₹${summary.totalCouponDiscount.toLocaleString('en-IN')}`]);
     worksheet.addRow(['Net Total Amount', `₹${summary.totalAmount.toLocaleString('en-IN')}`]);
 
-    // Add spacing
+    
     worksheet.addRow([]);
     worksheet.addRow([]);
 
-    // Product details section
+   
     worksheet.addRow(['PRODUCT DETAILS']);
     worksheet.getCell('A12').font = { bold: true, size: 14 };
 
-    // Headers for product details
+    
     const headerRow = worksheet.addRow([
       'Order ID', 'Customer Name', 'Customer Email', 'Product Name', 'Quantity',
       'Original Price', 'Discount Amount', 'Sale Price', 'Total Price', 'Payment Method', 'Order Date'
     ]);
     
-    // Style the header row
+    
     headerRow.font = { bold: true };
     headerRow.fill = {
       type: 'pattern',
@@ -461,7 +460,7 @@ const exportSalesReportExcel = async (req, res, next) => {
       fgColor: { argb: 'FFE5E7EB' }
     };
 
-    // Add product data
+  
     productDetails.forEach(item => {
       worksheet.addRow([
         item.orderId,
@@ -478,21 +477,21 @@ const exportSalesReportExcel = async (req, res, next) => {
       ]);
     });
 
-    // Auto-fit columns
+   
     worksheet.columns.forEach(column => {
       if (column.header) {
         column.width = Math.max(column.width || 10, column.header.length + 2);
       }
     });
 
-    // Set response headers
+
     const filterInfo = type === 'custom' && fromDate && toDate ?
       `${fromDate}-to-${toDate}` :
       type;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename=ChronoX-Detailed-Sales-Report-${filterInfo}-${Date.now()}.xlsx`);
 
-    // Write and send the file
+
     await workbook.xlsx.write(res);
     res.end();
 
