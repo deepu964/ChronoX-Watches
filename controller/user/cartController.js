@@ -19,8 +19,7 @@ const getCart = async (req, res, next) => {
             });
         }
 
-       
-        
+    
         const categoryOff = await categoryOffer.find({
                             isDeleted: false,
                             status: 'Active',
@@ -42,7 +41,7 @@ const getCart = async (req, res, next) => {
 
 
             const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
-
+            console.log(catOffer,'is cat')
             let catDiscount = 0;
             if (catOffer && catOffer.discount) {
                 catDiscount = (regularPrice * catOffer.discount) / 100;

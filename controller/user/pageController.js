@@ -1,6 +1,8 @@
+const { listen } = require('file-upload');
 const categorySchema = require('../../models/categorySchema');
 const productSchema = require('../../models/productSchema');
 const wishlistSchema = require('../../models/wishlistSchema');
+const categoryOffer = require('../../models/categoryOfferSchema');
 const mongoose = require('mongoose');
 
 const getLoadHomePage = async (req, res) => {
@@ -159,9 +161,8 @@ const getProductDetails = async (req, res) => {
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
         const userId = req.session.user?._id;
 
-        const product = await productSchema.findById(id);
+        const product = await productSchema.findById(id).populate('categoryId')
         const products = await productSchema.find({ isActive: false, isDeleted: false }).limit(4);
-        
         
         let userWishlist = [];
         if (userId) {
@@ -172,11 +173,39 @@ const getProductDetails = async (req, res) => {
             }
         }
 
+        const categoryOff = await categoryOffer.find({
+            isDeleted:false,
+            status:'Active',
+        }).populate('category')
+
+       
+        let catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId._id.toString());
+    
+        let discountPer = 0;
+        let diff =0
+        for(let prod of product.variants){
+           diff =(prod.regularPrice - prod.salePrice );
+           discountPer = (diff/prod.regularPrice) * 100 ;
+
+        }
+
+
+        let lastOff=0;
+        if(catOffer.discount >= discountPer){
+            lastOff += catOffer.discount;
+        }else{
+            lastOff += discountPer;
+            
+        }
+
+        
         res.render('user/details', {
             user: req.session.user,
             product,
             cloudName,
             products,
+            diff,
+            lastOff,
             userWishlist,
             isInWishlist: userWishlist.includes(id)
         });

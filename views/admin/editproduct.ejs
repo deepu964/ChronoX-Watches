@@ -43,6 +43,99 @@
             border: none;
             cursor: pointer;
         }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            width: 235px;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .nav-items {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .nav-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .account-btn, .logout-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .account-btn {
+            background-color: white;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .account-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .logout-btn {
+            background-color: #111827;
+            color: white;
+            border: none;
+        }
+        
+        .logout-btn:hover {
+            background-color: #000;
+        }
     </style>
 </head>
 
@@ -51,25 +144,29 @@
         <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+        <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <span class="logo-text">ChronoX</span>
+                <span class="logo-text">Chrono</span>X
             </div>
         </div>
-        <div class="nav-items">
-            <a href="/admin/dashboard" class="nav-item">
+        
+                <div class="nav-items">
+            <a href="/admin/dashboard" class="nav-item active">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="/admin/product" class="nav-item active">
+            <a href="/admin/product" class="nav-item">
                 <i class="fas fa-box"></i>
                 <span>Products</span>
             </a>
             <a href="/admin/orders" class="nav-item">
                 <i class="fas fa-list"></i>
                 <span>Order List</span>
+            </a>
+            <a href="/admin/returns" class="nav-item">
+                <i class="fas fa-undo"></i>
+                <span>Returns</span>
             </a>
             <a href="/admin/userlist" class="nav-item">
                 <i class="fas fa-user"></i>
@@ -87,16 +184,19 @@
                 <i class="fas fa-ticket-alt"></i>
                 <span>Coupons</span>
             </a>
-            <!-- <a href="#" class="nav-item">
-                <i class="fas fa-qrcode"></i>
-                <span>Scanner</span>
-            </a> -->
+            <a href="/admin/category-offers" class="nav-item">
+                <i class="fas fa-percent"></i>
+                <span>Category Offers</span>
+            </a>
         </div>
+        
+
         <div class="sidebar-footer">
             <button class="account-btn">Account</button>
-            <a href="/admin/logout"><button class="logout-btn">Logout</button></a>
+            <a href="/admin/logout" style="text-decoration-line: none;"><button class="logout-btn">Logout</button></a>
         </div>
     </div>
+
 
     <div class="main-content">
         <div class="header">
@@ -522,7 +622,7 @@
                 } else if (salePrice > 1000000) {
                     showError('salePriceError', 'Sale price cannot exceed 1,000,000');
                     isValid = false;
-                } else if (salePrice >= regularPrice) {
+                } else if (salePrice > regularPrice) {
                     showError('salePriceError', 'Sale price must be less than regular price');
                     isValid = false;
                 }

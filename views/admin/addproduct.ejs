@@ -569,14 +569,16 @@ in.css">
                 document.getElementById('regularPriceError').style.display = 'block';
                 isValid = false;
             }
-
+            
             
             const salePrice = parseFloat(document.getElementById('salePrice').value);
-            if (isNaN(salePrice) || salePrice <= 0 || salePrice >= regularPrice) {
+            if (isNaN(salePrice) || salePrice <= 0 || salePrice  > regularPrice) {
                 document.getElementById('salePriceError').textContent = 'Sale price must be greater than 0 and less than regular price';
                 document.getElementById('salePriceError').style.display = 'block';
                 isValid = false;
+            
             }
+
 
             const mainImageInput = document.getElementById('mainImageInput');
             if (!mainImageInput.files.length) {

@@ -1,3 +1,4 @@
+const { type } = require('jquery');
 const mongoose = require('mongoose');
 const { stringify } = require('uuid');
 
@@ -32,6 +33,11 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
   },
+  categoryOff : {
+    type: mongoose.Schema.Types.ObjectId,
+    ref : 'CategoryOffer'
+  },
+
   brand: String,
   offer: Number,
   model: {

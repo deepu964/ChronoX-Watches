@@ -751,17 +751,17 @@
             <div class="product-info">
                 <h1 class="product-title"><%= product.name %></h1>
                 <div class="product-price">
-                        <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
+                        <span class="current-price" style="font-weight: bold; font-size: 1.1em; color: #000;">
                         ₹<%= product.variants[0]?.salePrice %>
                         </span>
                         <span style="text-decoration: line-through; color: rgb(221, 203, 203); font-size: 0.9em; margin-left: 8px;">
                     ₹<%= product.variants[0]?.regularPrice %>
                     </span>
                     </div>
-                <!-- <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
-                <%= product.offer %>% OFF
+                <span style="color: rgb(251, 5, 5); font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                <%= lastOff %> % OFF
                  </span>
-                 -->
+                
                 <div class="rating">
                     <span class="stars">⭐⭐⭐⭐⭐</span>
                     <span class="rating-text">(4.8/5 - 124 reviews)</span>
