@@ -163,7 +163,7 @@ const getProductDetails = async (req, res) => {
 
         const product = await productSchema.findById(id).populate('categoryId')
         const products = await productSchema.find({ isActive: false, isDeleted: false }).limit(4);
-        
+        console.log(product,'is pro ')
         let userWishlist = [];
         if (userId) {
             const wishlistSchema = require('../../models/wishlistSchema');
@@ -180,7 +180,7 @@ const getProductDetails = async (req, res) => {
 
        
         let catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId._id.toString());
-    
+        const discount = catOffer?.discount;
         let discountPer = 0;
         let diff =0
         for(let prod of product.variants){
@@ -189,10 +189,9 @@ const getProductDetails = async (req, res) => {
 
         }
 
-
         let lastOff=0;
-        if(catOffer.discount >= discountPer){
-            lastOff += catOffer.discount;
+        if(discount >= discountPer){
+            lastOff += discount;
         }else{
             lastOff += discountPer;
             
