@@ -163,7 +163,7 @@ const getProductDetails = async (req, res) => {
 
         const product = await productSchema.findById(id).populate('categoryId')
         const products = await productSchema.find({ isActive: false, isDeleted: false }).limit(4);
-        console.log(product,'is pro ')
+        
         let userWishlist = [];
         if (userId) {
             const wishlistSchema = require('../../models/wishlistSchema');
@@ -196,7 +196,15 @@ const getProductDetails = async (req, res) => {
             lastOff += discountPer;
             
         }
-
+        let amount=0
+        let lastAmount =0
+        if(discount){
+          for(let prod of product.variants){
+                amount = (prod.regularPrice*discount)/100;
+                lastAmount = prod.regularPrice - amount ;
+          }
+        }
+        
         
         res.render('user/details', {
             user: req.session.user,
@@ -205,6 +213,8 @@ const getProductDetails = async (req, res) => {
             products,
             diff,
             lastOff,
+            lastAmount,
+            discount,
             userWishlist,
             isInWishlist: userWishlist.includes(id)
         });

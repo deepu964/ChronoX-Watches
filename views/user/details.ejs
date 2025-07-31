@@ -752,7 +752,11 @@
                 <h1 class="product-title"><%= product.name %></h1>
                 <div class="product-price">
                         <span class="current-price" style="font-weight: bold; font-size: 1.1em; color: #000;">
-                        ₹<%= product.variants[0]?.salePrice %>
+                        <% if (!discount) { %>
+                                ₹<%= product.variants[0]?.salePrice  %>
+                                <% } else { %>
+                                 ₹<%= lastAmount  %>
+                        <% } %>
                         </span>
                         <span style="text-decoration: line-through; color: rgb(221, 203, 203); font-size: 0.9em; margin-left: 8px;">
                     ₹<%= product.variants[0]?.regularPrice %>
