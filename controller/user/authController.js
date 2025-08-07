@@ -6,27 +6,23 @@ const generateOtp = require('../../utils/generateOtp');
 const sendOtpEmail = require('../../utils/sendOtpEmail');
 const sendResetPass = require('../../utils/sendResetPass');
 const crypto = require('crypto');
-
+const logger = require('../../utils/logger')
 
 function generateReferralCode(name) {
   return name.toLowerCase().slice(0, 3) + Math.floor(1000 + Math.random() * 9000);
 }
 
-function generateCouponCode() {
-    return 'CPN' + Math.floor(100000 + Math.random() * 900000); 
-}
-
-const loginPage = (req, res) => {
+const loginPage = (req, res, next) => {
     try {
         if (req.session.user) {
             return res.redirect('/');
         }
-        const passChange = req.query.params
+        const passChange = req.query.params;
         const message = req.query.message || '';
         const blocked = req.query.blocked || '';
         res.render('user/login', { message, blocked, passChange });
     } catch (error) {
-        console.error("Login page error:", error);
+        logger.error('Login page error:', error);
         next(error);
     }
 };
@@ -57,7 +53,7 @@ const login = async (req, res) => {
         return res.redirect('/');
 
     } catch (error) {
-        console.error("Login error:", error);
+        logger.error('Login error:', error);
         return res.redirect('/login?message=Login failed. Please try again.');
     }
 };
@@ -66,7 +62,7 @@ const logout = async (req, res) => {
     req.session.user = null;
     res.clearCookie('connect.sid');
     return res.redirect('/login');
-}
+};
 
 const signUpPage = (req, res) => {
     try {
@@ -79,8 +75,8 @@ const signUpPage = (req, res) => {
 
         res.render('user/signup', { message, error2, referralCode });
     } catch (error) {
-        console.error("Signup page error:", error);
-        res.status(500).send("Internal Server Error");
+        logger.error('Signup page error:', error);
+        res.status(500).send('Internal Server Error');
     }
 };
 
@@ -112,9 +108,9 @@ const signUp = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = generateOtp();
         const otpExpr = Date.now() + 1 * 60 * 1000;
-        console.log(otp)
+        logger.info(otp);
 
-        await sendOtpEmail(email, otp)
+        await sendOtpEmail(email, otp);
 
         req.session.tempUser = {
             fullname,
@@ -129,17 +125,17 @@ const signUp = async (req, res) => {
         return res.redirect('/verify-otp');
 
     } catch (error) {
-        console.error("Signup error:", error);
+        logger.error('Signup error:', error);
         return res.redirect('/signup?message=Signup failed: ' + error.message);
     }
 };
 
-const getVerifyOtp = (req, res) => {
+const getVerifyOtp = (req, res, next) => {
     try {
         if (!req.session.tempUser) {
             return res.redirect('/signup?message=Session expired. Please sign up again.');
         }
-        const otpExpr = req.session.tempUser.otpExpr
+        const otpExpr = req.session.tempUser.otpExpr;
 
         const message = req.query.message || '';
         res.render('user/verify-otp', {
@@ -148,7 +144,7 @@ const getVerifyOtp = (req, res) => {
             otpExpr
         });
     } catch (error) {
-        console.error("OTP page error:", error);
+        logger.error('OTP page error:', error);
         next(error);
     }
 };
@@ -162,8 +158,8 @@ const verifyOtp = async (req, res) => {
             return res.redirect('/signup?message=Session expired. Please sign up again.');
         }
 
-        console.log("Session OTP:", sessionUser.otp);
-        console.log("Submitted OTP:", otp);
+        logger.info('Session OTP:', sessionUser.otp);
+        logger.info('Submitted OTP:', otp);
 
         if (new Date() > sessionUser?.otpExpr) {
             delete sessionUser.otp;
@@ -220,7 +216,7 @@ const verifyOtp = async (req, res) => {
                         });
 
                         if (existingReferral) {
-                            console.log('Referral record already exists, skipping reward');
+                            logger.warn('Referral record already exists, skipping reward');
                         } else {
                             
                             let referrerWallet = await Wallet.findOne({ user: referrer._id });
@@ -267,10 +263,10 @@ const verifyOtp = async (req, res) => {
                             });
                             await referralRecord.save();
 
-                            console.log(`Referral reward of ₹${rewardAmount} credited to ${referrer.fullname}'s wallet`);
+                            logger.warn(`Referral reward of ₹${rewardAmount} credited to ${referrer.fullname}'s wallet`);
                         }
                     } catch (error) {
-                        console.error('Error processing referral reward:', error);
+                        logger.error('Error processing referral reward:', error);
                         
                         try {
                             const failedReferralRecord = new Referral({
@@ -284,11 +280,11 @@ const verifyOtp = async (req, res) => {
                             });
                             await failedReferralRecord.save();
                         } catch (recordError) {
-                            console.error('Error creating failed referral record:', recordError);
+                            logger.error('Error creating failed referral record:', recordError);
                         }
                     }
                 } else {
-                    console.log('Invalid referrer or self-referral attempt detected');
+                    logger.warn('Invalid referrer or self-referral attempt detected');
                 }
             }
 
@@ -303,17 +299,15 @@ const verifyOtp = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("OTP verification error:", error);
+        logger.error('OTP verification error:', error);
         return res.redirect('/verify-otp?message=Verification failed: ' + error.message);
     }
 };
 
-
-
 const resendOtp = async (req, res) => {
     try {
         const sessionUser = req.session.tempUser;
-        const email = sessionUser.email
+        const email = sessionUser.email;
 
         if (!sessionUser) {
             return res.status(400).json({
@@ -324,19 +318,19 @@ const resendOtp = async (req, res) => {
 
         const newOtp = generateOtp();
         const newotpExpr = new Date() + 1 * 60 * 1000;
-        console.log(newOtp);
+        logger.info(newOtp);
 
         req.session.tempUser.otp = newOtp;
         req.session.tempUser.otpExpr = newotpExpr;
 
-        await sendOtpEmail(email, newOtp)
+        await sendOtpEmail(email, newOtp);
         return res.status(200).json({
             success: true,
             message: 'OTP sent successfully to your email'
         });
 
     } catch (error) {
-        console.error("Resend OTP error:", error);
+        logger.error('Resend OTP error:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to resend OTP: ' + error.message
@@ -344,89 +338,88 @@ const resendOtp = async (req, res) => {
     }
 };
 
-const getforgotPass = async (req, res) => {
+const getforgotPass = async (req, res, next) => {
     try {
         const error1 = req.query.error1 || '';
         res.render('user/forgot-pass', { error1 });
     } catch (error) {
         next(error);
     }
-}
+};
 
 const forgotPass = async (req, res) => {
     try {
-        const { email } = req.body
+        const { email } = req.body;
         if (!email) {
-            return res.redirect('/forgotpassword?error=Email%20is%20reqiured')
+            return res.redirect('/forgotpassword?error=Email%20is%20reqiured');
         }
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email });
 
         if (!user) {
-            return res.redirect('/forgotpassword?error=User%20not%20found')
+            return res.redirect('/forgotpassword?error=User%20not%20found');
         }
         if (email.toLowerCase() !== user.email.toLowerCase()) {
-            return res.redirect('/forgotpassword?error=Email%20not%20exist')
+            return res.redirect('/forgotpassword?error=Email%20not%20exist');
         }
 
-        const token = crypto.randomBytes(32).toString("hex")
+        const token = crypto.randomBytes(32).toString('hex');
 
         user.resetToken = token;
-        user.resetTokenExpr = new Date() + 3600000
-        await user.save()
+        user.resetTokenExpr = new Date() + 3600000;
+        await user.save();
 
         const resetLink = `http://localhost:3001/newPass/${token}`;
 
-        await sendResetPass(email, resetLink)
+        await sendResetPass(email, resetLink);
 
-        res.send("check your email for reset link");
+        res.send('check your email for reset link');
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Something went wrong");
+        logger.error(error);
+        res.status(500).send('Something went wrong');
     }
-}
+};
 
 const getNewPass = async (req, res) => {
     try {
         const { token } = req.params;
-        console.log(token, 'new get pass')
+        logger.info(token, 'new get pass');
 
         res.render('user/newPass', { token });
 
     } catch (error) {
-        console.log(error, "user not exist");
+        logger.error(error, 'user not exist');
     }
-}
+};
 
 const newPass = async (req, res) => {
     const { token } = req.params;
     const { password, confirm } = req.body;
-    console.log(token, "post token");
+    
     try {
-        const user = await User.findOne({ resetToken: token })
-        console.log(user, 'this is user');
+        const user = await User.findOne({ resetToken: token });
+        
         if (!user) {
-            return res.json({ success: false, message: "Invalid or Expired token." });
+            return res.json({ success: false, message: 'Invalid or Expired token.' });
         }
 
         if (password !== confirm) {
-            return res.json({ success: false, message: "Passwords do not match" });
+            return res.json({ success: false, message: 'Passwords do not match' });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword, "hashed");
+        
         user.password = hashedPassword;
         user.resetToken = undefined;
         user.resetTokenExpr = undefined;
 
         await user.save();
-        console.log("saved")
+        
 
-        return res.redirect('/login?passChange=password chnaged')
+        return res.redirect('/login?passChange=password chnaged');
 
     } catch (error) {
-        res.status(500).json({ message: "server error" });
+        res.status(500).json({ message: 'server error',error });
     }
-}
-
+};
 
 const validateReferralCode = async (req, res) => {
     try {
@@ -472,7 +465,7 @@ const validateReferralCode = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error validating referral code:', error);
+        logger.error('Error validating referral code:', error);
         return res.json({ valid: false, message: 'Error validating referral code' });
     }
 };

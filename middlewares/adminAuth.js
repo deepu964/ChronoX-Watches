@@ -11,7 +11,7 @@
 const jwt = require('jsonwebtoken');
 
 const authenticateJwt = (req,res,next)=>{
-    const token = req.cookies.token
+    const token = req.cookies.token;
 
     if(!token){
         res.redirect('/admin');
@@ -19,13 +19,13 @@ const authenticateJwt = (req,res,next)=>{
 
     jwt.verify(token,process.env.JWT_SECRET,(err,admin)=>{
         if(err){
-            return res.redirect('/admin?error=Inavalid%20Token')
+            return res.redirect('/admin?error=Inavalid%20Token');
         }
         req.admin = admin;
         next();
-    })
+    });
 
-}
+};
 
 const authenticateSession = (req,res,next)=>{
     if(!req.session.admin){
@@ -33,7 +33,7 @@ const authenticateSession = (req,res,next)=>{
     }
     req.admin = req.session.admin;
     next();
-}
+};
 
 const adminAuth =(req,res,next)=>{
     if(req.session && req.session.admin){
@@ -41,7 +41,7 @@ const adminAuth =(req,res,next)=>{
     }else{
         res.redirect('/admin');
     }
-}
+};
 
 
 const authMiddleware = process.env.AUTH_METHOD === 'JWT' ? authenticateJwt : authenticateSession;

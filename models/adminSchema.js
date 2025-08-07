@@ -14,6 +14,6 @@ const adminSchema = new mongoose.Schema({
         type:Boolean,
         required:true
     }
-})
+});
 
 module.exports =mongoose.model('admin',adminSchema);

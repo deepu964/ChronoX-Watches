@@ -1,6 +1,4 @@
-const { type } = require('jquery');
 const mongoose = require('mongoose');
-const { stringify } = require('uuid');
 
 const variantSchema = new mongoose.Schema({
   regularPrice: { type: Number,},

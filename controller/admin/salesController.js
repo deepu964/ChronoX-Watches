@@ -1,6 +1,7 @@
 const orderSchema = require('../../models/orderSchema');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
+const logger = require('../../utils/logger');
 
 const getSalesReport = async (req, res, next) => {
   try {
@@ -12,7 +13,7 @@ const getSalesReport = async (req, res, next) => {
 
     
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
-    console.log("FILTER RANGE:", startDate, endDate);
+    
 
     
     const filter = {
@@ -65,7 +66,7 @@ const getSalesReport = async (req, res, next) => {
       endRecord: Math.min(skip + limit, totalOrders)
     });
   } catch (error) {
-    console.log("Sales report error:", error);
+    logger.error('Sales report error:', error);
     next(error);
   }
 };
@@ -329,7 +330,7 @@ const exportSalesReportPDF = async (req, res, next) => {
     doc.end();
 
   } catch (error) {
-    console.log("export sales report PDF error", error);
+    logger.error('export sales report PDF error', error);
     next(error);
   }
 };
@@ -496,7 +497,7 @@ const exportSalesReportExcel = async (req, res, next) => {
     res.end();
 
   } catch (error) {
-    console.log("export sales report Excel error", error);
+    logger.error('export sales report Excel error', error);
     next(error);
   }
 };

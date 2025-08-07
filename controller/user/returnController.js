@@ -1,6 +1,8 @@
 const Order = require('../../models/orderSchema');
 const Return = require('../../models/returnSchema');
-const Wallet = require('../../models/walletSchema')
+const Wallet = require('../../models/walletSchema');
+const logger = require('../../utils/logger');
+
 
 const getMyReturns = async (req, res, next) => {
     try {
@@ -35,7 +37,7 @@ const getMyReturns = async (req, res, next) => {
             
         });
     } catch (error) {
-        console.error("My returns page error:", error);
+        logger.error('My returns page error:', error);
         next(error);
     }
 };
@@ -143,7 +145,7 @@ const requestReturn = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error(' Return request error:', error);
+        logger.error(' Return request error:', error);
         next(error);
     }
 };

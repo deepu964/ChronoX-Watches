@@ -1,6 +1,6 @@
 const couponSchema = require('../../models/couponSchema');
-const Cart = require('../../models/cartSchema');
 const User = require('../../models/userSchema');
+const logger = require('../../utils/logger')
 
 const applyCoupon = async (req, res, next) => {
   try {
@@ -20,20 +20,20 @@ const applyCoupon = async (req, res, next) => {
     });
 
     if (existCoupon) {
-      return res.json({ success: false, message: "You already used this coupon" });
+      return res.json({ success: false, message: 'You already used this coupon' });
     }
     
 
     if (!coupon) {
-      return res.json({ success: false, message: "Invalid coupon" });
+      return res.json({ success: false, message: 'Invalid coupon' });
     }
 
     if (new Date(coupon.expiryDate) < new Date()) {
-      return res.json({ success: false, message: "Coupon expired" });
+      return res.json({ success: false, message: 'Coupon expired' });
     }
 
     if (coupon.user.includes(userId)) {
-      return res.json({ success: false, message: "You already used this coupon" });
+      return res.json({ success: false, message: 'You already used this coupon' });
     }
 
     if (grandTotal < coupon.minPurchase) {
@@ -45,7 +45,6 @@ const applyCoupon = async (req, res, next) => {
 
     const discountAmount = Math.round((grandTotal * coupon.discount) / 100);
     const minPurchase = coupon.minPurchase;
-    const maxDiscount = coupon.discount;
     
     // coupon.user.push(userId);
     // await coupon.save();
@@ -60,7 +59,7 @@ const applyCoupon = async (req, res, next) => {
     
     return res.json({ success: true, discountAmount });
   } catch (err) {
-    console.log("Error applying coupon:", err);
+    logger.error('Error applying coupon:', err);
     next(err);
   }
 };
@@ -69,18 +68,18 @@ const removeCoupon = async (req, res, next) => {
   try {
     const userId = req.session.user?._id;
     if (!userId) {
-      return res.json({ success: false, message: "User not logged in" });
+      return res.json({ success: false, message: 'User not logged in' });
     }
 
     const user = await User.findById(userId).lean();
     if (!user) {
-      return res.json({ success: false, message: "User not found" });
+      return res.json({ success: false, message: 'User not found' });
     }
 
     const coupon = req.session.coupon;
 
     if (!coupon) {
-      return res.json({ success: false, message: "No coupon to remove" });
+      return res.json({ success: false, message: 'No coupon to remove' });
     }
 
     const existCoupon = await couponSchema.findOne({
@@ -90,7 +89,7 @@ const removeCoupon = async (req, res, next) => {
 
 
     if (!existCoupon) {
-      return res.json({ success: false, message: "Coupon not found or inactive" });
+      return res.json({ success: false, message: 'Coupon not found or inactive' });
     }
 
     await couponSchema.findOneAndUpdate(
@@ -101,10 +100,10 @@ const removeCoupon = async (req, res, next) => {
 
     delete req.session.coupon;
 
-    return res.json({ success: true, message: "Coupon removed successfully" });
+    return res.json({ success: true, message: 'Coupon removed successfully' });
 
-  } catch (error) {
-    console.log("remove coupon error", error);
+  } catch (error){
+    logger.error('remove coupon error', error);
     next(error);
   }
 };
@@ -117,4 +116,4 @@ const removeCoupon = async (req, res, next) => {
 module.exports = {
   applyCoupon,
   removeCoupon
-}
+};

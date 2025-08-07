@@ -1,51 +1,48 @@
-const errorMiddleware = require('../../middlewares/errorMiddleware');
 const Admin = require('../../models/adminSchema');
 const Order = require('../../models/orderSchema');
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
-const Category = require('../../models/categorySchema');
 const Referral = require('../../models/referralSchema');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const PDFDocument = require('pdfkit');
-const productSchema = require('../../models/productSchema');
+const logger = require('../../utils/logger');
 
 
-const getAdminLogin =async (req,res,next) => {
+const getAdminLogin = async (req, res, next) => {
     try {
-        
-        if(req.session.admin){
-          return res.redirect('/admin/dashboard')
+
+        if (req.session.admin) {
+            return res.redirect('/admin/dashboard');
         }
 
-        const error = req.query.error
-        return res.render('admin/login',{error})
+        const error = req.query.error;
+        return res.render('admin/login', { error });
 
 
     } catch (error) {
-        console.log('this is adminlogin page error',error);
-        next(error)
+        logger.error('this is adminlogin page error', error);
+        next(error);
     }
-    
-}
 
-const getDashBoard = async (req,res,next) => {
+};
+
+const getDashBoard = async (req, res, next) => {
     try {
 
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-        if(!req.session.admin){
-            return res.redirect('/admin')
+        if (!req.session.admin) {
+            return res.redirect('/admin');
         }
 
         const metrics = await getDashboardMetrics();
-       
 
-        res.render('admin/dashboard', { metrics,cloudName })
+
+        res.render('admin/dashboard', { metrics, cloudName });
     } catch (error) {
-        console.log('this is dash board page error',error);
-        next(error)
+        logger.error('this is dash board page error', error);
+        next(error);
     }
-}
+};
 
 const getDashboardMetrics = async () => {
     try {
@@ -54,7 +51,7 @@ const getDashboardMetrics = async () => {
         const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-        
+
         const totalCustomers = await User.countDocuments({ isBlocked: false });
         const lastMonthCustomers = await User.countDocuments({
             isBlocked: false,
@@ -67,13 +64,13 @@ const getDashboardMetrics = async () => {
         const customerGrowth = lastMonthCustomers > 0 ?
             ((thisMonthCustomers - lastMonthCustomers) / lastMonthCustomers * 100).toFixed(1) : 0;
 
-       
+
         const totalOrders = await Order.countDocuments({
             status: { $nin: ['Cancelled'] },
             paymentStatus: 'Paid'
         });
 
-       
+
         const salesAggregation = await Order.aggregate([
             {
                 $match: {
@@ -92,7 +89,7 @@ const getDashboardMetrics = async () => {
 
         const totalSales = salesAggregation.length > 0 ? salesAggregation[0].totalSales : 0;
 
-        
+
         const thisMonthSales = await Order.aggregate([
             {
                 $match: {
@@ -130,13 +127,13 @@ const getDashboardMetrics = async () => {
         const salesGrowth = lastMonthSalesAmount > 0 ?
             ((thisMonthSalesAmount - lastMonthSalesAmount) / lastMonthSalesAmount * 100).toFixed(1) : 0;
 
-        
+
         const totalProducts = await Product.countDocuments({
             isDeleted: false,
-            isActive: false 
+            isActive: false
         });
 
-       
+
         const referralStats = await Referral.getReferralStats();
         const thisMonthReferrals = await Referral.countDocuments({
             createdAt: { $gte: startOfMonth },
@@ -161,7 +158,7 @@ const getDashboardMetrics = async () => {
             referralGrowth
         };
     } catch (error) {
-        console.error('Error fetching dashboard metrics:', error);
+        logger.error('Error fetching dashboard metrics:', error);
         return {
             totalCustomers: 0,
             customerGrowth: 0,
@@ -183,7 +180,7 @@ const getChartData = async (req, res, next) => {
 
         switch (period) {
             case 'yearly':
-                
+
                 const selectedYear = year ? parseInt(year) : now.getFullYear();
                 const startOfYear = new Date(selectedYear, 0, 1);
                 const endOfYear = new Date(selectedYear, 11, 31, 23, 59, 59);
@@ -207,7 +204,7 @@ const getChartData = async (req, res, next) => {
                 ]);
 
                 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
                 for (let i = 1; i <= 12; i++) {
                     const monthData = yearlyData.find(d => d._id === i);
@@ -217,7 +214,7 @@ const getChartData = async (req, res, next) => {
                 break;
 
             case 'monthly':
-                
+
                 const selectedMonth = month ? parseInt(month) - 1 : now.getMonth();
                 const selectedYearForMonth = year ? parseInt(year) : now.getFullYear();
                 const startOfMonth = new Date(selectedYearForMonth, selectedMonth, 1);
@@ -250,7 +247,7 @@ const getChartData = async (req, res, next) => {
                 break;
 
             case 'weekly':
-                
+
                 const weekStart = week ? new Date(week) : new Date(now.setDate(now.getDate() - now.getDay()));
                 const weekEnd = new Date(weekStart);
                 weekEnd.setDate(weekStart.getDate() + 6);
@@ -283,7 +280,7 @@ const getChartData = async (req, res, next) => {
                 break;
 
             case 'daily':
-                
+
                 const selectedDate = req.query.date ? new Date(req.query.date) : new Date();
                 const startOfDay = new Date(selectedDate);
                 startOfDay.setHours(0, 0, 0, 0);
@@ -316,14 +313,14 @@ const getChartData = async (req, res, next) => {
                 break;
 
             default:
-                
+
                 const defaultWeekStart = new Date(now.setDate(now.getDate() - now.getDay()));
                 const defaultWeekEnd = new Date(defaultWeekStart);
                 defaultWeekEnd.setDate(defaultWeekStart.getDate() + 6);
 
-                
+
                 labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                chartData = [0, 0, 0, 0, 0, 0, 0]; 
+                chartData = [0, 0, 0, 0, 0, 0, 0];
         }
 
         res.json({
@@ -341,8 +338,8 @@ const getChartData = async (req, res, next) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching chart data:', error);
-        res.status(500).json({ success: false, message: 'Error fetching chart data' });
+        logger.error('Error fetching chart data:', error);
+        next(error);
     }
 };
 
@@ -392,7 +389,7 @@ const getTopProducts = async (req, res, next) => {
             {
                 $match: {
                     'product.isDeleted': false,
-                    'product.isActive': false 
+                    'product.isActive': false
                 }
             },
             {
@@ -410,8 +407,8 @@ const getTopProducts = async (req, res, next) => {
 
         res.json({ success: true, data: topProducts });
     } catch (error) {
-        console.error('Error fetching top products:', error);
-        res.status(500).json({ success: false, message: 'Error fetching top products' });
+        logger.error('Error fetching top products:', error);
+        next(error);
     }
 };
 
@@ -450,7 +447,7 @@ const getTopCategories = async (req, res, next) => {
             {
                 $match: {
                     'product.isDeleted': false,
-                    'product.isActive': false 
+                    'product.isActive': false
                 }
             },
             {
@@ -493,8 +490,8 @@ const getTopCategories = async (req, res, next) => {
 
         res.json({ success: true, data: topCategories });
     } catch (error) {
-        console.error('Error fetching top categories:', error);
-        res.status(500).json({ success: false, message: 'Error fetching top categories' });
+        logger.error('Error fetching top categories:', error);
+        next(error);
     }
 };
 
@@ -533,7 +530,7 @@ const getTopBrands = async (req, res, next) => {
             {
                 $match: {
                     'product.isDeleted': false,
-                    'product.isActive': false, 
+                    'product.isActive': false,
                     'product.brand': { $exists: true, $ne: null, $ne: '' }
                 }
             },
@@ -562,52 +559,52 @@ const getTopBrands = async (req, res, next) => {
 
         res.json({ success: true, data: topBrands });
     } catch (error) {
-        console.error('Error fetching top brands:', error);
-        res.status(500).json({ success: false, message: 'Error fetching top brands' });
+        logger.error('Error fetching top brands:', error);
+        next(error);
     }
 };
 
-const adminLogin =async (req,res,next) => {
-   try {
-    const {email,password} = req.body;
-    if(!email || !password)return res.redirect('/admin?error=email and password is required');
-    
-    const admin = await Admin.findOne({email})
-    
-    if(!admin)return res.redirect('/admin?error=Admin not found')
+const adminLogin = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) return res.redirect('/admin?error=email and password is required');
 
-    const isMatch = await bcrypt.compare(password,admin.password)
-    if(!isMatch)return res.redirect('/admin?error=Invalid Password');
+        const admin = await Admin.findOne({ email });
+
+        if (!admin) return res.redirect('/admin?error=Admin not found');
+
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch) return res.redirect('/admin?error=Invalid Password');
 
 
-    req.session.admin = {id:admin._id,email:admin.email};
+        req.session.admin = { id: admin._id, email: admin.email };
 
-    if(process.env.AUTH_METHOD === "JWT"){
-            const token = jwt.sign({id:admin._id, email:admin.email},process.env.JWT_SECRET,{expiresIn:'1h'})
-            res.cookie("token",token,{httpOnly:true});
+        if (process.env.AUTH_METHOD === 'JWT') {
+            const token = jwt.sign({ id: admin._id, email: admin.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            res.cookie('token', token, { httpOnly: true });
+        }
+
+        res.redirect('/admin/dashboard');
+
+    } catch (error) {
+        logger.error('this is admin login error', error);
+        next(error);
+
     }
 
-    res.redirect('/admin/dashboard');
+};
 
-   }catch (error) {
-    console.log('this is admin login error',error);
-        next(error)
+const logout = async (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
 
-   }
-    
-}
-
-const logout = async (req,res)=>{
-    req.session.destroy((err)=>{
-        if(err){
-            
             return res.redirect('/page-404');
         }
-    }) 
-    
+    });
+
     res.clearCookie('connect.sid');
     return res.redirect('/admin');
-}
+};
 
 
 

@@ -1,11 +1,11 @@
 const User = require('../../models/userSchema');
 const Referral = require('../../models/referralSchema');
 const Wallet = require('../../models/walletSchema');
-
+const logger = require('../../utils/logger')
 
 const getReferralList = async (req, res, next) => {
     try {
-        const search = req.query.search || "";
+        const search = req.query.search || '';
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         const skip = (page - 1) * limit;
@@ -16,9 +16,9 @@ const getReferralList = async (req, res, next) => {
             
             const users = await User.find({
                 $or: [
-                    { fullname: { $regex: search, $options: "i" } },
-                    { email: { $regex: search, $options: "i" } },
-                    { referralCode: { $regex: search, $options: "i" } }
+                    { fullname: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { referralCode: { $regex: search, $options: 'i' } }
                 ]
             }).select('_id');
             
@@ -27,7 +27,7 @@ const getReferralList = async (req, res, next) => {
                 $or: [
                     { referrer: { $in: userIds } },
                     { referred: { $in: userIds } },
-                    { referralCode: { $regex: search, $options: "i" } }
+                    { referralCode: { $regex: search, $options: 'i' } }
                 ]
             };
         }
@@ -42,9 +42,6 @@ const getReferralList = async (req, res, next) => {
             .skip(skip)
             .limit(limit);
 
-
-            
-
         res.render('admin/referrals', {
             referrals,
             currentPage: page,
@@ -55,7 +52,7 @@ const getReferralList = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching referral list:', error);
+        logger.error('Error fetching referral list:', error);
         next(error);
     }
 };
@@ -89,8 +86,8 @@ const getReferralStats = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching referral stats:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch referral statistics' });
+        logger.error('Error fetching referral stats:', error);
+        next(error);
     }
 };
 
@@ -134,7 +131,7 @@ const getReferralDetails = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching referral details:', error);
+        logger.error('Error fetching referral details:', error);
         next(error);
     }
 };
@@ -163,7 +160,7 @@ const updateReferralStatus = async (req, res, next) => {
 
                 await referrerWallet.addMoney(
                     referral.rewardAmount,
-                    `Referral reward (Admin processed) for referring user`,
+                    'Referral reward (Admin processed) for referring user',
                     null,
                     null
                 );
@@ -171,7 +168,7 @@ const updateReferralStatus = async (req, res, next) => {
                 referral.rewardGiven = true;
                 referral.rewardGivenAt = new Date();
             } catch (error) {
-                console.error('Error processing referral reward:', error);
+                logger.error('Error processing referral reward:', error);
                 return res.status(500).json({ 
                     success: false, 
                     message: 'Failed to process referral reward' 
@@ -186,8 +183,8 @@ const updateReferralStatus = async (req, res, next) => {
         res.json({ success: true, message: 'Referral status updated successfully' });
 
     } catch (error) {
-        console.error('Error updating referral status:', error);
-        res.status(500).json({ success: false, message: 'Failed to update referral status' });
+        logger.error('Error updating referral status:', error);
+        next(error);
     }
 };
 
@@ -203,7 +200,7 @@ const getReferralAnalytics = async (req, res, next) => {
             {
                 $group: {
                     _id: {
-                        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                        $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
                     },
                     referrals: { $sum: 1 },
                     rewards: { $sum: '$rewardAmount' },
@@ -218,8 +215,8 @@ const getReferralAnalytics = async (req, res, next) => {
         res.json({ success: true, analytics });
 
     } catch (error) {
-        console.error('Error fetching referral analytics:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch analytics data' });
+        logger.error('Error fetching referral analytics:', error);
+        next(error);
     }
 };
 

@@ -2,6 +2,8 @@ const productSchema = require('../../models/productSchema');
 const Cart = require('../../models/cartSchema');
 const wishlistSchema = require('../../models/wishlistSchema');
 const categoryOffer = require('../../models/categoryOfferSchema');
+const logger = require('../../utils/logger')
+
 
 const getCart = async (req, res, next) => {
     try {
@@ -41,7 +43,6 @@ const getCart = async (req, res, next) => {
 
 
             const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
-            console.log(catOffer,'is cat')
             let catDiscount = 0;
             if (catOffer && catOffer.discount) {
                 catDiscount = (regularPrice * catOffer.discount) / 100;
@@ -72,7 +73,7 @@ const getCart = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.log('cart get error:', error);
+        logger.error('cart get error:', error);
         next(error);
     }
 };
@@ -95,8 +96,7 @@ const addToCart = async (req, res, next) => {
         }
 
         const maxQuantityAllowed = 5;
-        const stockQty = product.variants[0]?.quantity || 0
-        const price = product.variants[0]?.regularPrice;
+        const stockQty = product.variants[0]?.quantity || 0;
         const itemPrice = product.variants[0]?.salePrice ;
         
         
@@ -168,7 +168,7 @@ const addToCart = async (req, res, next) => {
         return res.status(200).json({ success: true, message });
 
     } catch (error) {
-        console.log('cart add error:', error);
+        logger.error('cart add error:', error);
         next(error);
     }
 };
@@ -216,7 +216,7 @@ const updateCartItem = async (req, res, next) => {
 
         return res.status(400).json({ success: false, message: 'Invalid action' });
     } catch (err) {
-        console.log(' cart updated error')
+        logger.error(' cart updated error');
         next(err);
     }
 };
@@ -234,7 +234,7 @@ const removeFromCart = async (req, res, next) => {
 
         res.json({ success: true, message: 'Product removed from cart' });
     } catch (err) {
-        console.log(' cart remove error')
+        logger.error(' cart remove error');
         next(err);
     }
 };
@@ -251,7 +251,7 @@ const emptyCart = async (req, res, next) => {
 
         res.json({ success: true, message: 'Cart emptied' });
     } catch (err) {
-        console.log(' cart empty page error')
+        logger.error(' cart empty page error');
         next(err);
     }
 };

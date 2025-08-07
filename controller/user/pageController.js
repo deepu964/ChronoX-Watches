@@ -1,40 +1,41 @@
-const { listen } = require('file-upload');
 const categorySchema = require('../../models/categorySchema');
 const productSchema = require('../../models/productSchema');
 const wishlistSchema = require('../../models/wishlistSchema');
 const categoryOffer = require('../../models/categoryOfferSchema');
 const mongoose = require('mongoose');
+const logger = require('../../utils/logger');
 
-const getLoadHomePage = async (req, res) => {
+
+const getLoadHomePage = async (req, res, next) => {
     try {
         const category = await categorySchema.find({ isListed: true });
-        const products = await productSchema.find({ isActive: false })
-        const newProducts = await productSchema.find({isActive: false}).sort({createdAt:-1}).limit(8)
-        const user = req.session.user
-        const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+        const products = await productSchema.find({ isActive: false });
+        const newProducts = await productSchema.find({isActive: false}).sort({createdAt:-1}).limit(8);
+        const user = req.session.user;
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
         res.render('user/home', {
             user, products, cloudName,
             category,newProducts
         });
     } catch (error) {
-        console.error("Home page error:", error);
-        return res.render('user/page-404')
+        logger.error('Home page error:', error);
+        next(error)
     }
 };
 
-const PageNotFound = (req, res) => {
+const PageNotFound = (req, res, next) => {
     try {
         res.status(404).render('user/404');
     } catch (error) {
         next(error);
-        console.error("404 page error:", error);
+        logger.error('404 page error:', error);
     }
 };
 
-const getShopPage = async (req, res) => {
+const getShopPage = async (req, res, next) => {
     try {
         const {
-            search = "",
+            search = '',
             categoryId: categoryFilter = [],
             sortBy
         } = req.query;
@@ -79,9 +80,9 @@ const getShopPage = async (req, res) => {
                         finalPrice: {
                             $min: {
                                 $map: {
-                                    input: "$variants",
-                                    as: "variant",
-                                    in: { $ifNull: ["$$variant.salePrice", "$$variant.regularPrice"] }
+                                    input: '$variants',
+                                    as: 'variant',
+                                    in: { $ifNull: ['$$variant.salePrice', '$$variant.regularPrice'] }
                                 }
                             }
                         }
@@ -118,7 +119,7 @@ const getShopPage = async (req, res) => {
 
             const rawProducts = await productSchema.find(filter)
                 .populate({
-                    path: "categoryId",
+                    path: 'categoryId',
                     model: 'Category',
                     match: { isListed: true }
                 })
@@ -150,18 +151,18 @@ const getShopPage = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Shop page error:", error);
-        res.status(500).send("Server error");
+        logger.error('Shop page error:', error);
+        next(error)
     }
 };
 
-const getProductDetails = async (req, res) => {
+const getProductDetails = async (req, res, next) => {
     try {
         const id = req.params.id;
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
         const userId = req.session.user?._id;
 
-        const product = await productSchema.findById(id).populate('categoryId')
+        const product = await productSchema.findById(id).populate('categoryId');
         const products = await productSchema.find({ isActive: false, isDeleted: false }).limit(4);
         
         let userWishlist = [];
@@ -176,13 +177,13 @@ const getProductDetails = async (req, res) => {
         const categoryOff = await categoryOffer.find({
             isDeleted:false,
             status:'Active',
-        }).populate('category')
+        }).populate('category');
 
        
         let catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId._id.toString());
         const discount = catOffer?.discount;
         let discountPer = 0;
-        let diff =0
+        let diff =0;
         for(let prod of product.variants){
            diff =(prod.regularPrice - prod.salePrice );
            discountPer = (diff/prod.regularPrice) * 100 ;
@@ -196,8 +197,8 @@ const getProductDetails = async (req, res) => {
             lastOff += discountPer;
             
         }
-        let amount=0
-        let lastAmount =0
+        let amount=0;
+        let lastAmount =0;
         if(discount){
           for(let prod of product.variants){
                 amount = (prod.regularPrice*discount)/100;
@@ -219,10 +220,10 @@ const getProductDetails = async (req, res) => {
             isInWishlist: userWishlist.includes(id)
         });
     } catch (error) {
-        console.log("Product details error:", error);
-        res.status(500).send("Server error");
+        logger.error('Product details error:', error);
+        next(error)
     }
-}
+};
 
 module.exports = {
     getLoadHomePage,

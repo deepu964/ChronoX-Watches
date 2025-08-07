@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const env = require('dotenv').config();
+require('dotenv').config();
 
 const sendResetPass = async (email,resetLink) => {
     try {
@@ -66,12 +66,12 @@ const sendResetPass = async (email,resetLink) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log("link email sent:", info.response);
+        console.log('link email sent:', info.response);
         return true;
 
     } catch (error) {
-        console.error("Failed to send link:", error);
+        console.error('Failed to send link:', error);
         return false;
     }
 };
-module.exports = sendResetPass
+module.exports = sendResetPass;

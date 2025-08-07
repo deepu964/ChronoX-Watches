@@ -1,5 +1,6 @@
 const User = require('../../models/userSchema');
 const addressSchema = require('../../models/addressSchema');
+const logger = require('../../utils/logger')
 
 const getAddress = async (req, res, next) => {
     try {
@@ -10,11 +11,11 @@ const getAddress = async (req, res, next) => {
         const user = await User.findById(userId);
         const addresses = await addressSchema.find({ userId: userId }).lean();
         res.render('user/address', { user, addresses });
-    } catch (error) {
-        console.log('address get error');
+    } catch (error){
+        logger.error('address get error');
         next(error);
     }
-}
+};
 
 const getAddAddress = async (req, res, next) => {
     try {
@@ -22,10 +23,10 @@ const getAddAddress = async (req, res, next) => {
         res.render('user/addAddress', { user });
 
     } catch (error) {
-        console.log("address add error");
+        logger.error('address add error');
         next(error);
     }
-}
+};
 
 const addAddress = async (req, res, next) => {
     try {
@@ -48,10 +49,10 @@ const addAddress = async (req, res, next) => {
         await newAddress.save();
         return res.status(200).redirect('/address?message=Address added successfully');
     } catch (error) {
-        console.log("add address error");
+        logger.error('add address error');
         next(error);
     }
-}
+};
 
 const getEditAddress = async (req, res, next) => {
     try {
@@ -63,7 +64,7 @@ const getEditAddress = async (req, res, next) => {
             address
         });
     } catch (err) {
-        console.log(' get edit address error')
+        logger.error(' get edit address error');
         next(err);
     }
 };
@@ -103,10 +104,10 @@ const editAddress = async (req, res, next) => {
         });
         return res.status(200).json({ success: true, message: 'Address updated successfully' });
     } catch (error) {
-        console.log(' edit address error')
+        logger.error(' edit address error');
         next(error);
     }
-}
+};
 
 const deleteAddress = async (req, res, next) => {
     try {
@@ -119,10 +120,10 @@ const deleteAddress = async (req, res, next) => {
         await addressSchema.findByIdAndDelete(addressId);
         return res.status(200).json({ success: true, message: 'Address deleted successfully' });
     } catch (error) {
-        console.log(' delete address error')
+        logger.error(' delete address error');
         next(error);
     }
-}
+};
 
 module.exports = {
     getAddress,

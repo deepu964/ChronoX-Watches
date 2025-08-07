@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../../models/userSchema');
 const generateOtp = require('../../utils/generateOtp');
 const sendOtpEmail = require('../../utils/sendOtpEmail');
+const logger = require('../../utils/logger')
 
 const getUserProfile = async (req, res, next) => {
     try {
@@ -11,10 +12,10 @@ const getUserProfile = async (req, res, next) => {
 
         res.render('user/userProfile', { user });
     } catch (error) {
-        console.log("user profile  error")
+        logger.error('user profile  error');
         next(error);
     }
-}
+};
 
 const updateProfile = async (req, res, next) => {
     try {
@@ -24,10 +25,10 @@ const updateProfile = async (req, res, next) => {
 
         const existUser = await User.findById(userId);
         if (!existUser) {
-            return res, json({
+            return res.json({
                 success: false,
-                message: "user not found"
-            })
+                message: 'user not found'
+            });
         }
         await User.findByIdAndUpdate(userId, {
             fullname: name,
@@ -36,25 +37,25 @@ const updateProfile = async (req, res, next) => {
         }, { new: true });
         return res.json({
             success: true,
-        })
+        });
 
     } catch (error) {
-        console.log("profile updated error");
+        logger.error('profile updated error');
         next(error);
     }
-}
+};
 
 const verifyChangeEmail = async (req, res, next) => {
     try {
         const enteredOtp = req.body.otp;
         if (enteredOtp == req.session.userOtp) {
-            res.redirect('/')
+            res.redirect('/');
         }
     } catch (error) {
-        console.log('this is  verifychange mail page ',error);
+        logger.error('this is  verifychange mail page ',error);
         next(error);
     }
-}
+};
 
 const changeEmail = async (req, res, next) => {
     try {
@@ -77,7 +78,7 @@ const changeEmail = async (req, res, next) => {
 
 
         const otp = generateOtp();
-        console.log("Generated OTP:", otp);
+        logger.info('Generated OTP:', otp);
         const otpExpr = Date.now() + 1 * 60 * 1000;
 
         await sendOtpEmail(email, otp);
@@ -96,9 +97,9 @@ const changeEmail = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
+};
 
-const getChangeEmailOtp = (req, res) => {
+const getChangeEmailOtp = (req, res, next) => {
     try {
 
         if (!req.session.emailChange) {
@@ -115,12 +116,12 @@ const getChangeEmailOtp = (req, res) => {
             query: req.query
         });
     } catch (error) {
-        console.error("Change email OTP page error:", error);
-        next(error)
+        logger.error('Change email OTP page error:', error);
+        next(error);
     }
-}
+};
 
-const verifyChangeEmailOtp = async (req, res) => {
+const verifyChangeEmailOtp = async (req, res, next) => {
     try {
         const { otp } = req.body;
         const sessionData = req.session.emailChange;
@@ -146,10 +147,10 @@ const verifyChangeEmailOtp = async (req, res) => {
 
         return res.redirect('/userProfile?message=Email changed successfully');
     } catch (error) {
-        console.error("Change email OTP verification error:", error);
-        return res.redirect('/profile/otp-sent?message=Verification failed: ' + error.message);
+        logger.error('Change email OTP verification error:', error);
+        next(error)
     }
-}
+};
 
 const changePassword = async (req, res, next) => {
     try {
@@ -159,7 +160,7 @@ const changePassword = async (req, res, next) => {
         const existsUser = await User.findById(userId);
         if (!existsUser) {
 
-            return res.status(400).json({ success: false, message: "user not found" })
+            return res.status(400).json({ success: false, message: 'user not found' });
         }
 
         if (!currentPassword || !newPassword || !confirmPassword) {
@@ -183,11 +184,11 @@ const changePassword = async (req, res, next) => {
 
 
     } catch (error) {
-        console.log("change pass page error");
+        logger.error('change pass page error');
         next(error);
     }
 
-}
+};
 
 module.exports = {
     getUserProfile,

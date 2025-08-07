@@ -1,7 +1,7 @@
 const User = require('../../models/userSchema');
 const Referral = require('../../models/referralSchema');
 const Wallet = require('../../models/walletSchema');
-
+const logger = require('../../utils/logger');
 
 const getReferralDashboard = async (req, res, next) => {
     try {
@@ -57,7 +57,7 @@ const getReferralDashboard = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching referral dashboard:', error);
+        logger.error('Error fetching referral dashboard:', error);
         next(error);
     }
 };
@@ -92,7 +92,7 @@ const getReferralHistory = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching referral history:', error);
+        logger.error('Error fetching referral history:', error);
         next(error);
     }
 };
@@ -119,11 +119,8 @@ const generateReferralLink = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error generating referral link:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to generate referral link' 
-        });
+        logger.error('Error generating referral link:', error);
+        next(error)
     }
 };
 
@@ -181,7 +178,7 @@ const getReferralEarnings = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching referral earnings:', error);
+        logger.error('Error fetching referral earnings:', error);
         next(error);
     }
 };

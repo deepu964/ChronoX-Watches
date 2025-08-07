@@ -3,11 +3,11 @@ const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Return = require('../../models/returnSchema');
 const Wallet = require('../../models/walletSchema');
-
+const logger = require('../../utils/logger')
 
 const getOrders = async (req, res, next) => {
     try {
-        const search = req.query.search || "";
+        const search = req.query.search || '';
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         const skip = (page - 1) * limit;
@@ -45,24 +45,7 @@ const getOrders = async (req, res, next) => {
             .skip(skip)
             .limit(limit);
 
-            
-            // const totalAmountOrder = await Order.aggregate([
-            //             {
-            //                 $match: {
-            //                     status: { $nin: ['Cancelled'] },
-            //                     paymentStatus: 'Paid'
-            //                 }
-            //             },
-            //             {
-            //                 $group: {
-            //                     _id: null,
-            //                     totalSales: { $sum: '$totalAmount' },
-            //                     count: { $sum: 1 }
-            //                 }
-            //             }
-            //         ]);
-
-            // console.log(totalAmountOrder,'is herre')
+    
 
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
@@ -77,7 +60,7 @@ const getOrders = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching orders:', error);
+        logger.error('Error fetching orders:', error);
         next(error);
     }
 };
@@ -103,7 +86,7 @@ const getOrderDetails = async (req, res, next) => {
         res.render('admin/orderDetails', { order, cloudName, returnRequest });
 
     } catch (error) {
-        console.error('Error fetching order details:', error);
+        logger.error('Error fetching order details:', error);
         next(error);
     }
 };
@@ -142,7 +125,7 @@ const updateOrderStatus = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error updating order status:', error);
+        logger.error('Error updating order status:', error);
         next(error);
     }
 };
@@ -263,7 +246,7 @@ const processReturn = async (req, res, next) => {
     }
 
   } catch (error) {
-    console.error('Process return error:', error);
+    logger.error('Process return error:', error);
     next(error);
   }
 };
@@ -308,7 +291,7 @@ const getReturns = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Error fetching returns:', error);
+        logger.error('Error fetching returns:', error);
         next(error);
     }
 };

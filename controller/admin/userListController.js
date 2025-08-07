@@ -1,16 +1,17 @@
-const User = require('../../models/userSchema')
+const User = require('../../models/userSchema');
+const logger = require('../../utils/logger')
 
 const userList = async (req,res,next) => {
     try {
-        const search = req.query.search || "";
+        const search = req.query.search || '';
         const page = parseInt(req.query.page) || 1;
         const limit = 4;
 
         const query = {
             $or:[
-               {fullname:{$regex:search , $options:"i"}},
-               {email:{$regex:search, $options:"i"}}
-            ]}
+               {fullname:{$regex:search , $options:'i'}},
+               {email:{$regex:search, $options:'i'}}
+            ]};
         const totalUser = await User.countDocuments(query);
 
         const totalPage = Math.ceil(totalUser/limit);
@@ -30,14 +31,14 @@ const userList = async (req,res,next) => {
                  totalUser,
                  limit
                  
-            })
+            });
     } catch (error) {
-        console.log('this is userlist page error ',error);
+        logger.error('this is userlist page error ',error);
         // res.redirect('/admin/dashboard');
-        next(error)
+        next(error);
     }
     
-}
+};
 
 const blockUser = async (req,res,next) => {
     try {
@@ -48,17 +49,17 @@ const blockUser = async (req,res,next) => {
 
         await User.findByIdAndUpdate(userId,{isBlocked:newStatus});
         if(newStatus){
-            res.json({success:true,message:"User Blocked"})
+            res.json({success:true,message:'User Blocked'});
         } else{
-            res.json({success:true,message:"User Unblocked"})
+            res.json({success:true,message:'User Unblocked'});
         }
 
     } catch (error) {
-        console.log("userblock is error",error);
-        next(error)
+        logger.error('userblock is error',error);
+        next(error);
     }
     
-}
+};
 
 
 module.exports = {
@@ -66,4 +67,4 @@ module.exports = {
     blockUser,
    
     
-}
+};

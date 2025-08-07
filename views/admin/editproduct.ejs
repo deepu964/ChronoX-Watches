@@ -508,7 +508,7 @@
         if (!form) {
             console.error('Form with ID "editProductForm" not found');
         } else {
-            // console.log('Form found, attaching submit event listener');
+            
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -547,7 +547,6 @@
                 const category = getInputValue('category');
                 const additionalInfo = getInputValue('additionalInfo');
 
-
                 const errorFields = [
                     'productNameError', 'descriptionError', 'brandError',
                     'modelError', 'regularPriceError', 'salePriceError', 'stockError',
@@ -555,6 +554,33 @@
                 ];
                 errorFields.forEach(clearError);
 
+                const originalProdName = "<%= product.name%>";
+                const orginaldescription ="<%= product.description%>";
+                const orginalbrand ="<%= product.brand%>";
+                const orginalmodel="<%= product.model%>";
+                const orginalregularPrice = parseFloat("<%= product.variants[0].regularPrice %>");
+                const orginalsalePrice = parseFloat("<%= product.variants[0].salePrice %>");
+                const orginalquantity = parseInt("<%= product.variants[0].quantity %>");
+                const orginalcategory="<%= product.categoryId._id%>";
+                const orginaladditionalInfo="<%= product.additionalInfo%>";
+
+                const isSameAsOriginal = 
+                productName.trim().toLowerCase() === originalProdName.trim().toLowerCase() &&
+                description.trim().toLowerCase() === orginaldescription.trim().toLowerCase() &&
+                brand.trim().toLowerCase() === orginalbrand.trim().toLowerCase() &&
+                model.trim().toLowerCase() === orginalmodel.trim().toLowerCase() &&
+                regularPrice === orginalregularPrice &&
+                salePrice === orginalsalePrice &&
+                quantity === orginalquantity &&
+                category.trim().toLowerCase() === orginalcategory.trim().toLowerCase() &&
+                additionalInfo.trim().toLowerCase() === orginaladditionalInfo.trim().toLowerCase();
+
+
+
+                if(isSameAsOriginal){
+                    showToast("No changes made to update",'info');
+                    return
+                }
 
                 if (!productName) {
                     showError('productNameError', 'Product name is required');

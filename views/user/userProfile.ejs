@@ -661,6 +661,11 @@
                 font-size: 20px;
             }
         }
+
+           .error-message {
+                display: block;
+                margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -759,14 +764,7 @@
                         </div>
                     </a>
                 </li>
-                <!-- <li class="menu-item">
-                    <a href="#">
-                        <div class="menu-left">
-                            <div class="menu-icon"><i class="fas fa-gift"></i></div>
-                            <span>Referral Code</span>
-                        </div>
-                    </a>
-                </li> -->
+               
             </ul>
         </aside>
 
@@ -937,50 +935,154 @@
             }, 2000);
         });
 
-        // Profile form functionality
-        document.getElementById("profileForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
 
-            const name = e.target.fullname.value;
-            const mobile = e.target.mobile.value || "";
-            const email = e.target.email.value;
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("profileForm");
 
-            const originalEmail = "<%= user.email %>"; // from backend
-            console.log(originalEmail, email);
-            if (email !== originalEmail) {
-                // Email changed → OTP flow
-                const res = await fetch('/user-email-change', {
-                method: "POST",
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name, mobile, newEmail: email })
-                });
+            const fullnameInput = form.elements["fullname"];
+            const emailInput = form.elements["email"];
+            const mobileInput = form.elements["mobile"];
 
-                const data = await res.json();
-                if(data.message){
-                    window.location.href = '/profile/otp-sent';
-                }
+            const originalEmail = "<%= user.email %>";
 
-                // OTP verification is now handled on a separate page
-                // with proper SweetAlert notifications
-            } else {
-                
-                const res = await fetch('/userProfile', {
-                method: "POST",
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name,email, mobile })
-                });
-
-                const data = await res.json();
-                if(data.success){
-                    setTimeout(()=>{location.reload()},2000)
-                     showToast('Profile updated successfully!');
-                    
-                } else {
-                    showToast('Failed to update profile.');
-                }
-                 
+            // Add error spans
+            function createError(input) {
+                const span = document.createElement("span");
+                span.className = "error-message";
+                span.style.color = "red";
+                span.style.fontSize = "0.85em";
+                input.parentElement.appendChild(span);
+                return span;
             }
+
+            const errorName = createError(fullnameInput);
+            const errorEmail = createError(emailInput);
+            const errorMobile = createError(mobileInput);
+
+            // Validation functions
+            function validateName(name) {
+                const lettersOnly = name.replace(/[^A-Za-z]/g, "");
+                const startsWithCapital = /^[A-Z]/.test(name.trim());
+
+                if (name.trim() === "") {
+                    errorName.textContent = "Full name is required";
+                    return false;
+                } else if (!/^[A-Za-z ]+$/.test(name)) {
+                    errorName.textContent = "Only letters and spaces allowed";
+                    return false;
+                } else if (!startsWithCapital) {
+                    errorName.textContent = "Name must start with a capital letter";
+                    return false;
+                } else if (lettersOnly.length > 10) {
+                    errorName.textContent = "Max 10 letters (excluding spaces)";
+                    return false;
+                } else {
+                    errorName.textContent = "";
+                    return true;
+                }
+            }
+
+            function validateEmail(email) {
+                const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!pattern.test(email)) {
+                    errorEmail.textContent = "Invalid email format";
+                    return false;
+                } else {
+                    errorEmail.textContent = "";
+                    return true;
+                }
+            }
+
+            function validateMobile(mobile) {
+                if (!/^[6-9]\d{9}$/.test(mobile)) {
+                    errorMobile.textContent = "Must be 10 digits, starting with 6-9";
+                    return false;
+                } else {
+                    errorMobile.textContent = "";
+                    return true;
+                }
+            }
+
+            // Real-time input validation
+            fullnameInput.addEventListener("input", () => validateName(fullnameInput.value));
+            emailInput.addEventListener("input", () => validateEmail(emailInput.value));
+            mobileInput.addEventListener("input", () => validateMobile(mobileInput.value));
+
+            // Form submit
+            form.addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                const name = fullnameInput.value.trim();
+               
+                const email = emailInput.value.trim();
+                const mobile = mobileInput.value.trim();
+
+                const isNameValid = validateName(name);
+                const isEmailValid = validateEmail(email);
+                const isMobileValid = validateMobile(mobile);
+
+                if (!isNameValid || !isEmailValid || !isMobileValid) {
+                    showToast("Please fix validation errors before submitting.",'error');
+                    return;
+                }
+
+                const originalName = "<%= user.fullname %>";
+                const originalEmail = "<%= user.email %>";
+                const originalMobile = "<%= user.mobile %>";
+
+                  const isSameAsOriginal =
+                    name === originalName &&
+                    email === originalEmail &&
+                    mobile === originalMobile;
+
+                if (isSameAsOriginal) {
+                    showToast("No changes made to update.", 'info');
+                    return;
+                }
+
+                try {
+                    if (email !== originalEmail) {
+                        // Email changed → trigger OTP flow
+                        const res = await fetch('/user-email-change', {
+                            method: "POST",
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, mobile, newEmail: email })
+                        });
+
+                        const data = await res.json();
+                        if (data.message) {
+                            window.location.href = '/profile/otp-sent';
+                        } else {
+                            showToast(data.error || "Failed to start OTP flow.");
+                        }
+
+                    } else {
+                        // No email change → update profile
+                        const res = await fetch('/userProfile', {
+                            method: "POST",
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, email, mobile })
+                        });
+
+                        const data = await res.json();
+                        if (data.success) {
+                            showToast('Profile updated successfully!');
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            showToast(data.error || 'Failed to update profile.');
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error:", err);
+                    showToast("Something went wrong.");
+                }
             });
+        });
+
+
+
+
+
 
             document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
             const otp = document.getElementById('otpInput').value;

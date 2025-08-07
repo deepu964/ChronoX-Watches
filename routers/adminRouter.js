@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const nocache = require('nocache')
 const adminController = require('../controller/admin/adminController');
 const userListController = require('../controller/admin/userListController');
 const productController = require('../controller/admin/productController');
-const categoryController = require('../controller/admin/categoryController')
+const categoryController = require('../controller/admin/categoryController');
 const couponController = require('../controller/admin/couponController');
 const orderController = require('../controller/admin/orderController');
 const salesController = require('../controller/admin/salesController');
 const referralController = require('../controller/admin/referralController');
-const {authMiddleware,adminAuth} = require('../middlewares/adminAuth')
+const {authMiddleware,adminAuth} = require('../middlewares/adminAuth');
 
 function preventBackHistory(req, res, next) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -32,22 +31,22 @@ router.get('/userlist',authMiddleware,userListController.userList);
 router.put('/userlist/block/:id',authMiddleware,userListController.blockUser);
 
 router.all('/product',authMiddleware,adminAuth,productController.product);
-router.put('/product/block/:id',authMiddleware,adminAuth,productController.blockedProduct)
+router.put('/product/block/:id',authMiddleware,adminAuth,productController.blockedProduct);
 
 router.get('/addproduct',authMiddleware,adminAuth,productController.getproductAdd);
-router.post('/addproduct',authMiddleware,adminAuth,productController.addProduct)
+router.post('/addproduct',authMiddleware,adminAuth,productController.addProduct);
 
 router.get('/editproduct/edit/:id',productController.getEditProduct);
 router.put('/product/edit/:id',productController.editProduct);
-router.delete('/product/:id',productController.deleteProduct)
+router.delete('/product/:id',productController.deleteProduct);
 
 router.get('/category', authMiddleware,adminAuth,categoryController.listCategories);
 router.get('/addcategory',authMiddleware,adminAuth, categoryController.getAddCategory);
-router.post('/addcategory', authMiddleware,adminAuth,categoryController.addCategory)
+router.post('/addcategory', authMiddleware,adminAuth,categoryController.addCategory);
 router.patch('/category/toggle-status/:id',authMiddleware,adminAuth,categoryController.toggleCategoryStatus);
 router.get('/category/edit/:id',authMiddleware,adminAuth,categoryController.getEditCategory);
 router.put('/category/edit/:id',authMiddleware,adminAuth, categoryController.editCategory);
-router.delete('/category/:id', authMiddleware,adminAuth,categoryController.deleteCategory)
+router.delete('/category/:id', authMiddleware,adminAuth,categoryController.deleteCategory);
 
 router.get('/category-offers', authMiddleware,adminAuth,categoryController.getCategoryOffers);
 router.get('/category-offers/add', authMiddleware,adminAuth,categoryController.getAddCategoryOffer);
@@ -63,7 +62,7 @@ router.post('/coupon/addCoupon',couponController.addCoupon);
 router.get('/coupon/edit/:id',couponController.getEditCoupon);
 router.put('/coupon/edit/:id',couponController.editCoupon); 
 router.patch('/toggle-status/:id',couponController.toggleCouponStatus);
-router.delete('/coupon/delete/:id',couponController.deleteCoupon)
+router.delete('/coupon/delete/:id',couponController.deleteCoupon);
 
 router.get('/orders', authMiddleware, adminAuth, orderController.getOrders);
 router.get('/orders/:id', authMiddleware, adminAuth, orderController.getOrderDetails);

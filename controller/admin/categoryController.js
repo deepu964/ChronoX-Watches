@@ -1,16 +1,15 @@
-const { json } = require('express');
 const  categorySchema = require('../../models/categorySchema');
-const productSchema = require('../../models/productSchema');
 const categoryOfferSchema = require('../../models/categoryOfferSchema');
+const logger = require('../../utils/logger')
 
 const listCategories = async (req,res,next) => {
     try {
-        const search = req.query.search || "";
+        const search = req.query.search || '';
         const page = parseInt(req.query.page) || 1;
         const limit = 3;
 
         const query=
-                {name:{$regex:search , $options:"i"}}
+                {name:{$regex:search , $options:'i'}};
             
         const total = await categorySchema.countDocuments(query);
         const totalPage = Math.ceil(total / limit);
@@ -31,21 +30,21 @@ const listCategories = async (req,res,next) => {
 
     });
     } catch (error) {
-       console.log("category list error");
-        next(error)
+       logger.error('category list error');
+        next(error);
     
 }
-} 
+}; 
 
 const getAddCategory = async (req,res,next) => {
     try {
         res.render('admin/addcategory');
     } catch (error) {
-      console.log(" get category error")
-        next(error)
+      logger.error(' get category error');
+        next(error);
     }
     
-}
+};
 
 const addCategory = async (req,res,next) => {
     
@@ -57,7 +56,7 @@ const addCategory = async (req,res,next) => {
       });
 
       if (existingCategory) {
-        return res.json({ success: false, message: "Category already exists || Only first letter should be Capital" });
+        return res.json({ success: false, message: 'Category already exists || Only first letter should be Capital' });
       }
 
       const newCategory = new categorySchema({
@@ -69,28 +68,28 @@ const addCategory = async (req,res,next) => {
       });
       await newCategory.save();
       
-      return res.json({ success:true, message:"Category added successfully"});
+      return res.json({ success:true, message:'Category added successfully'});
     } catch (error) {
-      console.log("add category error",error)
+      logger.error('add category error',error);
         next(error);
     }
     
-}
+};
 
 const toggleCategoryStatus = async (req, res,next) => {
   try {
     const { id } = req.params;
-    const category = await categorySchema.findById(id)
+    const category = await categorySchema.findById(id);
     const currentStatus = category.isListed;
     const newStatus = !currentStatus;
     await categorySchema.findByIdAndUpdate(id,
         {isListed:newStatus}
     );
     
-    res.json({ success: true, message:"Updated successfully" });
+    res.json({ success: true, message:'Updated successfully' });
   } catch (err) {
-    console.log('this is toggle page error',error)
-    next(err)
+    logger.error('this is toggle page error',err);
+    next(err);
     res.status(500).json({ success: false });
   }
 };
@@ -103,10 +102,10 @@ const getEditCategory = async (req,res) => {
 
         res.render('admin/editcategory',{category});
     } catch (error) {
-        console.log("this is edit category error",error);
+        logger.error('this is edit category error',error);
         res.status(500).redirect('admin/page-404');
     }
-}
+};
 
 const editCategory = async (req, res, next) => {
   try {
@@ -115,19 +114,19 @@ const editCategory = async (req, res, next) => {
 
     const currentCategory = await categorySchema.findById(catId);
     if (!currentCategory) {
-      return res.json({ success: false, message: "Category not found" });
+      return res.json({ success: false, message: 'Category not found' });
     }
 
     if (categoryName && categoryName !== currentCategory.name) {
       const nameExists = await categorySchema.findOne({
         _id: { $ne: catId }, 
-        name: { $regex: new RegExp(`^${categoryName}$`, "i") } 
+        name: { $regex: new RegExp(`^${categoryName}$`, 'i') } 
       });
 
       if (nameExists) {
         return res.json({
           success: false,
-          message: "Category name already exists. Use a different name"
+          message: 'Category name already exists. Use a different name'
         });
       }
     }
@@ -139,9 +138,9 @@ const editCategory = async (req, res, next) => {
       }
     });
 
-    return res.json({ success: true, message: "Updated Successfully" });
+    return res.json({ success: true, message: 'Updated Successfully' });
   } catch (error) {
-    console.log(" edit category error",error)
+    logger.error(' edit category error',error);
     next(error);
   }
 };
@@ -151,31 +150,31 @@ const deleteCategory = async (req,res,next) => {
         const id = req.params.id;
         const category = await categorySchema.findById(id);
         if(category.isListed){
-          await categorySchema.findByIdAndUpdate(id,{isListed:false})
+          await categorySchema.findByIdAndUpdate(id,{isListed:false});
         }else{
-          await categorySchema.findByIdAndUpdate(id,{isListed:true})
+          await categorySchema.findByIdAndUpdate(id,{isListed:true});
         }
         
         if(!category){
-            return res.json({success:false,message:"Category not found"})
+            return res.json({success:false,message:'Category not found'});
         }
-        return res.json({success:true,message:"Successfully Deleted"})
+        return res.json({success:true,message:'Successfully Deleted'});
     } catch (error) {
-      console.log(" delete category error",error)
+      logger.error(' delete category error',error);
         next(error);
     }
     
-}
+};
 
 const getCategoryOffers = async (req, res, next) => {
   try {
-    const search = req.query.search || "";
+    const search = req.query.search || '';
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
 
     const query = search ? {
       $or: [
-        { offerName: { $regex: search, $options: "i" } }
+        { offerName: { $regex: search, $options: 'i' } }
       ],
       isDeleted: false
     } : { isDeleted: false };
@@ -199,7 +198,7 @@ const getCategoryOffers = async (req, res, next) => {
       limit
     });
   } catch (error) {
-    console.log("get category offer error", error);
+    logger.error('get category offer error', error);
     next(error);
   }
 };
@@ -211,7 +210,7 @@ const getAddCategoryOffer = async (req, res, next) => {
 
     res.render('admin/addCategoryOffer', { categories });
   } catch (error) {
-    console.log("get add category offer error", error);
+    logger.error('get add category offer error', error);
     next(error);
   }
 };
@@ -231,7 +230,7 @@ const addCategoryOffer = async (req, res, next) => {
     if (existingOffer) {
       return res.json({
         success: false,
-        message: "This category already has an active offer"
+        message: 'This category already has an active offer'
       });
     }
 
@@ -244,14 +243,14 @@ const addCategoryOffer = async (req, res, next) => {
     if (start < today) {
       return res.json({
         success: false,
-        message: "Start date cannot be in the past"
+        message: 'Start date cannot be in the past'
       });
     }
 
     if (end <= start) {
       return res.json({
         success: false,
-        message: "End date must be after start date"
+        message: 'End date must be after start date'
       });
     }
 
@@ -268,10 +267,10 @@ const addCategoryOffer = async (req, res, next) => {
 
     return res.json({
       success: true,
-      message: "Category offer added successfully"
+      message: 'Category offer added successfully'
     });
   } catch (error) {
-    console.log("add category offer error", error);
+    logger.error('add category offer error', error);
     next(error);
   }
 };
@@ -283,12 +282,12 @@ const toggleCategoryOfferStatus = async (req, res, next) => {
 
     
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.json({ success: false, message: "Invalid offer ID" });
+      return res.json({ success: false, message: 'Invalid offer ID' });
     }
 
     const offer = await categoryOfferSchema.findById(id);
     if (!offer) {
-      return res.json({ success: false, message: "Offer not found" });
+      return res.json({ success: false, message: 'Offer not found' });
     }
 
     await categoryOfferSchema.findByIdAndUpdate(id, { status });
@@ -298,7 +297,7 @@ const toggleCategoryOfferStatus = async (req, res, next) => {
       message: `Offer ${status.toLowerCase()} successfully`
     });
   } catch (error) {
-    console.log("toggle category offer status error", error);
+    logger.error('toggle category offer status error', error);
     next(error);
   }
 };
@@ -309,22 +308,22 @@ const deleteCategoryOffer = async (req, res, next) => {
 
     
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.json({ success: false, message: "Invalid offer ID" });
+      return res.json({ success: false, message: 'Invalid offer ID' });
     }
 
     const offer = await categoryOfferSchema.findById(id);
     if (!offer) {
-      return res.json({ success: false, message: "Offer not found" });
+      return res.json({ success: false, message: 'Offer not found' });
     }
 
     await categoryOfferSchema.findByIdAndUpdate(id, { isDeleted: true });
 
     res.json({
       success: true,
-      message: "Offer deleted successfully"
+      message: 'Offer deleted successfully'
     });
   } catch (error) {
-    console.log("delete category offer error", error);
+    logger.error('delete category offer error', error);
     next(error);
   }
 };
@@ -348,8 +347,8 @@ const getEditCategoryOffer = async (req, res, next) => {
 
     res.render('admin/editCategoryOffer', { offer, categories });
   } catch (error) {
-    console.log("get edit category offer error", error);
-    res.redirect('/admin/category-offers');
+    logger.error('get edit category offer error', error);
+    next(error);
   }
 };
 
@@ -360,12 +359,12 @@ const editCategoryOffer = async (req, res, next) => {
 
     
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.json({ success: false, message: "Invalid offer ID" });
+      return res.json({ success: false, message: 'Invalid offer ID' });
     }
 
     const currentOffer = await categoryOfferSchema.findById(id);
     if (!currentOffer) {
-      return res.json({ success: false, message: "Offer not found" });
+      return res.json({ success: false, message: 'Offer not found' });
     }
 
     
@@ -380,7 +379,7 @@ const editCategoryOffer = async (req, res, next) => {
     if (existingOffer) {
       return res.json({
         success: false,
-        message: "This category already has another active offer"
+        message: 'This category already has another active offer'
       });
     }
 
@@ -391,7 +390,7 @@ const editCategoryOffer = async (req, res, next) => {
     if (end <= start) {
       return res.json({
         success: false,
-        message: "End date must be after start date"
+        message: 'End date must be after start date'
       });
     }
 
@@ -405,10 +404,10 @@ const editCategoryOffer = async (req, res, next) => {
 
     return res.json({
       success: true,
-      message: "Category offer updated successfully"
+      message: 'Category offer updated successfully'
     });
   } catch (error) {
-    console.log("edit category offer error", error);
+    logger.error('edit category offer error', error);
     next(error);
   }
 };

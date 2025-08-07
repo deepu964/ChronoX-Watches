@@ -19,7 +19,7 @@ const isAuth = (req, res, next) => {
             }
         })
         .catch(err => {
-            console.error("Middleware error:", err);
+            console.error('Middleware error:', err);
             res.redirect('/login');
         });
 };

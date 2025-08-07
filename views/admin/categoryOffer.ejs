@@ -6,6 +6,7 @@
   <title>Category Offers</title>
   <link rel="stylesheet" href="/css/categoryOffer.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/js/notifications.js"></script>
 </head>
@@ -20,7 +21,7 @@
       </div>
 
                  <div class="nav-items">
-            <a href="/admin/dashboard" class="nav-item active">
+            <a href="/admin/dashboard" class="nav-item">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
@@ -52,10 +53,14 @@
                 <i class="fas fa-ticket-alt"></i>
                 <span>Coupons</span>
             </a>
-            <a href="/admin/category-offers" class="nav-item">
+            <a href="/admin/category-offers" class="nav-item active">
                 <i class="fas fa-percent"></i>
                 <span>Category Offers</span>
             </a>
+            <a href="/admin/referrals" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Referrals</span>
+                </a>
         </div>
 
       <div class="sidebar-footer">
@@ -117,14 +122,14 @@
                                     data-id="<%= offer._id %>"
                                     <%= offer.status === 'Active' ? 'checked' : '' %>
                                     />
-                                    <span class="slider"></span>
+                                    <span class="slider" data-bs-toggle="tooltip" title="Status change to block and unblock"></span>
                                 </label>
                                 </td>
                                 <td>
-                                <button class="action-btn edit"  onclick="editOffer('<%= offer._id %>')">
+                                <button class="action-btn edit"  onclick="editOffer('<%= offer._id %>')" data-bs-toggle="tooltip" title="Edit the category-offer">
                                     <i class="fas fa-edit" ></i>
                                 </button>
-                                <button class="action-btn delete" onclick="askDeleteOffer('<%= offer._id %>')">
+                                <button class="action-btn delete" onclick="askDeleteOffer('<%= offer._id %>')" data-bs-toggle="tooltip" title="Delete the category-offer">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -193,8 +198,17 @@
     </main>
   </div>
   
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        });
+
     document.addEventListener('DOMContentLoaded', function() {
         // Status toggle functionality
         document.querySelectorAll('.status-toggle').forEach(toggle => {

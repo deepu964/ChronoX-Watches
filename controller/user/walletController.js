@@ -1,5 +1,7 @@
 const User = require('../../models/userSchema');
 const Wallet = require('../../models/walletSchema');
+const logger = require('../../utils/logger');
+
 
 const getWallet = async (req, res, next) => {
     try {
@@ -19,7 +21,7 @@ const getWallet = async (req, res, next) => {
             );
             await User.findByIdAndUpdate(userId, { wallet: wallet._id });
         }
-        console.log(wallet,'is walletedededede')
+        
         const totalTransactions = wallet.transactions.length;
         const totalPage = Math.ceil(totalTransactions / limit);
 
@@ -37,7 +39,7 @@ const getWallet = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.error('Wallet page error:', error);
+        logger.error('Wallet page error:', error);
         next(error);
     }
 };
@@ -79,7 +81,7 @@ const addAmount = async (req, res) => {
     res.json({ success: true, message: 'Amount added to wallet' });
 
   } catch (err) {
-    console.error('Add Amount Error:', err);
+    logger.error('Add Amount Error:', err);
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };

@@ -1,5 +1,6 @@
 const couponSchema =require('../../models/couponSchema');
-const productSchema = require('../../models/productSchema');
+const logger = require('../../utils/logger')
+
 
 const getCoupon = async (req,res,next) => {
     try {
@@ -32,22 +33,22 @@ const getCoupon = async (req,res,next) => {
         user
 
     });
-    } catch (error) {
-       console.log("get coupon error")
-        next(error)
+    } catch (error){
+      logger.error('get coupon error');
+      next(error);
     
 }
-} 
+}; 
 
 const getAddCoupon = async (req,res,next) => {
     try {
         res.render('admin/addCoupon');
     } catch (error) {
-        console.log(" add coupon error")
-        next(error)
+        logger.error(' add coupon error');
+        next(error);
     }
     
-}
+};
 
 const addCoupon = async (req,res,next) => {
    try {
@@ -55,10 +56,10 @@ const addCoupon = async (req,res,next) => {
     
     const existsCoupon = await couponSchema.findOne({name:name});
     if(existsCoupon ){
-         return res.status(400).json({success:false,message:"Coupon is already exists"});
+         return res.status(400).json({success:false,message:'Coupon is already exists'});
     }
     if( discount <= 0 || discount > 80){
-      return res.status(400).json({success:false, message:"Discount limit 1 to 80"})
+      return res.status(400).json({success:false, message:'Discount limit 1 to 80'});
     }
     const newCoupon = new couponSchema({
         name,
@@ -67,15 +68,15 @@ const addCoupon = async (req,res,next) => {
         minPurchase
     });
     
-    await newCoupon.save()
+    await newCoupon.save();
 
-    res.status(200).json({success:true, message:"Coupon Add Successfull"})
+    res.status(200).json({success:true, message:'Coupon Add Successfull'});
    
    } catch (error) {
-    console.log("add coupon error",error)
-    next(error)
+    logger.error('add coupon error',error);
+    next(error);
    } 
-}
+};
 
 const getEditCoupon = async (req,res,next) => {
     try {
@@ -86,11 +87,11 @@ const getEditCoupon = async (req,res,next) => {
         }
         res.render('admin/editCoupon', { coupon });
     } catch (error) {
-        console.log("get edit coupon error",error)
-        next(error)
+        logger.error('get edit coupon error',error);
+        next(error);
     }
     
-}
+};
 
 const editCoupon = async (req, res, next) => {
   try {
@@ -116,7 +117,7 @@ const editCoupon = async (req, res, next) => {
     if (name.toLowerCase() !== coupon.name.toLowerCase()) {
       const nameExists = await couponSchema.findOne({
         _id: { $ne: couponId },
-        name: { $regex: new RegExp(`^${name}$`, "i") }
+        name: { $regex: new RegExp(`^${name}$`, 'i') }
       });
 
       if (nameExists) {
@@ -171,7 +172,7 @@ const editCoupon = async (req, res, next) => {
     return res.json({ success: true, message: 'Coupon updated successfully' });
 
   } catch (error) {
-    console.error('editCoupon error:', error);
+    logger.error('editCoupon error:', error);
     next(error);
   }
 };
@@ -193,7 +194,7 @@ const toggleCouponStatus = async (req, res, next) => {
 
     res.json({ success: true, message: `Coupon ${active ? 'activated' : 'deactivated'} successfully` });
   } catch (error) {
-    console.log("toggleCouponStatus error:", error);
+    logger.error('toggleCouponStatus error:', error);
     next(error);
   }
 };
@@ -203,19 +204,19 @@ const deleteCoupon = async (req,res,next) => {
         const id = req.params.id;
         const coupon = await couponSchema.findById(id);
         if(!coupon){
-          return  res.status(400).json({success:false, message:"coupon is not found"});
+          return  res.status(400).json({success:false, message:'coupon is not found'});
         }
 
         await couponSchema.findByIdAndDelete(id);
 
-        res.status(200).json({success:true,message:"Coupon deleted successfull"});
+        res.status(200).json({success:true,message:'Coupon deleted successfull'});
 
     } catch (error) {
-        console.log(" delete coupon error")
+        logger.error(' delete coupon error');
        next(error); 
     }
     
-}
+};
 
 
 module.exports = {
@@ -226,4 +227,4 @@ module.exports = {
     getEditCoupon,
     editCoupon,
     toggleCouponStatus, 
-}
+};

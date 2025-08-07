@@ -1302,7 +1302,7 @@
             });
         }
 
-        <% if (returnRequest) { %>
+        <% if(returnRequest) { %>
         async function processReturn(action) {
             const adminNotes = document.getElementById('adminNotes').value;
             const returnId = '<%= returnRequest._id %>';

@@ -1,23 +1,22 @@
 const productSchema = require('../../models/productSchema');
 const categorySchema = require('../../models/categorySchema');
 const cloudinary = require('../../utils/cloudinary');
-const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
-const { nextTick } = require('process');
+const logger = require('../../utils/logger')
 
 const product = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 6;
-        const search = req.query.search ? req.query.search.trim() : "";
+        const search = req.query.search ? req.query.search.trim() : '';
         const category = req.query.category || 'all';
         
         let query = {};
 
         if (search) {
-            query.name = { $regex: search, $options: "i" };
+            query.name = { $regex: search, $options: 'i' };
         }
 
         if (category !== 'all') {
@@ -44,7 +43,7 @@ const product = async (req, res, next) => {
         const totalPage = Math.ceil(totalProducts / limit);
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
-        const categories = await categorySchema.find({ isListed: true })
+        const categories = await categorySchema.find({ isListed: true });
         
 
         res.render('admin/product', {
@@ -61,7 +60,7 @@ const product = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.log("product list page error");
+        logger.error('product list page error');
         next(error);
     }
 };
@@ -71,7 +70,7 @@ const getproductAdd = async (req, res) => {
         const categories = await categorySchema.find({ isListed: true }) || [];
         res.render('admin/addproduct', { categories });
     } catch (error) {
-        console.log("Product add page error:", error);
+        logger.error('Product add page error:', error);
         res.render('admin/addproduct', { categories: [] });
     }
 };
@@ -104,7 +103,7 @@ const addProduct = async (req, res) => {
                     },
                     (error, result) => {
                         if (error) {
-                            console.error('Cloudinary upload error:', error);
+                            logger.error('Cloudinary upload error:', error);
                             reject(error);
                         } else {
                             
@@ -133,7 +132,7 @@ const addProduct = async (req, res) => {
             const result = await uploadToCloudinary(processedBuffer, processedFilename);
             images.push({ public_id: result.public_id, isMain: true });
         } else {
-            throw new Error("Main product image is required");
+            throw new Error('Main product image is required');
         }
 
 
@@ -144,7 +143,7 @@ const addProduct = async (req, res) => {
 
             for (let file of additionalImageFiles) {
                 if (!file.tempFilePath) {
-                    console.warn(`Skipping invalid additional image: Missing temp file path for ${file?.name || 'unknown'}`);
+                    logger.warn(`Skipping invalid additional image: Missing temp file path for ${file?.name || 'unknown'}`);
                     continue;
                 }
 
@@ -179,7 +178,7 @@ const addProduct = async (req, res) => {
 
 
     } catch (error) {
-        console.error("Error adding product:", error.message, error.stack);
+        logger.error('Error adding product:', error.message, error.stack);
         res.status(500).send(`Internal Server Error: ${error.message}`);
     }
 };
@@ -189,24 +188,24 @@ const getEditProduct = async (req, res,next) => {
     try {
         const productId = req.params.id;
 
-        const product = await productSchema.findOne({ _id: productId }).populate("categoryId");
+        const product = await productSchema.findOne({ _id: productId }).populate('categoryId');
 
          if (!product) {
-            return res.status(404).render("admin/404", { message: "Product not found" });
+            return res.status(404).render('admin/404', { message: 'Product not found' });
         }
 
         if (!product.categoryId) {
-            console.warn("⚠️ Category for product is missing or deleted");
+            logger.warn('⚠️ Category for product is missing or deleted');
         }
 
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-        const categories = await categorySchema.find()
+        const categories = await categorySchema.find();
         res.render('admin/editproduct', { product, categories, cloudName });
     } catch (error) {
-        console.log('get edit product page error');
+        logger.error('get edit product page error');
         next(error);
     }
-}
+};
 
 const editProduct = async (req, res, next) => {
   try {
@@ -216,12 +215,12 @@ const editProduct = async (req, res, next) => {
     } = req.body;
 
     const product = await productSchema.findById(editId);
-    if (!product) return res.json({ success: false, message: "Product not found" });
+    if (!product) return res.json({ success: false, message: 'Product not found' });
 
     
     if (name && name !== product.name) {
       const existProduct = await productSchema.findOne({ name, _id: { $ne: editId } });
-      if (existProduct) return res.json({ success: false, message: "Name already exists" });
+      if (existProduct) return res.json({ success: false, message: 'Name already exists' });
     }
 
     let images = product.images || [];
@@ -287,10 +286,10 @@ const editProduct = async (req, res, next) => {
       }
     });
 
-    res.json({ success: true, message: "Product updated successfully" });
+    res.json({ success: true, message: 'Product updated successfully' });
 
   } catch (err) {
-    console.log("edit product page error");
+    logger.error('edit product page error');
     next(err);
   }
 };
@@ -300,16 +299,16 @@ const deleteProduct = async (req, res,next) => {
         const id = req.params.id;
         const product = await productSchema.findByIdAndDelete(id);
         if (!product) {
-            return res.json({ success: false, message: "Product is not found" });
+            return res.json({ success: false, message: 'Product is not found' });
         } else {
-            return res.json({ success: true, message: "product Delete Successfull" });
+            return res.json({ success: true, message: 'product Delete Successfull' });
         }
     } catch (error) {
-        console.log("delete product error");
+        logger.error('delete product error');
         next(error);
 
     }
-}
+};
 
 const blockedProduct = async (req, res, next) => {
     try {
@@ -321,25 +320,25 @@ const blockedProduct = async (req, res, next) => {
 
         await productSchema.findByIdAndUpdate(productId, { isActive: newStatus });
         if (newStatus) {
-            res.json({ success: true, message: "product blocked" });
+            res.json({ success: true, message: 'product blocked' });
         } else {
-            res.json({ success: false, message: "Product unblocked" });
+            res.json({ success: false, message: 'Product unblocked' });
         }
     } catch (error) {
-        console.log("block porduct error")
+        logger.error('block porduct error');
         next(error);
     }
 
-}
+};
 
 const getProductDetails = async (req, res, next) => {
     const productId = req.params.id;
 
     try {
-        const product = await Product.findById(productId).populate('reviews.user', 'name');
+        const product = await productSchema.findById(productId).populate('reviews.user', 'name');
         res.render('productDetails', { product });
     } catch (error) {
-        console.log("details get error");
+        logger.error('details get error');
         next(error);
     }
 };
@@ -362,7 +361,7 @@ const addReview = async (req, res, next) => {
         await product.save();
         res.status(200).json({ message: 'Review saved' });
     } catch (error) {
-        console.log("review add error")
+        logger.error('review add error');
         next(error);
     }
 };

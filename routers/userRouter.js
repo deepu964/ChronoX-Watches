@@ -28,7 +28,7 @@ router.get('/logout', authController.logout);
 router.post('/logout', isAuth, authController.logout);
 
 router.get('/forgot-pass', authController.getforgotPass);
-router.post('/forgot-pass', authController.forgotPass)
+router.post('/forgot-pass', authController.forgotPass);
 
 router.get('/newPass/:token', authController.getNewPass);
 router.post('/newPass/:token', authController.newPass);
@@ -49,15 +49,15 @@ router.get('/user/google/callback',passport.authenticate('google',{failureRedire
 });
 
 router.get('/shop', isAuth, pageController.getShopPage);
-router.get('/productdetails/:id', isAuth, pageController.getProductDetails)
+router.get('/productdetails/:id', isAuth, pageController.getProductDetails);
 router.get('/productdetails/:id', productController.getProductDetails);
 router.post('/productdetails/review/:id', productController.addReview);
 
 router.get('/userProfile', isAuth, profileController.getUserProfile);
 router.post('/userProfile', isAuth, profileController.updateProfile);
-router.post("/user-email-change", isAuth, profileController.changeEmail);
-router.get("/profile/otp-sent", isAuth, profileController.getChangeEmailOtp);
-router.post("/email-verify-otp", isAuth, profileController.verifyChangeEmailOtp);
+router.post('/user-email-change', isAuth, profileController.changeEmail);
+router.get('/profile/otp-sent', isAuth, profileController.getChangeEmailOtp);
+router.post('/email-verify-otp', isAuth, profileController.verifyChangeEmailOtp);
 router.post('/profile-change-pass', isAuth, profileController.changePassword);
 
 router.get('/address', isAuth, addressController.getAddress);

@@ -343,13 +343,16 @@ body {
 
             let isValid = true;
 
-            const namePattern = /^[A-Za-z ]+$/;
+           const namePattern = /^[A-Za-z ]{1,10}$/;
+
             if (fullnameid.value.trim() === "") {
                 error1.textContent = "Full name is required";
                 isValid = false;
             } else if (!namePattern.test(fullnameid.value.trim())) {
-                error1.textContent = "Name should contain only letters and spaces";
+                error1.textContent = "Name must be up to 10 letters and spaces only";
                 isValid = false;
+            } else {
+                error1.textContent = "";
             }
 
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

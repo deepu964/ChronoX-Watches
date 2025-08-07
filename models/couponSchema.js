@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 function generateCouponCode() {
   const length = 8;
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let couponCode = '';
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
