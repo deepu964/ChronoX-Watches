@@ -166,7 +166,7 @@ const checkoutGetController = async (req, res, next) => {
         mrpTotal 
       });
     }
-
+    
     const grandTotal = subTotal;
 
     res.render('user/checkOut', {
@@ -800,13 +800,11 @@ const cancelOrder = async (req, res, next) => {
         let itemRefund = itemTotal;
 
         if (order.coupon) {
-          
           const totalOrderValue = order.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
           const itemShare = itemTotal / totalOrderValue;
           const couponShare = itemShare * order.coupon.discountAmount;
           itemRefund -= couponShare;
         }
-
         refundAmount += itemRefund;
       }
     }
@@ -826,7 +824,6 @@ const cancelOrder = async (req, res, next) => {
           order.cancelledRefundTotal = 0;
       }
         order.cancelledRefundTotal += refundAmount;
-
 
       await wallet.addMoney(
         refundAmount,
@@ -1066,7 +1063,7 @@ const createRazorpayOrder = async (req, res) => {
      variant.quantity -= Items.quantity;
    }
     await prod.save()
-    console.log(localOrder,'is order local dndkfndkfjvfjgdjhj')
+    
     } else {
       localOrder.razorpayOrderId = razorpayOrder.id;
       await localOrder.save();

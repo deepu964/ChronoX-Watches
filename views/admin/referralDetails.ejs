@@ -141,19 +141,19 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Name:</span>
-                        <span class="info-value"><%= referral.referred.fullname %></span>
+                        <span class="info-value"><%= referral.referrer.fullname %></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Email:</span>
-                        <span class="info-value"><%= referral.referred.email %></span>
+                        <span class="info-value"><%= referral.referrer.email %></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Mobile:</span>
-                        <span class="info-value"><%= referral.referred.mobile || 'N/A' %></span>
+                        <span class="info-value"><%= referral.referrer.mobile || 'N/A' %></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Joined Date:</span>
-                        <span class="info-value"><%= new Date(referral.referred.createdAt).toLocaleDateString('en-IN') %></span>
+                        <span class="info-value"><%= new Date(referral.referrer.createdAt).toLocaleDateString('en-IN') %></span>
                     </div>
                 </div>
             </div>

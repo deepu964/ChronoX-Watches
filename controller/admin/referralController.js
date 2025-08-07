@@ -42,6 +42,9 @@ const getReferralList = async (req, res, next) => {
             .skip(skip)
             .limit(limit);
 
+
+            
+
         res.render('admin/referrals', {
             referrals,
             currentPage: page,
@@ -122,6 +125,7 @@ const getReferralDetails = async (req, res, next) => {
                 }
             }
         ]);
+        
 
         res.render('admin/referralDetails', {
             referral,

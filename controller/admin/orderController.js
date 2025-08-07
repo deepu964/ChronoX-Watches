@@ -45,6 +45,25 @@ const getOrders = async (req, res, next) => {
             .skip(skip)
             .limit(limit);
 
+            
+            // const totalAmountOrder = await Order.aggregate([
+            //             {
+            //                 $match: {
+            //                     status: { $nin: ['Cancelled'] },
+            //                     paymentStatus: 'Paid'
+            //                 }
+            //             },
+            //             {
+            //                 $group: {
+            //                     _id: null,
+            //                     totalSales: { $sum: '$totalAmount' },
+            //                     count: { $sum: 1 }
+            //                 }
+            //             }
+            //         ]);
+
+            // console.log(totalAmountOrder,'is herre')
+
         const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
         res.render('admin/orders', {
