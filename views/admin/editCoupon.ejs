@@ -703,6 +703,22 @@
             outline: 2px solid var(--primary);
             outline-offset: 2px;
         }
+
+          .error-message {
+            color: red;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            }
+            .error-message.show {
+            display: block;
+            opacity: 1;
+            }
+            .form-input.error {
+            border: 1px solid red;
+            }
     </style>
 </head>
 <body>
@@ -806,7 +822,7 @@
                             <p class="card-description">Modify the coupon information and save your changes</p>
                         </div>
                         <div class="card-content">
-                            <form id="couponForm">
+                            <form id="couponForm" novalidate>
                                 <input type="hidden" id="couponId" value="sample-coupon-id">
                                 
                                 <div class="form-group">
@@ -900,143 +916,177 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
-    <script>
-  const form = document.getElementById('couponForm');
-  const couponId = form?.dataset.id;
+<script>
+    const form = document.getElementById('couponForm');
+const couponNameInput = document.getElementById('couponName');
+const discountInput = document.getElementById('discount');
+const expiryDateInput = document.getElementById('expiryDate');
+const minPurchaseInput = document.getElementById('minPurchase');
+const submitBtn = document.getElementById('submitBtn');
 
-  const couponNameInput = document.getElementById('couponName');
-  const discountInput = document.getElementById('discount');
-  const expiryDateInput = document.getElementById('expiryDate');
-  const minPurchaseInput = document.getElementById('minPurchase');
-  const submitBtn = document.getElementById('submitBtn');
+const previewCode = document.getElementById('previewCode');
+const previewDiscount = document.getElementById('previewDiscount');
+const previewMinPurchase = document.getElementById('previewMinPurchase');
+const previewExpiry = document.getElementById('previewExpiry');
 
-  const previewCode = document.getElementById('previewCode');
-  const previewDiscount = document.getElementById('previewDiscount');
-  const previewMinPurchase = document.getElementById('previewMinPurchase');
-  const previewExpiry = document.getElementById('previewExpiry');
 
-  expiryDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
 
-  // Toast
-  function showToast(msg, type = 'success') {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.className = `toast ${type} show`;
-    setTimeout(() => toast.classList.remove('show'), 3000);
+
+// Set expiry date minimum to today
+expiryDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
+
+// Toast function
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Show error under input
+function showError(id, msg) {
+  const el = document.getElementById(id + 'Error');
+  const input = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+  input.classList.add('error');
+}
+
+// Remove error under input
+function clearError(id) {
+  const el = document.getElementById(id + 'Error');
+  const input = document.getElementById(id);
+  el.classList.remove('show');
+  input.classList.remove('error');
+}
+
+// Validate form fields
+function validateForm() {
+  let valid = true;
+  ['couponName', 'discount', 'expiryDate', 'minPurchase'].forEach(clearError);
+
+  const name = couponNameInput.value.trim();
+  if (!name) {
+    showError('couponName', 'This field is required');
+    valid = false;
+  } else if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(name)) {
+    showError('couponName', 'Start with letter, 3–50 characters allowed');
+    valid = false;
   }
 
-  // Error display
-  function showError(id, msg) {
-    const el = document.getElementById(id + 'Error');
-    const input = document.getElementById(id);
-    if (el && input) {
-      el.textContent = msg;
-      el.classList.add('show');
-      input.classList.add('error');
-    }
+  const discount = parseFloat(discountInput.value);
+  if (!discountInput.value) {
+    showError('discount', 'This field is required');
+    valid = false;
+  } else if (isNaN(discount) || discount <= 0 || discount > 80) {
+    showError('discount', 'Discount must be between 1 and 80');
+    valid = false;
   }
 
-  function clearError(id) {
-    const el = document.getElementById(id + 'Error');
-    const input = document.getElementById(id);
-    if (el && input) {
-      el.classList.remove('show');
-      input.classList.remove('error');
-    }
+  const expiry = new Date(expiryDateInput.value);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  if (!expiryDateInput.value) {
+    showError('expiryDate', 'This field is required');
+    valid = false;
+  } else if (expiry < today) {
+    showError('expiryDate', 'Expiry must be a future date');
+    valid = false;
   }
 
-  // Validate inputs
-  function validateForm() {
-    let valid = true;
-    ['couponName', 'discount', 'expiryDate', 'minPurchase'].forEach(clearError);
-
-    const name = couponNameInput.value.trim();
-    if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(name)) {
-      showError('couponName', 'Start with letter, 3–50 characters allowed');
-      valid = false;
-    }
-
-    const discount = parseFloat(discountInput.value);
-    if (isNaN(discount) || discount <= 0 || discount > 100) {
-      showError('discount', 'Discount must be between 1 and 100');
-      valid = false;
-    }
-
-    const expiry = new Date(expiryDateInput.value);
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    if (isNaN(expiry.getTime()) || expiry < today) {
-      showError('expiryDate', 'Expiry must be a future date');
-      valid = false;
-    }
-
-    const min = parseFloat(minPurchaseInput.value);
-    if (isNaN(min) || min < 0) {
-      showError('minPurchase', 'Minimum must be 0 or more');
-      valid = false;
-    }
-
-    return valid;
+  const min = parseFloat(minPurchaseInput.value);
+  if (minPurchaseInput.value === '') {
+    showError('minPurchase', 'This field is required');
+    valid = false;
+  } else if (isNaN(min) || min < 0) {
+    showError('minPurchase', 'Minimum must be 0 or more');
+    valid = false;
   }
 
-  // Preview live update
-  function updatePreview() {
-    previewCode.textContent = couponNameInput.value || 'COUPON_NAME';
-    previewDiscount.textContent = (discountInput.value || '0') + '% OFF';
-    previewMinPurchase.textContent = '₹' + (minPurchaseInput.value || '0');
-    previewExpiry.textContent = expiryDateInput.value || 'Not set';
+  return valid;
+}
+
+// Update preview in real time
+function updatePreview() {
+  previewCode.textContent = couponNameInput.value || 'COUPON_NAME';
+  previewDiscount.textContent = (discountInput.value || '0') + '% OFF';
+  previewMinPurchase.textContent = '₹' + (minPurchaseInput.value || '0');
+  previewExpiry.textContent = expiryDateInput.value || 'Not set';
+}
+
+// Attach real-time validation & preview
+[couponNameInput, discountInput, expiryDateInput, minPurchaseInput].forEach(input => {
+  input.addEventListener('input', () => {
+    clearError(input.id);
+    validateForm();
+    updatePreview();
+  });
+});
+
+
+const originalValues = {
+  name: couponNameInput.value.trim(),
+  discount: parseFloat(discountInput.value),
+  expiryDate: expiryDateInput.value,
+  minPurchase: parseFloat(minPurchaseInput.value)
+};
+
+// Submit handler
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!validateForm()) return;
+
+      // Check if values changed
+  const currentValues = {
+    name: couponNameInput.value.trim(),
+    discount: parseFloat(discountInput.value),
+    expiryDate: expiryDateInput.value,
+    minPurchase: parseFloat(minPurchaseInput.value)
+  };
+
+  const noChanges = Object.keys(originalValues).every(
+    key => originalValues[key] === currentValues[key]
+  );
+
+  if (noChanges) {
+    showToast('No changes made.', 'info');
+    return; // Stop submission
   }
 
-  [couponNameInput, discountInput, expiryDateInput, minPurchaseInput].forEach(input => {
-    input.addEventListener('input', () => {
-      clearError(input.id);
-      updatePreview();
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Updating...';
+
+  try {
+    const res = await fetch(`/admin/coupon/edit/${document.getElementById('couponId').value}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: couponNameInput.value.trim(),
+        discount: parseFloat(discountInput.value),
+        expiryDate: expiryDateInput.value,
+        minPurchase: parseFloat(minPurchaseInput.value)
+      })
     });
-  });
 
-  // Handle submit
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Updating...';
-    
-    try {
-        const couponId = document.getElementById('couponid').value
-    console.log(couponId,"id")
-        console.log('heree22')
-      const res = await fetch(`/admin/coupon/edit/${couponId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: couponNameInput.value.trim(),
-          discount: parseFloat(discountInput.value),
-          expiryDate: expiryDateInput.value,
-          minPurchase: parseFloat(minPurchaseInput.value)
-        })
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        showToast(data.message || 'Coupon updated!');
-        setTimeout(() => window.location.href = '/admin/coupon', 1500);
-      } else {
-        showToast(data.message || 'Update failed', 'error');
-      }
-
-    } catch (err) {
-      console.error(err);
-      showToast('Server error. Please try again.', 'error');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Coupon';
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message || 'Coupon updated!');
+      setTimeout(() => window.location.href = '/admin/coupon', 1500);
+    } else {
+      showToast(data.message || 'Update failed', 'error');
     }
-  });
+  } catch (err) {
+    console.error(err);
+    showToast('Server error. Please try again.', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Coupon';
+  }
+});
 
-  updatePreview();
+// Initial preview
+updatePreview();
+
 </script>
-
 
 </body>
 </html>

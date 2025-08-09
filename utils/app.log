@@ -85,3 +85,55 @@
 [2025-08-09T05:28:56.168Z] INFO: Server is running at http://localhost:3001
 [2025-08-09T05:29:45.785Z] INFO: Server is running at http://localhost:3001
 [2025-08-09T05:29:47.945Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:41:31.341Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T06:47:44.805Z] ERROR: editCoupon error:
+[2025-08-09T06:47:50.664Z] ERROR: editCoupon error:
+[2025-08-09T06:48:47.100Z] ERROR: editCoupon error:
+[2025-08-09T06:51:25.463Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T06:51:54.204Z] ERROR: editCoupon error:
+[2025-08-09T11:24:25.684Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:28.946Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:30.638Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:35.344Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:39.032Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:56.701Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:59.384Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:01.397Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:05.702Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:11.358Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:59.562Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:03.272Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:05.277Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:09.344Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:13.069Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:26.731Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:27:02.121Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:27:37.123Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:28:16.712Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:33.352Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:36.837Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:50.688Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:56.088Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:34:40.139Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:36:52.311Z] ERROR: [object Object]
+[2025-08-09T11:36:53.358Z] ERROR: [object Object]
+[2025-08-09T11:36:54.262Z] ERROR: [object Object]
+[2025-08-09T11:40:11.195Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:35.532Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:41.382Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:55.378Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:59.065Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:41:00.980Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:42:24.114Z] ERROR: Error adding product:
+[2025-08-09T11:43:04.540Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:10.140Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:13.764Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:15.747Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:18.344Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:21.930Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:24.491Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:33.049Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:45:05.938Z] ERROR: products/1754739903602_main-2abe3d44-d650-48b6-bc2e-322085570dc5
+[2025-08-09T11:59:09.774Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:00:42.047Z] ERROR: products/1754740837110_main-4827ceed-da89-487f-929c-c05ee34565b5
+[2025-08-09T12:01:55.748Z] INFO: Server is running at http://localhost:3001

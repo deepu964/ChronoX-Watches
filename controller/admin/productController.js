@@ -120,23 +120,32 @@ const addProduct = async (req, res) => {
                 ? req.files.mainImage[0]
                 : req.files.mainImage;
 
-            if (!mainImage.tempFilePath) {
+        if (!mainImage.mimetype.startsWith("image")) {
+                throw new Error("Main image must be a valid image file");
+        }
 
-            }
+        const maxSize = 1024 * 1024; 
+        if (mainImage.size > maxSize) {
+            throw new Error("Main image size should be less than 1MB");
+        }
 
-            const processedFilename = `main-${uuidv4()}.jpg`;
-            const processedBuffer = await sharp(mainImage.tempFilePath)
+
+        const processedFilename = `main-${uuidv4()}.jpg`;
+        const processedBuffer = await sharp(mainImage.tempFilePath)
                 .resize(800, 800, { fit: 'cover' })
                 .toBuffer();
 
-            const result = await uploadToCloudinary(processedBuffer, processedFilename);
-            images.push({ public_id: result.public_id, isMain: true });
+        const result = await uploadToCloudinary(processedBuffer, processedFilename);
+
+            images.push({ public_id: result.public_id, url: result.secure_url ,isMain: true });
+
         } else {
             throw new Error('Main product image is required');
         }
 
 
         if (req.files && req.files.additionalImages) {
+
             const additionalImageFiles = Array.isArray(req.files.additionalImages)
                 ? req.files.additionalImages
                 : [req.files.additionalImages];
@@ -153,7 +162,10 @@ const addProduct = async (req, res) => {
                     .toBuffer();
 
                 const result = await uploadToCloudinary(processedBuffer, processedFilename);
-                images.push({ public_id: result.public_id, isMain: false });
+                images.push({ public_id: result.public_id, url: result.secure_url, isMain: false });
+
+                
+                
             }
         }
 
