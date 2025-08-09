@@ -435,8 +435,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(41, 40, 40, 0.7);
+            backdrop-filter: none;
             z-index: 2000;
             animation: fadeIn 0.3s ease;
         }
@@ -666,6 +666,24 @@
                 display: block;
                 margin-top: 4px;
         }
+
+        .error-message,
+            .success-message {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            text-align: left;
+            }
+
+            .error-message {
+            color: #e63946;
+            }
+
+            .success-message {
+            color: #2ca650;
+            }
+
+
+
     </style>
 </head>
 <body>
@@ -840,14 +858,17 @@
                     <div class="modal-form-group">
                         <label for="currentPassword">Current Password</label>
                         <input type="password" id="currentPassword" name="currentPassword" >
+                        <div id="error1" class="error-message"></div>
                     </div>
                     <div class="modal-form-group">
                         <label for="newPassword">New Password</label>
                         <input type="password" id="newPassword" name="newPassword" >
+                        <div id="error2" class="error-message"></div>
                     </div>
                     <div class="modal-form-group">
                         <label for="confirmPassword">Confirm New Password</label>
                         <input type="password" id="confirmPassword" name="confirmPassword" >
+                        <div id="error3" class="error-message"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -869,6 +890,11 @@
         const closeModal = document.getElementById('closeModal');
         const cancelModal = document.getElementById('cancelModal');
         const changePasswordForm = document.getElementById('changePasswordForm');
+
+
+        const error1 = document.getElementById('error1');
+        const error2 = document.getElementById('error2');
+        const error3 = document.getElementById('error3');
 
         // Open modal
         changePasswordBtn.addEventListener('click', function(e) {
@@ -895,45 +921,143 @@
         });
 
         // Handle form submission
-        changePasswordForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = document.getElementById('changePasswordForm');
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+        // changePasswordForm.addEventListener('submit', async function(e) {
+        //     e.preventDefault();
+        //     const form = document.getElementById('changePasswordForm');
+        //     const currentPassword = document.getElementById('currentPassword').value;
+        //     const newPassword = document.getElementById('newPassword').value;
+        //     const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (newPassword !== confirmPassword) {
-                showToast('New passwords do not match!');
-                return;
-            }
+        //     error1.textContent = "";
+        //     error2.textContent = "";
+        //     error3.textContent = "";
 
-            if (newPassword.length < 6) {
-                showToast('New password must be at least 6 characters long!');
-                return;
-            }
+        //     let isValid = true;
+
+        //     if (newPassword !== confirmPassword) {
+        //         error2.textContent = ('New passwords do not match!');
+        //        isValid =false;
+        //     }
+
+        //     if (newPassword.length < 6) {
+        //         error2.textContent = ('New password must be at least 6 characters long!');
+        //         isValid = false;
+        //     }
+            
             
            
-            // Simulate password change
-            const submitBtn = changePasswordForm.querySelector('.btn-primary');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
-            submitBtn.disabled = true;
+        //     // Simulate password change
+        //     const submitBtn = changePasswordForm.querySelector('.btn-primary');
+        //     const originalText = submitBtn.innerHTML;
+        //     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+        //     submitBtn.disabled = true;
 
-            const res = await fetch('/profile-change-pass', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
-            });
+        //     const res = await fetch('/profile-change-pass', {
+        //         method: 'POST',
+        //         headers: {'Content-Type': 'application/json'},
+        //         body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+        //     });
 
-            const data = await res.json();
+            
 
-            setTimeout(() => {
-                showToast('Password changed successfully!');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                closeModalFunc();
-            }, 2000);
+        //     const data = await res.json();
+
+        //     if(currentPassword.length == 0 && newPassword.length == 0 && confirmPassword.length == 0){
+        //         showToast("No change to change",'info')
+        //     }else{
+
+        //         setTimeout(() => {
+        //             showToast('Password changed successfully!');
+        //             submitBtn.innerHTML = originalText;
+        //             submitBtn.disabled = false;
+        //             closeModalFunc();
+        //         }, 2000);
+        //     }
+
+        // });
+
+        changePasswordForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const currentPassword = document.getElementById('currentPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+    const error1 = document.getElementById('error1'); // Current password error
+    const error2 = document.getElementById('error2'); // New password error
+    const error3 = document.getElementById('error3'); // Confirm password error
+
+    // Clear errors
+    error1.textContent = "";
+    error2.textContent = "";
+    error3.textContent = "";
+
+    // If all fields empty → No changes
+    if (!currentPassword && !newPassword && !confirmPassword) {
+        showToast("No changes to update", 'info');
+        return;
+    }
+
+    let isValid = true;
+
+    // Front-end validations
+    if (!currentPassword) {
+        error1.textContent = "Please enter your current password!";
+        isValid = false;
+    }
+
+    if (!newPassword) {
+        error2.textContent = "Please enter a new password!";
+        isValid = false;
+    } else if (newPassword.length < 6) {
+        error2.textContent = "New password must be at least 6 characters!";
+        isValid = false;
+    } else if (newPassword === currentPassword) {
+        error2.textContent = "New password cannot be the same as current password!";
+        isValid = false;
+    }
+
+    if (newPassword !== confirmPassword) {
+        error3.textContent = "New password and confirm password do not match!";
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    // Show loading state
+    const submitBtn = changePasswordForm.querySelector('.btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+    submitBtn.disabled = true;
+
+    try {
+        const res = await fetch('/profile-change-pass', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
         });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            showToast(data.message, 'success');
+            closeModalFunc();
+        } else {
+            // Map backend messages to inline errors
+            if (data.message.includes("Current password")) error1.textContent = data.message;
+            else if (data.message.includes("match")) error3.textContent = data.message;
+            else error2.textContent = data.message;
+        }
+
+    } catch (err) {
+        console.error(err);
+        showToast("Something went wrong. Please try again.", 'error');
+    }
+
+    // Reset button
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+});
 
 
         document.addEventListener("DOMContentLoaded", function () {

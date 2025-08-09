@@ -156,6 +156,16 @@ const changePassword = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
         const { currentPassword, newPassword, confirmPassword } = req.body;
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ success: false, message: 'No changes to update' });
+        }
+
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+
 
         const existsUser = await User.findById(userId);
         if (!existsUser) {
@@ -163,13 +173,18 @@ const changePassword = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'user not found' });
         }
 
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            return res.status(400).json({ success: false, message: 'All fields are required' });
-        }
 
         const passwordMatch = await bcrypt.compare(currentPassword, existsUser.password);
         if (!passwordMatch) {
             return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+        }
+
+          if (newPassword.length < 6) {
+            return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long' });
+        }
+
+        if (newPassword === currentPassword) {
+            return res.status(400).json({ success: false, message: 'New password cannot be the same as current password' });
         }
 
 
