@@ -958,12 +958,12 @@
 
                         <div class="price-row">
                             <span>Total MRP</span>
-                            <span>₹<%= totalMRP.toLocaleString() %></span>
+                            <span id="cart-total">₹<%= totalMRP.toLocaleString() %></span>
                         </div>
 
                         <div class="price-row">
                             <span>Discount on MRP</span>
-                            <span class="green">- ₹<%= discount.toLocaleString() %></span>
+                            <span class="green" id="discount">- ₹<%= discount.toLocaleString() %></span>
                         </div>
 
                         <!-- <div class="price-row">
@@ -974,7 +974,7 @@
 
                         <div class="price-row total">
                             <strong>Total Amount</strong>
-                            <strong>₹<%= grandTotal  %></strong>
+                            <strong id="grandTotal">₹<%= grandTotal  %></strong>
                         </div>
                     </div>
 
@@ -997,41 +997,39 @@
 
                 async function updateCart(productId, action) {
                     try {
-                        const res = await fetch(`/cart/update`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ productId, action })
-                        });
-                        const data = await res.json();
-                        if (data.success) {
-                            if (data.quantity === 0) {
-                                const cartItem = document.querySelector(`[data-id="${productId}"]`);
-                                if (cartItem) {
-                                    cartItem.classList.add('removing');
-                                    setTimeout(() => {
-                                        cartItem.remove();
-                                        
-                                        const remainingItems = document.querySelectorAll('.cart-item').length;
-                                        if (remainingItems <= 1) { 
-                                            location.reload();
-                                        }
-                                    }, 500);
-                                }
-                            } else {
+                            const res = await fetch(`/cart/update`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ productId, action })
+                            });
+                            const data = await res.json();
+
+                            if (data.success) {
+                                // Update quantity
                                 document.getElementById(`qty-${productId}`).innerText = data.quantity;
+
+                                if (data.cartTotal !== undefined) {
+                                    document.getElementById('cart-total').innerText = `₹${data.cartTotal.toLocaleString()}`;
+                                }
+
+                                if(data.discountOff !== undefined){
+                                    document.getElementById('discount').innerText = `-₹${data.discountOff.toLocaleString()}`
+                                }
+
+                                if(data.grandTotal !== undefined){
+                                    document.getElementById('grandTotal').innerText = `${data.grandTotal.toLocaleString()}`
+                                }
+
+                                showToast(data.message || 'Cart updated');
+                            } else {
+                                showToast(data.message || 'Failed to update cart', 'error');
                             }
-                            showToast(data.message || 'Cart updated');
-                             setTimeout(() => location.reload(), 500);
-                        } else {
-                            showToast(data.message || 'Failed to update cart', 'error');
+                        } catch (err) {
+                            console.error(err);
+                            showToast('Something went wrong');
                         }
-                    } catch (err) {
-                        console.error(err);
-                        showToast('Something went wrong');
                     }
-                }
+
 
                 async function removeItem(productId) {
                     try {

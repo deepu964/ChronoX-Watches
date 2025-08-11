@@ -9,7 +9,6 @@ const getCart = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
         const cart = await Cart.findOne({ user: userId }).populate('items.product').lean();
-
         if (!cart || !cart.items || cart.items.length === 0) {
             return res.render('user/cart', {
                 user: req.session.user,
@@ -178,10 +177,9 @@ const updateCartItem = async (req, res, next) => {
         const userId = req.session.user._id;
         const { productId, action } = req.body;
 
-        const cart = await Cart.findOne({ user: userId });
+        const cart = await Cart.findOne({ user: userId }).populate('items.product');
         if (!cart) return res.status(404).json({ success: false, message: 'Cart not found' });
-
-        const item = cart.items.find(item => item.product.toString() === productId);
+        const item = cart.items.find(item => item.product._id.toString() === productId);
         if (!item) return res.status(404).json({ success: false, message: 'Product not found in cart' });
 
         const product = await productSchema.findById(productId).populate('categoryId');
@@ -192,6 +190,28 @@ const updateCartItem = async (req, res, next) => {
         const totalStock = product.variants.reduce((sum, v) => sum + (v.quantity || 0), 0);
         const MAX_QTY = 5;
 
+
+        const categoryOff = await categoryOffer.find({
+                            isDeleted: false,
+                            status: 'Active',
+                            }).lean();
+
+        const productOff = (item.product.variants[0].regularPrice - item.product.variants[0].salePrice);
+            const catOffer = categoryOff.find(cat => cat.category._id.toString() === product.categoryId.toString());
+            let catDiscount = 0;
+            if (catOffer && catOffer.discount) {
+                catDiscount = (regularPrice * catOffer.discount) / 100;
+            }
+
+            let grandTotal=0;
+            const bestOffer = Math.max(productOff, catDiscount);
+            let discountOff = bestOffer * item.quantity;
+ 
+
+            grandTotal = item.product.variants[0].regularPrice  - discountOff ;
+
+
+
         if (action === 'increase') {
             if (item.quantity >= MAX_QTY) {
                 return res.status(400).json({ success: false, message: `Max ${MAX_QTY} quantity allowed` });
@@ -201,20 +221,39 @@ const updateCartItem = async (req, res, next) => {
             }
             item.quantity += 1;
             await cart.save();
-            return res.json({ success: true, message: 'Quantity increased', quantity: item.quantity });
+            discountOff = bestOffer * item.quantity;
+            grandTotal = (item.product.variants[0].regularPrice * item.quantity ) - discountOff ;
+            return res.json({ 
+                success: true, 
+                message: 'Quantity increased', 
+                quantity: item.quantity,
+                itemTotal: item.quantity * item.product.variants[0].regularPrice,
+                discountOff,
+                grandTotal,
+                cartTotal: cart.items.reduce((sum, i) => sum + (i.quantity * i.product.variants[0].regularPrice), 0)
+            });
         }
 
+       
         if (action === 'decrease') {
             if (item.quantity <= 1) {
                 return res.status(400).json({ success: false, message: 'Minimum 1 quantity required' });
             } else {
                 item.quantity -= 1;
                 await cart.save();
-                return res.json({ success: true, message: 'Quantity decreased', quantity: item.quantity });
+                discountOff = bestOffer * item.quantity;
+                grandTotal = (item.product.variants[0].regularPrice * item.quantity ) - discountOff ;
+                return res.json({ 
+                    success: true, 
+                    message: 'Quantity decreased', 
+                    quantity: item.quantity,
+                    itemTotal: item.quantity * item.product.variants[0].regularPrice,
+                    discountOff,
+                    grandTotal,
+                    cartTotal: cart.items.reduce((sum, i) => sum + (i.quantity * i.product.variants[0].regularPrice), 0) 
+                });
             }
-        }
-
-        return res.status(400).json({ success: false, message: 'Invalid action' });
+        }    
     } catch (err) {
         logger.error(' cart updated error');
         next(err);
