@@ -11,40 +11,34 @@ const getSalesReport = async (req, res, next) => {
 
     const { type, fromDate, toDate } = req.query;
 
-    
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
-    
 
-    
     const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
-      status: { $ne: 'Cancelled' }
+      status: { $ne: 'Cancelled' },
     };
-
 
     const totalOrders = await orderSchema.countDocuments(filter);
     const totalPages = Math.ceil(totalOrders / limit);
 
-  
-    const orders = await orderSchema.find(filter)
+    const orders = await orderSchema
+      .find(filter)
       .populate('user', 'fullname email')
-      .sort({ createdAt: -1 }) 
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-   
-    const allOrders = await orderSchema.find(filter)
-      .sort({ createdAt: -1 }); 
+    const allOrders = await orderSchema.find(filter).sort({ createdAt: -1 });
 
     const summary = {
       totalOrders,
       totalSales: 0,
       totalDiscount: 0,
       totalCouponDiscount: 0,
-      totalAmount: 0
+      totalAmount: 0,
     };
 
-    allOrders.forEach(order => {
+    allOrders.forEach((order) => {
       const originalAmount = order.totalAmount + (order.discount || 0);
       summary.totalSales += originalAmount;
       summary.totalDiscount += order.discount || 0;
@@ -63,7 +57,7 @@ const getSalesReport = async (req, res, next) => {
       totalOrders,
       limit,
       startRecord: skip + 1,
-      endRecord: Math.min(skip + limit, totalOrders)
+      endRecord: Math.min(skip + limit, totalOrders),
     });
   } catch (error) {
     logger.error('Sales report error:', error);
@@ -77,7 +71,6 @@ const getDateRange = (type, fromDate, toDate) => {
 
   switch (type) {
     case 'daily':
-      
       startDate = new Date(now);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date(now);
@@ -85,9 +78,8 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     case 'weekly':
-      
-      const currentDay = now.getDay(); 
-      const diff = currentDay === 0 ? 6 : currentDay - 1; 
+      const currentDay = now.getDay();
+      const diff = currentDay === 0 ? 6 : currentDay - 1;
       startDate = new Date(now);
       startDate.setDate(now.getDate() - diff);
       startDate.setHours(0, 0, 0, 0);
@@ -96,7 +88,6 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     case 'monthly':
-      
       startDate = new Date(now.getFullYear(), now.getMonth(), 1);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -104,7 +95,6 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     case 'yearly':
-      
       startDate = new Date(now.getFullYear(), 0, 1);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date(now.getFullYear(), 11, 31);
@@ -118,9 +108,8 @@ const getDateRange = (type, fromDate, toDate) => {
         endDate = new Date(toDate);
         endDate.setHours(23, 59, 59, 999);
       } else {
-        
         startDate = new Date(now);
-        startDate.setDate(now.getDate() - 6); 
+        startDate.setDate(now.getDate() - 6);
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date(now);
         endDate.setHours(23, 59, 59, 999);
@@ -128,8 +117,7 @@ const getDateRange = (type, fromDate, toDate) => {
       break;
 
     default:
-      
-      const defaultCurrentDay = now.getDay(); 
+      const defaultCurrentDay = now.getDay();
       const defaultDiff = defaultCurrentDay === 0 ? 6 : defaultCurrentDay - 1;
       startDate = new Date(now);
       startDate.setDate(now.getDate() - defaultDiff);
@@ -146,41 +134,39 @@ const exportSalesReportPDF = async (req, res, next) => {
     const { type, fromDate, toDate } = req.query;
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    
-    const orders = await orderSchema.find({
-      createdAt: { $gte: startDate, $lte: endDate },
-      status: { $ne: 'Cancelled' }
-    })
-    .populate('user', 'fullname email')
-    .populate('items.product', 'productName')
-    .sort({ createdAt: -1 });
+    const orders = await orderSchema
+      .find({
+        createdAt: { $gte: startDate, $lte: endDate },
+        status: { $ne: 'Cancelled' },
+      })
+      .populate('user', 'fullname email')
+      .populate('items.product', 'productName')
+      .sort({ createdAt: -1 });
 
-    
     const summary = {
       totalOrders: orders.length,
       totalSales: 0,
       totalDiscount: 0,
       totalCouponDiscount: 0,
       totalAmount: 0,
-      totalProducts: 0
+      totalProducts: 0,
     };
 
-    
     const productDetails = [];
 
-    orders.forEach(order => {
+    orders.forEach((order) => {
       const couponDiscount = order.coupon?.discountAmount || 0;
-      
-      order.items.forEach(item => {
+
+      order.items.forEach((item) => {
         const itemDiscount = item.discount || 0;
         const itemDiscountShare = item.discountShare || 0;
         const originalPrice = item.price || 0;
         const paidPrice = item.paidPrice || 0;
         const quantity = item.quantity || 0;
-        
+
         // Calculate total discount for this item (item discount + share of coupon discount)
         const totalItemDiscount = itemDiscount + itemDiscountShare;
-        
+
         productDetails.push({
           orderId: '#' + order._id.toString().slice(-6).toUpperCase(),
           customerName: order.user?.fullname || 'N/A',
@@ -192,46 +178,57 @@ const exportSalesReportPDF = async (req, res, next) => {
           salePrice: paidPrice,
           totalPrice: paidPrice * quantity,
           paymentMethod: order.paymentMethod || 'N/A',
-          orderDate: order.createdAt
+          orderDate: order.createdAt,
         });
-        
-        
+
         summary.totalProducts += quantity;
         summary.totalSales += originalPrice * quantity;
         summary.totalDiscount += totalItemDiscount * quantity;
         summary.totalAmount += paidPrice * quantity;
       });
-      
+
       summary.totalCouponDiscount += couponDiscount;
     });
 
     const doc = new PDFDocument({
       margin: 30,
       size: 'A4',
-      layout: 'landscape'
+      layout: 'landscape',
     });
 
-    const filterInfo = type === 'custom' && fromDate && toDate ?
-      `${fromDate}-to-${toDate}` :
-      type;
+    const filterInfo =
+      type === 'custom' && fromDate && toDate
+        ? `${fromDate}-to-${toDate}`
+        : type;
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=ChronoX-Detailed-Sales-Report-${filterInfo}-${Date.now()}.pdf`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=ChronoX-Detailed-Sales-Report-${filterInfo}-${Date.now()}.pdf`
+    );
 
     doc.pipe(res);
 
-   
     doc.fontSize(24).fillColor('#111827').text('ChronoX', { align: 'center' });
-    doc.fontSize(18).fillColor('#3b82f6').text('Detailed Sales Report', { align: 'center' });
+    doc
+      .fontSize(18)
+      .fillColor('#3b82f6')
+      .text('Detailed Sales Report', { align: 'center' });
     doc.moveDown(0.5);
 
-
     doc.fontSize(12).fillColor('#666666');
-    doc.text(`Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)}`, { align: 'center' });
-    doc.text(`Period: ${startDate.toLocaleDateString('en-IN')} - ${endDate.toLocaleDateString('en-IN')}`, { align: 'center' });
-    doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`, { align: 'center' });
+    doc.text(`Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)}`, {
+      align: 'center',
+    });
+    doc.text(
+      `Period: ${startDate.toLocaleDateString('en-IN')} - ${endDate.toLocaleDateString('en-IN')}`,
+      { align: 'center' }
+    );
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`,
+      { align: 'center' }
+    );
     doc.moveDown(1);
 
-    
     doc.fontSize(16).fillColor('#111827').text('Summary', { underline: true });
     doc.moveDown(0.5);
 
@@ -244,25 +241,49 @@ const exportSalesReportPDF = async (req, res, next) => {
     let summaryY = summaryStartY + 15;
 
     doc.text(`Total Orders: ${summary.totalOrders}`, leftCol, summaryY);
-    doc.text(`Total Products Sold: ${summary.totalProducts}`, rightCol, summaryY);
+    doc.text(
+      `Total Products Sold: ${summary.totalProducts}`,
+      rightCol,
+      summaryY
+    );
     summaryY += 20;
 
-    doc.text(`Total Sales Amount: ₹${summary.totalSales.toLocaleString('en-IN')}`, leftCol, summaryY);
-    doc.text(`Total Discount: ₹${summary.totalDiscount.toLocaleString('en-IN')}`, rightCol, summaryY);
+    doc.text(
+      `Total Sales Amount: ₹${summary.totalSales.toLocaleString('en-IN')}`,
+      leftCol,
+      summaryY
+    );
+    doc.text(
+      `Total Discount: ₹${summary.totalDiscount.toLocaleString('en-IN')}`,
+      rightCol,
+      summaryY
+    );
     summaryY += 20;
 
-    doc.text(`Total Coupon Discount: ₹${summary.totalCouponDiscount.toLocaleString('en-IN')}`, leftCol, summaryY);
-    doc.fontSize(14).fillColor('#111827').text(`Net Total Amount: ₹${summary.totalAmount.toLocaleString('en-IN')}`, rightCol, summaryY);
+    doc.text(
+      `Total Coupon Discount: ₹${summary.totalCouponDiscount.toLocaleString('en-IN')}`,
+      leftCol,
+      summaryY
+    );
+    doc
+      .fontSize(14)
+      .fillColor('#111827')
+      .text(
+        `Net Total Amount: ₹${summary.totalAmount.toLocaleString('en-IN')}`,
+        rightCol,
+        summaryY
+      );
 
     doc.y = summaryStartY + 120;
     doc.moveDown(1);
 
-   
-    doc.fontSize(16).fillColor('#111827').text('Product Details', { underline: true });
+    doc
+      .fontSize(16)
+      .fillColor('#111827')
+      .text('Product Details', { underline: true });
     doc.moveDown(0.5);
 
     if (productDetails.length > 0) {
-     
       const tableTop = doc.y;
       doc.rect(30, tableTop, 780, 25).fill('#f3f4f6').stroke('#e5e7eb');
 
@@ -279,15 +300,16 @@ const exportSalesReportPDF = async (req, res, next) => {
       doc.text('Payment', 540, headerY);
 
       let currentY = tableTop + 35;
-      
-      productDetails.forEach((item, index) => {
 
-        if (currentY > 520) { 
+      productDetails.forEach((item, index) => {
+        if (currentY > 520) {
           doc.addPage();
           currentY = 50;
-          
-          
-          doc.rect(30, currentY - 25, 780, 25).fill('#f3f4f6').stroke('#e5e7eb');
+
+          doc
+            .rect(30, currentY - 25, 780, 25)
+            .fill('#f3f4f6')
+            .stroke('#e5e7eb');
           doc.fontSize(9).fillColor('#111827');
           const newHeaderY = currentY - 17;
           doc.text('Order ID', 35, newHeaderY);
@@ -301,9 +323,11 @@ const exportSalesReportPDF = async (req, res, next) => {
           doc.text('Payment', 540, newHeaderY);
         }
 
-        
         if (index % 2 === 0) {
-          doc.rect(30, currentY - 5, 780, 20).fill('#f9fafb').stroke();
+          doc
+            .rect(30, currentY - 5, 780, 20)
+            .fill('#f9fafb')
+            .stroke();
         }
 
         doc.fontSize(8).fillColor('#333333');
@@ -311,8 +335,16 @@ const exportSalesReportPDF = async (req, res, next) => {
         doc.text(item.customerName.substring(0, 12), 95, currentY);
         doc.text(item.productName.substring(0, 18), 165, currentY);
         doc.text(item.quantity.toString(), 285, currentY);
-        doc.text(`₹${item.originalPrice.toLocaleString('en-IN')}`, 310, currentY);
-        doc.text(`₹${item.discountAmount.toLocaleString('en-IN')}`, 380, currentY);
+        doc.text(
+          `₹${item.originalPrice.toLocaleString('en-IN')}`,
+          310,
+          currentY
+        );
+        doc.text(
+          `₹${item.discountAmount.toLocaleString('en-IN')}`,
+          380,
+          currentY
+        );
         doc.text(`₹${item.salePrice.toLocaleString('en-IN')}`, 430, currentY);
         doc.text(`₹${item.totalPrice.toLocaleString('en-IN')}`, 480, currentY);
         doc.text(item.paymentMethod, 540, currentY);
@@ -320,15 +352,23 @@ const exportSalesReportPDF = async (req, res, next) => {
         currentY += 25;
       });
     } else {
-      doc.fontSize(14).fillColor('#666666').text('No products found for the selected period.', { align: 'center' });
+      doc
+        .fontSize(14)
+        .fillColor('#666666')
+        .text('No products found for the selected period.', {
+          align: 'center',
+        });
     }
 
-    
     doc.fontSize(8).fillColor('#999999');
-    doc.text(`Report generated by ChronoX Admin Panel | ${new Date().toLocaleString('en-IN')}`, 30, doc.page.height - 30, { align: 'center' });
+    doc.text(
+      `Report generated by ChronoX Admin Panel | ${new Date().toLocaleString('en-IN')}`,
+      30,
+      doc.page.height - 30,
+      { align: 'center' }
+    );
 
     doc.end();
-
   } catch (error) {
     logger.error('export sales report PDF error', error);
     next(error);
@@ -340,40 +380,39 @@ const exportSalesReportExcel = async (req, res, next) => {
     const { type, fromDate, toDate } = req.query;
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-   
-    const orders = await orderSchema.find({
-      createdAt: { $gte: startDate, $lte: endDate },
-      status: { $ne: 'Cancelled' }
-    })
-    .populate('user', 'fullname email')
-    .populate('items.product', 'productName')
-    .sort({ createdAt: -1 });
+    const orders = await orderSchema
+      .find({
+        createdAt: { $gte: startDate, $lte: endDate },
+        status: { $ne: 'Cancelled' },
+      })
+      .populate('user', 'fullname email')
+      .populate('items.product', 'productName')
+      .sort({ createdAt: -1 });
 
-  
     const summary = {
       totalOrders: orders.length,
       totalSales: 0,
       totalDiscount: 0,
       totalCouponDiscount: 0,
       totalAmount: 0,
-      totalProducts: 0
+      totalProducts: 0,
     };
 
     const productDetails = [];
 
-    orders.forEach(order => {
+    orders.forEach((order) => {
       const couponDiscount = order.coupon?.discountAmount || 0;
-      
-      order.items.forEach(item => {
+
+      order.items.forEach((item) => {
         const itemDiscount = item.discount || 0;
         const itemDiscountShare = item.discountShare || 0;
         const originalPrice = item.price || 0;
         const paidPrice = item.paidPrice || 0;
         const quantity = item.quantity || 0;
-        
+
         // Calculate total discount for this item (item discount + share of coupon discount)
         const totalItemDiscount = itemDiscount + itemDiscountShare;
-        
+
         productDetails.push({
           orderId: '#' + order._id.toString().slice(-6).toUpperCase(),
           customerName: order.user?.fullname || 'N/A',
@@ -385,23 +424,21 @@ const exportSalesReportExcel = async (req, res, next) => {
           salePrice: paidPrice,
           totalPrice: paidPrice * quantity,
           paymentMethod: order.paymentMethod || 'N/A',
-          orderDate: order.createdAt.toLocaleDateString('en-IN')
+          orderDate: order.createdAt.toLocaleDateString('en-IN'),
         });
-        
-       
+
         summary.totalProducts += quantity;
         summary.totalSales += originalPrice * quantity;
         summary.totalDiscount += totalItemDiscount * quantity;
         summary.totalAmount += paidPrice * quantity;
       });
-      
+
       summary.totalCouponDiscount += couponDiscount;
     });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Detailed Sales Report');
 
-    
     worksheet.columns = [
       { header: 'Order ID', key: 'orderId', width: 15 },
       { header: 'Customer Name', key: 'customerName', width: 20 },
@@ -413,56 +450,70 @@ const exportSalesReportExcel = async (req, res, next) => {
       { header: 'Sale Price', key: 'salePrice', width: 15 },
       { header: 'Total Price', key: 'totalPrice', width: 15 },
       { header: 'Payment Method', key: 'paymentMethod', width: 15 },
-      { header: 'Order Date', key: 'orderDate', width: 15 }
+      { header: 'Order Date', key: 'orderDate', width: 15 },
     ];
 
-    
     worksheet.mergeCells('A1:K1');
     worksheet.getCell('A1').value = 'ChronoX Detailed Sales Report';
     worksheet.getCell('A1').font = { size: 16, bold: true };
     worksheet.getCell('A1').alignment = { horizontal: 'center' };
 
-    
     worksheet.mergeCells('A2:K2');
-    worksheet.getCell('A2').value = `Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)} | Period: ${startDate.toLocaleDateString('en-IN')} - ${endDate.toLocaleDateString('en-IN')}`;
+    worksheet.getCell('A2').value =
+      `Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)} | Period: ${startDate.toLocaleDateString('en-IN')} - ${endDate.toLocaleDateString('en-IN')}`;
     worksheet.getCell('A2').alignment = { horizontal: 'center' };
 
-    
     worksheet.addRow([]);
     worksheet.addRow(['SUMMARY']);
     worksheet.getCell('A4').font = { bold: true, size: 14 };
 
     worksheet.addRow(['Total Orders', summary.totalOrders]);
     worksheet.addRow(['Total Products Sold', summary.totalProducts]);
-    worksheet.addRow(['Total Sales Amount', `₹${summary.totalSales.toLocaleString('en-IN')}`]);
-    worksheet.addRow(['Total Discount', `₹${summary.totalDiscount.toLocaleString('en-IN')}`]);
-    worksheet.addRow(['Total Coupon Discount', `₹${summary.totalCouponDiscount.toLocaleString('en-IN')}`]);
-    worksheet.addRow(['Net Total Amount', `₹${summary.totalAmount.toLocaleString('en-IN')}`]);
+    worksheet.addRow([
+      'Total Sales Amount',
+      `₹${summary.totalSales.toLocaleString('en-IN')}`,
+    ]);
+    worksheet.addRow([
+      'Total Discount',
+      `₹${summary.totalDiscount.toLocaleString('en-IN')}`,
+    ]);
+    worksheet.addRow([
+      'Total Coupon Discount',
+      `₹${summary.totalCouponDiscount.toLocaleString('en-IN')}`,
+    ]);
+    worksheet.addRow([
+      'Net Total Amount',
+      `₹${summary.totalAmount.toLocaleString('en-IN')}`,
+    ]);
 
-    
     worksheet.addRow([]);
     worksheet.addRow([]);
 
-   
     worksheet.addRow(['PRODUCT DETAILS']);
     worksheet.getCell('A12').font = { bold: true, size: 14 };
 
-    
     const headerRow = worksheet.addRow([
-      'Order ID', 'Customer Name', 'Customer Email', 'Product Name', 'Quantity',
-      'Original Price', 'Discount Amount', 'Sale Price', 'Total Price', 'Payment Method', 'Order Date'
+      'Order ID',
+      'Customer Name',
+      'Customer Email',
+      'Product Name',
+      'Quantity',
+      'Original Price',
+      'Discount Amount',
+      'Sale Price',
+      'Total Price',
+      'Payment Method',
+      'Order Date',
     ]);
-    
-    
+
     headerRow.font = { bold: true };
     headerRow.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FFE5E7EB' }
+      fgColor: { argb: 'FFE5E7EB' },
     };
 
-  
-    productDetails.forEach(item => {
+    productDetails.forEach((item) => {
       worksheet.addRow([
         item.orderId,
         item.customerName,
@@ -474,28 +525,31 @@ const exportSalesReportExcel = async (req, res, next) => {
         `₹${item.salePrice.toLocaleString('en-IN')}`,
         `₹${item.totalPrice.toLocaleString('en-IN')}`,
         item.paymentMethod,
-        item.orderDate
+        item.orderDate,
       ]);
     });
 
-   
-    worksheet.columns.forEach(column => {
+    worksheet.columns.forEach((column) => {
       if (column.header) {
         column.width = Math.max(column.width || 10, column.header.length + 2);
       }
     });
 
-
-    const filterInfo = type === 'custom' && fromDate && toDate ?
-      `${fromDate}-to-${toDate}` :
-      type;
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename=ChronoX-Detailed-Sales-Report-${filterInfo}-${Date.now()}.xlsx`);
-
+    const filterInfo =
+      type === 'custom' && fromDate && toDate
+        ? `${fromDate}-to-${toDate}`
+        : type;
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=ChronoX-Detailed-Sales-Report-${filterInfo}-${Date.now()}.xlsx`
+    );
 
     await workbook.xlsx.write(res);
     res.end();
-
   } catch (error) {
     logger.error('export sales report Excel error', error);
     next(error);
@@ -505,5 +559,5 @@ const exportSalesReportExcel = async (req, res, next) => {
 module.exports = {
   getSalesReport,
   exportSalesReportPDF,
-  exportSalesReportExcel
+  exportSalesReportExcel,
 };

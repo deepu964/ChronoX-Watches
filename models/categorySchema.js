@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const categorySchema = new mongoose.Schema({
@@ -6,29 +5,29 @@ const categorySchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    trim: true
+    trim: true,
   },
 
   offer: {
     type: Number,
-    default: 0
+    default: 0,
   },
   description: {
     type: String,
-    default: ''
+    default: '',
   },
   addedDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   isListed: {
     type: Boolean,
-    default: true
+    default: true,
   },
-  isDeleted:{
-    type:Boolean,
-    default:false
-  }
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model('Category', categorySchema);

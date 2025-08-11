@@ -149,8 +149,8 @@
                     categoryNameError.textContent = 'Category name is required';
                     categoryNameError.style.display = 'block';
                     isValid = false;
-                } else if (categoryName.length < 3 || categoryName.length > 50) {
-                    categoryNameError.textContent = 'Category name must be 3-50 characters';
+                } else if (categoryName.length < 3 || categoryName.length > 10) {
+                    categoryNameError.textContent = 'Category name must be 3-10 characters';
                     categoryNameError.style.display = 'block';
                     isValid = false;
                 } else if (!/^[a-zA-Z0-9\s-]+$/.test(categoryName)) {

@@ -542,3 +542,24 @@
 [2025-08-11T10:33:02.620Z] INFO: Server is running at http://localhost:3001
 [2025-08-11T10:33:07.910Z] INFO: Server is running at http://localhost:3001
 [2025-08-11T10:33:10.854Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:39:26.865Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:40:34.547Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:49:50.105Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:49:53.342Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:49:56.993Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:50:04.319Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:53:05.056Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:53:07.981Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:53:13.463Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:54:13.073Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:54:19.179Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:54:25.599Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:58:05.140Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T12:08:38.856Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T13:24:31.399Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:24:35.979Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:24:36.828Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:24:41.687Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:28:57.629Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T14:00:27.338Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T14:00:41.547Z] INFO: Server is running at http://localhost:3001

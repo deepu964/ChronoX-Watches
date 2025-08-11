@@ -268,12 +268,12 @@
 
         // Validate offer name
         const offerName = document.getElementById('offerName');
-        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
+        const nameRegex = /^[A-Za-z\s\-]{3,10}$/;
         if (!offerName.value.trim()) {
           showError('nameError', 'Offer name is required', offerName);
           isValid = false;
         } else if (!nameRegex.test(offerName.value.trim())) {
-          showError('nameError', 'Offer name must be 3-50 characters, letters, spaces and hyphens only', offerName);
+          showError('nameError', 'Offer name must be 3-10 characters, letters, spaces and hyphens only', offerName);
           isValid = false;
         }
 
@@ -332,7 +332,7 @@
       });
 
       document.getElementById('offerName').addEventListener('input', function() {
-        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
+        const nameRegex = /^[A-Za-z\s\-]{3,10}$/;
         if (this.value.trim() && nameRegex.test(this.value.trim())) {
           this.classList.remove('error');
           document.getElementById('nameError').textContent = '';

@@ -2,21 +2,21 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const sendOtpEmail = async (email, otp) => {
-    try {
-        console.log('Sending OTP to email:', email);
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,       
-                pass: process.env.EMAIL_PASS  
-            }
-        });
+  try {
+    console.log('Sending OTP to email:', email);
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-        const mailOptions = {
-            from:'chronox9645@gmail.com' ,
-            to: email,
-            subject: 'Your OTP for Signup',
-            html: `<!DOCTYPE html>
+    const mailOptions = {
+      from: 'chronox9645@gmail.com',
+      to: email,
+      subject: 'Your OTP for Signup',
+      html: `<!DOCTYPE html>
                     <html>
                     <head>
                         <meta charset="UTF-8">
@@ -60,20 +60,16 @@ const sendOtpEmail = async (email, otp) => {
                         </div>
                     </body>
                     </html>
-                    `
-        };
+                    `,
+    };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('OTP email sent:', info.response);
-        return true;
-
-    } catch (error) {
-        console.error('Failed to send OTP:', error);
-        return false;
-    }
+    const info = await transporter.sendMail(mailOptions);
+    console.log('OTP email sent:', info.response);
+    return true;
+  } catch (error) {
+    console.error('Failed to send OTP:', error);
+    return false;
+  }
 };
 
-
-
 module.exports = sendOtpEmail;
-

@@ -1,6 +1,6 @@
 const couponSchema = require('../../models/couponSchema');
 const User = require('../../models/userSchema');
-const logger = require('../../utils/logger')
+const logger = require('../../utils/logger');
 
 const applyCoupon = async (req, res, next) => {
   try {
@@ -9,20 +9,22 @@ const applyCoupon = async (req, res, next) => {
 
     const coupon = await couponSchema.findOne({
       couponcode: code.trim().toUpperCase(),
-      isActive: true
+      isActive: true,
     });
-    
+
     const existCoupon = await couponSchema.findOne({
       couponcode: code.trim().toUpperCase(),
 
       isActive: true,
-      user: userId
+      user: userId,
     });
 
     if (existCoupon) {
-      return res.json({ success: false, message: 'You already used this coupon' });
+      return res.json({
+        success: false,
+        message: 'You already used this coupon',
+      });
     }
-    
 
     if (!coupon) {
       return res.json({ success: false, message: 'Invalid coupon' });
@@ -33,19 +35,22 @@ const applyCoupon = async (req, res, next) => {
     }
 
     if (coupon.user.includes(userId)) {
-      return res.json({ success: false, message: 'You already used this coupon' });
+      return res.json({
+        success: false,
+        message: 'You already used this coupon',
+      });
     }
 
     if (grandTotal < coupon.minPurchase) {
       return res.json({
         success: false,
-        message: `Minimum purchase of ₹${coupon.minPurchase} required`
+        message: `Minimum purchase of ₹${coupon.minPurchase} required`,
       });
     }
 
     const discountAmount = Math.round((grandTotal * coupon.discount) / 100);
     const minPurchase = coupon.minPurchase;
-    
+
     // coupon.user.push(userId);
     // await coupon.save();
 
@@ -53,10 +58,9 @@ const applyCoupon = async (req, res, next) => {
       couponcode: coupon.couponcode,
       discountAmount,
       minPurchase,
-      maxDiscount: coupon.discount
-
+      maxDiscount: coupon.discount,
     };
-    
+
     return res.json({ success: true, discountAmount });
   } catch (err) {
     logger.error('Error applying coupon:', err);
@@ -84,12 +88,14 @@ const removeCoupon = async (req, res, next) => {
 
     const existCoupon = await couponSchema.findOne({
       couponcode: coupon.couponcode,
-      isActive: true
+      isActive: true,
     });
 
-
     if (!existCoupon) {
-      return res.json({ success: false, message: 'Coupon not found or inactive' });
+      return res.json({
+        success: false,
+        message: 'Coupon not found or inactive',
+      });
     }
 
     await couponSchema.findOneAndUpdate(
@@ -97,23 +103,16 @@ const removeCoupon = async (req, res, next) => {
       { $pull: { user: userId } }
     );
 
-
     delete req.session.coupon;
 
     return res.json({ success: true, message: 'Coupon removed successfully' });
-
-  } catch (error){
+  } catch (error) {
     logger.error('remove coupon error', error);
     next(error);
   }
 };
 
-
-
-
-
-
 module.exports = {
   applyCoupon,
-  removeCoupon
+  removeCoupon,
 };

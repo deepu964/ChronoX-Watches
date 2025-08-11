@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const authController = require('../controller/user/authController');
 const profileController = require('../controller/user/profileController');
@@ -13,13 +11,13 @@ const pageController = require('../controller/user/pageController');
 const couponController = require('../controller/user/couponController');
 const referralController = require('../controller/user/referralController');
 const passport = require('passport');
-const   router = express.Router();
+const router = express.Router();
 const checkBlocked = require('../middlewares/checkBlocked');
 const isAuth = require('../middlewares/userAuth');
 const productController = require('../controller/admin/productController');
 const invoice = require('../controller/user/invoiceController');
 
-router.get('/',checkBlocked, pageController.getLoadHomePage);
+router.get('/', checkBlocked, pageController.getLoadHomePage);
 router.get('/PageNotFound', pageController.PageNotFound);
 
 router.get('/login', authController.loginPage);
@@ -41,12 +39,19 @@ router.get('/verify-otp', authController.getVerifyOtp);
 router.post('/verify-otp', authController.verifyOtp);
 router.post('/resend-otp', authController.resendOtp);
 
-router.get('/user/google',passport.authenticate('google',{scope:['profile','email']}));
-router.get('/user/google/callback',passport.authenticate('google',{failureRedirect:'/login'}),(req,res)=>{
+router.get(
+  '/user/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+router.get(
+  '/user/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
     req.session.user = req.user;
     req.session.isAuth = true;
     res.redirect('/');
-});
+  }
+);
 
 router.get('/shop', isAuth, pageController.getShopPage);
 router.get('/productdetails/:id', isAuth, pageController.getProductDetails);
@@ -57,7 +62,11 @@ router.get('/userProfile', isAuth, profileController.getUserProfile);
 router.post('/userProfile', isAuth, profileController.updateProfile);
 router.post('/user-email-change', isAuth, profileController.changeEmail);
 router.get('/profile/otp-sent', isAuth, profileController.getChangeEmailOtp);
-router.post('/email-verify-otp', isAuth, profileController.verifyChangeEmailOtp);
+router.post(
+  '/email-verify-otp',
+  isAuth,
+  profileController.verifyChangeEmailOtp
+);
 router.post('/profile-change-pass', isAuth, profileController.changePassword);
 
 router.get('/address', isAuth, addressController.getAddress);
@@ -81,22 +90,30 @@ router.post('/cart/empty', isAuth, cartController.emptyCart);
 router.post('/validate-cart', isAuth, orderController.validateCartForCheckout);
 router.get('/check-out', isAuth, orderController.checkoutGetController);
 router.post('/check-out', isAuth, orderController.addNewAddress);
-router.delete('/delete-check-address/:id', isAuth, orderController.deleteCheckAddress);
+router.delete(
+  '/delete-check-address/:id',
+  isAuth,
+  orderController.deleteCheckAddress
+);
 
 router.post('/apply-coupon', isAuth, couponController.applyCoupon);
-router.delete('/remove-coupon',isAuth,couponController.removeCoupon);
+router.delete('/remove-coupon', isAuth, couponController.removeCoupon);
 
 router.get('/payment', isAuth, orderController.getPayment);
 router.post('/payment', isAuth, orderController.placeOrder);
-router.get('/retry-payment/:orderId',isAuth,orderController.getRetry);
+router.get('/retry-payment/:orderId', isAuth, orderController.getRetry);
 
 router.get('/order-success', isAuth, orderController.getOrderSuccess);
 router.get('/order-details/:orderId', isAuth, orderController.getOrderDetails);
 router.get('/my-orders', isAuth, orderController.getMyOrders);
 router.put('/cancel-order/:orderId', isAuth, orderController.cancelOrder);
-router.put('/cancel-order-item/:orderId/:itemId', isAuth, orderController.cancelOrderItem);
+router.put(
+  '/cancel-order-item/:orderId/:itemId',
+  isAuth,
+  orderController.cancelOrderItem
+);
 router.get('/debug-order-ids', isAuth, orderController.debugOrderIds);
-router.post('/create-order',isAuth, orderController.createRazorpayOrder);
+router.post('/create-order', isAuth, orderController.createRazorpayOrder);
 
 router.post('/request-return', isAuth, returnController.requestReturn);
 router.get('/my-returns', isAuth, returnController.getMyReturns);
@@ -104,10 +121,17 @@ router.get('/wallet', isAuth, walletController.getWallet);
 router.post('/wallet/add-amount', isAuth, walletController.addAmount);
 router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
 
-
 router.get('/referrals', isAuth, referralController.getReferralDashboard);
 router.get('/referrals/history', isAuth, referralController.getReferralHistory);
-router.get('/referrals/generate-link', isAuth, referralController.generateReferralLink);
-router.get('/referrals/earnings', isAuth, referralController.getReferralEarnings);
+router.get(
+  '/referrals/generate-link',
+  isAuth,
+  referralController.generateReferralLink
+);
+router.get(
+  '/referrals/earnings',
+  isAuth,
+  referralController.getReferralEarnings
+);
 
 module.exports = router;

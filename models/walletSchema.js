@@ -4,64 +4,73 @@ const transactionSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ['credit', 'debit'],
-    required: true
+    required: true,
   },
   amount: {
     type: Number,
     required: true,
-    min: 0
+    min: 0,
   },
-  description: { 
+  description: {
     type: String,
-    required: true
+    required: true,
   },
   orderId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Order'
+    ref: 'Order',
   },
   returnId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Return'
+    ref: 'Return',
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+  },
+});
+
+const walletSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true,
+    },
+    balance: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    transactions: [transactionSchema],
+  },
+  {
+    timestamps: true,
   }
-});
+);
 
-const walletSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    unique: true,
-    
-  },
-  balance: {
-    type: Number,
-    default: 0,
-    min: 0
-  },
-  transactions: [transactionSchema]
-}, {
-  timestamps: true
-});
-
-
-walletSchema.methods.addMoney = function (amount, description, orderId = null, returnId = null) {
+walletSchema.methods.addMoney = function (
+  amount,
+  description,
+  orderId = null,
+  returnId = null
+) {
   this.balance += amount;
   this.transactions.push({
     type: 'credit',
     amount,
     description,
     orderId,
-    returnId
+    returnId,
   });
-  return this.save(); 
+  return this.save();
 };
 
-
-walletSchema.methods.deductMoney = function (amount, description, orderId = null) {
+walletSchema.methods.deductMoney = function (
+  amount,
+  description,
+  orderId = null
+) {
   if (this.balance < amount) {
     throw new Error('Insufficient wallet balance');
   }
@@ -70,9 +79,9 @@ walletSchema.methods.deductMoney = function (amount, description, orderId = null
     type: 'debit',
     amount,
     description,
-    orderId
+    orderId,
   });
-  return this.save(); 
+  return this.save();
 };
 
 module.exports = mongoose.model('Wallet', walletSchema);

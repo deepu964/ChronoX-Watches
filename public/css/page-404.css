@@ -259,7 +259,7 @@ header {
   .feature-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .contact-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -270,16 +270,16 @@ header {
   .contact-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .newsletter-form {
     flex-direction: column;
   }
-  
+
   .newsletter-input {
     border-radius: 4px;
     margin-bottom: 10px;
   }
-  
+
   .newsletter-button {
     border-radius: 4px;
   }

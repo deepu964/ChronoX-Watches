@@ -118,8 +118,8 @@
                 document.getElementById('categoryNameError').textContent = 'Category name is required';
                 document.getElementById('categoryNameError').style.display = 'block';
                 isValid = false;
-            } else if (categoryName.length < 3 || categoryName.length > 50) {
-                document.getElementById('categoryNameError').textContent = 'Category name must be 3-50 characters';
+            } else if (categoryName.length < 3 || categoryName.length > 10) {
+                document.getElementById('categoryNameError').textContent = 'Category name must be 3-10 characters';
                 document.getElementById('categoryNameError').style.display = 'block';
                 isValid = false;
             } else if (!/^[a-zA-Z0-9\s-]+$/.test(categoryName)) {

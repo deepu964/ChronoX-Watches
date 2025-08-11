@@ -69,7 +69,7 @@
                                 <% } %>
                                 
                                 <button class="payment-btn" type="button" onclick="payNow('<%=addresses%>')" id="payNowBtn">Pay Now</button>
-                                
+                                <input type="hidden" id="cartCount" value="<%= cartItems.length %>">
                             </form>
                         </div> 
                         
@@ -242,10 +242,14 @@
 
 
 
- 
-        async function payNow(addressId) {
+ async function payNow(addressId) {
     const amount = document.getElementById('orderAmount').value;
 
+    const cartItemsCount = parseInt(document.getElementById('cartCount').value, 10);
+        if (cartItemsCount === 0) {
+            return showToast("Your cart is empty");
+        }
+    
     if (!amount || !addressId) {
         return showToast("Amount or address is missing");
     }
@@ -262,6 +266,7 @@
         if (!data.success) {
             return showToast(data.message || 'Failed to create Razorpay order');
         }
+
 
         // ✅ [Update #1] Store order ID to use in both success and fail cases
         const orderId = data.localOrderId; // ← must be sent from backend

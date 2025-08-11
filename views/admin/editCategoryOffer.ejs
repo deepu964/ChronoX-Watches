@@ -1260,7 +1260,7 @@
                         break;
 
                     case 'offerName':
-                        const nameRegex = /^[A-Za-z\s\-]{3,50}$/;
+                        const nameRegex = /^[A-Za-z\s\-]{3,10}$/;
                         const trimmedValue = field.value.trim();
                         
                         if (!trimmedValue) {
@@ -1268,7 +1268,7 @@
                             errorMessage = 'Offer name is required';
                         } else if (!nameRegex.test(trimmedValue)) {
                             isValid = false;
-                            errorMessage = 'Offer name must be 3-50 characters, letters, spaces and hyphens only';
+                            errorMessage = 'Offer name must be 3-10 characters, letters, spaces and hyphens only';
                         }
                         break;
 
