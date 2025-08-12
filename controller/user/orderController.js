@@ -992,7 +992,7 @@ const debugOrderIds = async (req, res, next) => {
 const createRazorpayOrder = async (req, res) => {
   try {
     const { amount, address, orderId } = req.body;
-
+    
     const selectedAddress = await addressSchema.findById(address);
     if (!selectedAddress) {
       return res.json({ success: false, message: 'Invalid Address' });
@@ -1023,18 +1023,20 @@ const createRazorpayOrder = async (req, res) => {
       cartItems = localOrder.items;
     } else {
       const cart = await cartSchema
-        .find({ user: req.session.user })
+        .findOne({ user: req.session.user })
         .populate('items.product')
         .lean();
+        
       if (!cart || cart.length === 0) {
         return res.json({ success: false, message: 'No items in cart' });
       }
+      
+      cartItems = cart.items
+      await Cart.updateOne(
+        { user: req.session.user },
+        { $set: { items: [] } }
+      );
 
-      for (let item of cart) {
-        for (let it of item.items) {
-          cartItems.push(it);
-        }
-      }
     }
 
     const options = {
@@ -1088,6 +1090,7 @@ const createRazorpayOrder = async (req, res) => {
       localOrder.razorpayOrderId = razorpayOrder.id;
       await localOrder.save();
     }
+
 
     return res.status(200).json({
       success: true,

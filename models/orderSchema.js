@@ -74,4 +74,14 @@ const orderSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+
+
+orderSchema.index(
+  { user: 1, status: 1, isPaid: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { status: 'Pending', isPaid: false }
+  }
+);
+
 module.exports = mongoose.model('Order', orderSchema);
