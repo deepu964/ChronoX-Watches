@@ -790,6 +790,8 @@ const cancelOrder = async (req, res, next) => {
       ]
     );
 
+    console.log(order,'is oreder');
+
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (order.status !== 'Placed')
       return res.status(400).json({ message: 'Order cannot be cancelled' });
@@ -811,20 +813,25 @@ const cancelOrder = async (req, res, next) => {
 
         const itemTotal = item.price * item.quantity;
         let itemRefund = itemTotal;
+        console.log(itemRefund,'is refund')
 
         if (order.coupon) {
           const totalOrderValue = order.items.reduce(
             (sum, i) => sum + i.price * i.quantity,
             0
           );
+          console.log(totalOrderValue,'iskkkkk')
           const itemShare = itemTotal / totalOrderValue;
           const couponShare = itemShare * order.coupon.discountAmount;
           itemRefund -= couponShare;
+          console.log(itemShare,'is share');
+          console.log(couponShare,'is coupon');
         }
-        refundAmount += itemRefund;
       }
     }
+     refundAmount += order.totalAmount ;
 
+  
     if (
       (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&
       order.isPaid &&
@@ -838,10 +845,7 @@ const cancelOrder = async (req, res, next) => {
         order.user.wallet = wallet;
       }
 
-      if (!order.cancelledRefundTotal) {
-        order.cancelledRefundTotal = 0;
-      }
-      order.cancelledRefundTotal += refundAmount;
+      console.log(refundAmount,'is refund')
 
       await wallet.addMoney(
         refundAmount,
@@ -856,7 +860,7 @@ const cancelOrder = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: 'Order cancelled and refund issued to wallet' });
+      .json({ message: 'Order cancelled and refund issued to wallet ' });
   } catch (error) {
     logger.error('Cancel order error:', error);
     next(error);
@@ -1026,7 +1030,7 @@ const createRazorpayOrder = async (req, res) => {
         .findOne({ user: req.session.user })
         .populate('items.product')
         .lean();
-        
+
       if (!cart || cart.length === 0) {
         return res.json({ success: false, message: 'No items in cart' });
       }
