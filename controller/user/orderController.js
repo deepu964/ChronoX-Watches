@@ -790,7 +790,7 @@ const cancelOrder = async (req, res, next) => {
       ]
     );
 
-    console.log(order,'is oreder');
+    
 
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (order.status !== 'Placed')
@@ -813,7 +813,7 @@ const cancelOrder = async (req, res, next) => {
 
         const itemTotal = item.price * item.quantity;
         let itemRefund = itemTotal;
-        console.log(itemRefund,'is refund')
+       
 
         if (order.coupon) {
           const totalOrderValue = order.items.reduce(
@@ -824,8 +824,7 @@ const cancelOrder = async (req, res, next) => {
           const itemShare = itemTotal / totalOrderValue;
           const couponShare = itemShare * order.coupon.discountAmount;
           itemRefund -= couponShare;
-          console.log(itemShare,'is share');
-          console.log(couponShare,'is coupon');
+    
         }
       }
     }
