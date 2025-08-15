@@ -831,7 +831,6 @@ const cancelOrder = async (req, res, next) => {
     }
      refundAmount += order.totalAmount ;
 
-  
     if (
       (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&
       order.isPaid &&
