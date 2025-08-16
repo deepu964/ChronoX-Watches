@@ -189,9 +189,13 @@ const getProductDetails = async (req, res, next) => {
       })
       .populate('category');
 
-    let catOffer = categoryOff.find(
-      (cat) => cat.category._id.toString() === product.categoryId._id.toString()
-    );
+      let catOffer ;
+      if(catOffer){
+       catOffer = categoryOff.find(
+          (cat) => cat.category._id.toString() === product.categoryId._id.toString()
+        );
+      }
+      
     const discount = catOffer?.discount;
     let discountPer = 0;
     let diff = 0;
