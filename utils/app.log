@@ -1,0 +1,896 @@
+[2025-08-07T14:23:35.463Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:25:03.479Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:25:06.086Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:27:47.136Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:28:15.878Z] WARN: 4648
+[2025-08-07T14:28:51.502Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:29:18.874Z] INFO: 1082
+[2025-08-07T14:30:14.567Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:30:27.594Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:30:38.943Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:30:47.073Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:30:52.117Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:31:07.642Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:31:14.782Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:31:25.242Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:31:30.918Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:31:50.859Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:32:09.332Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:32:18.722Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:32:23.309Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:32:27.623Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:32:34.289Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:32:39.455Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:32:47.611Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:33:02.262Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:33:09.408Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:33:19.902Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:33:22.019Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:33:25.394Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:33:31.353Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:33:59.057Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:34:05.715Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:34:15.563Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:34:41.423Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:34:50.488Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:34:55.811Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:35:00.987Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:35:05.940Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:35:14.575Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T14:36:04.481Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T16:20:41.316Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T16:22:34.696Z] INFO: 2443
+[2025-08-07T18:45:22.064Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T19:26:30.853Z] INFO: Server is running at http://localhost:3001
+[2025-08-07T19:30:50.729Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:06:53.658Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:16:58.700Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:19:37.502Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:21:04.161Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:21:35.119Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:21:41.320Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:24:40.545Z] ERROR: delete product error
+[2025-08-08T11:24:41.582Z] ERROR: delete product error
+[2025-08-08T11:24:42.700Z] ERROR: delete product error
+[2025-08-08T11:24:48.179Z] ERROR: delete product error
+[2025-08-08T11:24:51.728Z] ERROR: delete product error
+[2025-08-08T11:24:51.735Z] ERROR: delete product error
+[2025-08-08T11:24:55.671Z] ERROR: product list page error
+[2025-08-08T11:25:05.648Z] ERROR: delete product error
+[2025-08-08T11:25:36.451Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:30:05.753Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:34:35.235Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:34:46.296Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:34:51.047Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:34:55.690Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:35:00.206Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:35:51.607Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:36:11.009Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:36:14.311Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:36:17.752Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:36:28.054Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T11:36:34.050Z] INFO: Server is running at http://localhost:3001
+[2025-08-08T12:05:20.303Z] ERROR:  cart updated error
+[2025-08-08T12:30:41.109Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-09T04:56:36.547Z] INFO: 8470
+[2025-08-09T04:57:01.899Z] INFO: Session OTP:
+[2025-08-09T04:57:01.901Z] INFO: Submitted OTP:
+[2025-08-09T05:00:47.434Z] INFO: 8849
+[2025-08-09T05:01:00.117Z] INFO: Session OTP:
+[2025-08-09T05:01:00.119Z] INFO: Submitted OTP:
+[2025-08-09T05:28:32.602Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:28:37.276Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:28:41.459Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:28:48.422Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:28:56.168Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:29:45.785Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:29:47.945Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T05:41:31.341Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T06:47:44.805Z] ERROR: editCoupon error:
+[2025-08-09T06:47:50.664Z] ERROR: editCoupon error:
+[2025-08-09T06:48:47.100Z] ERROR: editCoupon error:
+[2025-08-09T06:51:25.463Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T06:51:54.204Z] ERROR: editCoupon error:
+[2025-08-09T11:24:25.684Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:28.946Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:30.638Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:35.344Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:39.032Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:56.701Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:24:59.384Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:01.397Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:05.702Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:11.358Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:25:59.562Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:03.272Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:05.277Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:09.344Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:13.069Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:26:26.731Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:27:02.121Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:27:37.123Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:28:16.712Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:33.352Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:36.837Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:50.688Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:33:56.088Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:34:40.139Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:36:52.311Z] ERROR: [object Object]
+[2025-08-09T11:36:53.358Z] ERROR: [object Object]
+[2025-08-09T11:36:54.262Z] ERROR: [object Object]
+[2025-08-09T11:40:11.195Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:35.532Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:41.382Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:55.378Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:40:59.065Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:41:00.980Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:42:24.114Z] ERROR: Error adding product:
+[2025-08-09T11:43:04.540Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:10.140Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:13.764Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:15.747Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:18.344Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:21.930Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:24.491Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:43:33.049Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T11:45:05.938Z] ERROR: products/1754739903602_main-2abe3d44-d650-48b6-bc2e-322085570dc5
+[2025-08-09T11:59:09.774Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:00:42.047Z] ERROR: products/1754740837110_main-4827ceed-da89-487f-929c-c05ee34565b5
+[2025-08-09T12:01:55.748Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:05:18.864Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:13:40.645Z] ERROR: cart get error:
+[2025-08-09T12:13:52.121Z] ERROR: cart get error:
+[2025-08-09T12:14:45.411Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:14:58.274Z] ERROR: cart get error:
+[2025-08-09T12:15:00.572Z] ERROR: cart get error:
+[2025-08-09T12:15:06.612Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:15:12.489Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:15:41.719Z] ERROR: cart get error:
+[2025-08-09T12:15:43.837Z] ERROR: cart get error:
+[2025-08-09T12:16:09.623Z] ERROR: cart get error:
+[2025-08-09T12:17:11.055Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:17:18.543Z] ERROR: cart get error:
+[2025-08-09T12:17:59.790Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:18:06.596Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:18:22.151Z] ERROR: cart get error:
+[2025-08-09T12:19:03.723Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:19:15.146Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:19:23.786Z] ERROR: cart get error:
+[2025-08-09T12:19:45.405Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:19:48.996Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:19:55.882Z] ERROR: cart get error:
+[2025-08-09T12:20:06.435Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:20:26.218Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:20:38.108Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:20:40.169Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:20:57.893Z] ERROR: cart get error:
+[2025-08-09T12:21:14.625Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T12:21:30.536Z] ERROR: cart get error:
+[2025-08-09T19:40:06.241Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T19:40:32.034Z] INFO: Server is running at http://localhost:3001
+[2025-08-09T19:41:00.904Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:09:08.816Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:09:25.218Z] ERROR: cart get error:
+[2025-08-10T09:09:34.260Z] ERROR: cart get error:
+[2025-08-10T09:13:25.892Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:13:33.207Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:13:42.768Z] ERROR: cart get error:
+[2025-08-10T09:14:11.216Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:14:15.311Z] ERROR: cart get error:
+[2025-08-10T09:14:23.619Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:14:36.512Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:14:54.618Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:15:02.022Z] ERROR: cart get error:
+[2025-08-10T09:15:16.263Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:15:24.175Z] ERROR: cart get error:
+[2025-08-10T09:15:33.719Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:17:11.260Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:17:16.672Z] ERROR: cart get error:
+[2025-08-10T09:18:19.499Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:18:23.037Z] ERROR: cart get error:
+[2025-08-10T09:18:47.615Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:19:00.699Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:19:05.686Z] ERROR: cart get error:
+[2025-08-10T09:19:34.919Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:20:04.008Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:20:26.032Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:20:32.528Z] ERROR: cart get error:
+[2025-08-10T09:20:46.941Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:20:57.417Z] ERROR: cart get error:
+[2025-08-10T09:21:19.118Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:21:31.006Z] ERROR: cart get error:
+[2025-08-10T09:21:47.548Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:21:54.179Z] ERROR: cart get error:
+[2025-08-10T09:22:26.541Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:23:26.762Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T09:24:47.216Z] ERROR: cart get error:
+[2025-08-10T09:26:36.554Z] INFO: Server is running at http://localhost:3001
+[2025-08-10T18:22:27.106Z] ERROR: Login error:
+[2025-08-10T18:30:08.677Z] ERROR: Login error:
+[2025-08-11T03:35:22.270Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:35:36.629Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:35:40.799Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:35:55.049Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:36:00.611Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:36:08.858Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:36:27.761Z] ERROR:  cart updated error
+[2025-08-11T03:36:33.603Z] ERROR:  cart updated error
+[2025-08-11T03:38:09.834Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:38:13.972Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:39:41.624Z] ERROR:  cart updated error
+[2025-08-11T03:39:45.601Z] ERROR:  cart updated error
+[2025-08-11T03:39:46.360Z] ERROR:  cart updated error
+[2025-08-11T03:39:46.800Z] ERROR:  cart updated error
+[2025-08-11T03:40:00.424Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:40:21.361Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:40:34.160Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:40:36.869Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:41:25.596Z] ERROR:  cart updated error
+[2025-08-11T03:41:29.507Z] ERROR:  cart updated error
+[2025-08-11T03:42:42.157Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:42:48.114Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:42:50.590Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:43:09.165Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:43:16.415Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:43:21.707Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:43:55.853Z] ERROR:  cart updated error
+[2025-08-11T03:43:56.914Z] ERROR:  cart updated error
+[2025-08-11T03:44:26.524Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:44:36.152Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:44:43.230Z] ERROR:  cart updated error
+[2025-08-11T03:45:16.197Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:45:20.229Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:45:35.337Z] ERROR:  cart updated error
+[2025-08-11T03:51:58.576Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:52:00.516Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:55:27.229Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:56:27.239Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:56:55.198Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:57:04.047Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:57:11.011Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:57:25.701Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:57:33.871Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:57:36.648Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:57:41.314Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:57:44.090Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:59:06.028Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:59:22.261Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:59:25.090Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:59:26.776Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T03:59:45.829Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:07:05.009Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:07:07.191Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:07:08.802Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:07:16.928Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:07:44.454Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:08:07.189Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:08:08.441Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:08:40.890Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:09:12.542Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:09:17.716Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:09:20.219Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:09:58.374Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:10:01.287Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:10:07.776Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:11:02.150Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:11:13.564Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:11:47.675Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:19:52.557Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:19:56.463Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:19:59.394Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:20:30.209Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:26:46.050Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:26:48.345Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:26:50.825Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:27:11.033Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:27:13.302Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:27:14.979Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:27:18.350Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:27:23.057Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:28:32.579Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:29:17.736Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:29:23.209Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:29:31.248Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:29:36.900Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:29:48.913Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:29:50.426Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:30:00.956Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:31:39.142Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:31:42.728Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:31:46.545Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:31:59.532Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:03.666Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:05.396Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:19.734Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:22.385Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:24.711Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:28.381Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:34.784Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:41.164Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:32:54.607Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:33:00.937Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:33:02.365Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:33:34.843Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:33:56.482Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:34:02.504Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:34:08.811Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:34:12.788Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:34:15.983Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:34:19.933Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:34:22.592Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:35:30.492Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:35:36.746Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:36:26.192Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:39:13.406Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:39:16.760Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:39:28.860Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:40:39.030Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:41:18.936Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:41:23.737Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:43:06.084Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:43:13.891Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:43:21.785Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:43:25.800Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:43:27.274Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:44:28.369Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:45:04.190Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:46:03.140Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:46:26.800Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:46:32.630Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:46:34.982Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:47:05.240Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:50:55.234Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:54:04.870Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:54:10.482Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:54:41.735Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:54:54.474Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:55:16.607Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:55:19.007Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:55:24.670Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:55:49.997Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:56:07.104Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:56:11.291Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:56:16.972Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:56:25.159Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:56:34.049Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:56:44.676Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T04:56:47.933Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:00:18.587Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:00:35.702Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:00:42.985Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:01:13.497Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:08:24.128Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:08:26.735Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:08:28.514Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:08:33.179Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:08:54.056Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:09:00.375Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:09:05.411Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:09:24.814Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:09:37.159Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:10:10.860Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:10:12.240Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:10:15.047Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:10:20.813Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:18:47.791Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:18:51.917Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T05:18:54.062Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:19:39.388Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:19:53.558Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:19:58.740Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:09.079Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:13.514Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:16.712Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:23.271Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:27.340Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:32.599Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:41.378Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:48.276Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:53.142Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:20:55.727Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:21:05.056Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:02.486Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:05.641Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:10.478Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:29.121Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:30.645Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:33.320Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:43.828Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:48.814Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:22:54.586Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:23:18.897Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:23:23.609Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:23:27.136Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:23:30.368Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:23:59.580Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:24:03.638Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:24:13.096Z] ERROR:  cart updated error
+[2025-08-11T06:24:17.180Z] ERROR:  cart updated error
+[2025-08-11T06:25:12.648Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:25:15.116Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:26:10.627Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:26:13.364Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:26:43.062Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:26:45.300Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:26:53.030Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:26:55.776Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:27:02.363Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:27:54.320Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:27:56.897Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:28:05.617Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:28:08.784Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:28:21.122Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:28:25.310Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:28:31.527Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:28:39.327Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:28:46.833Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:32:02.611Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:32:10.050Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:32:11.391Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:32:20.780Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:32:23.569Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:35:15.647Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:35:22.387Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:35:29.221Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:35:32.837Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:35:36.156Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:41:37.541Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:41:40.280Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:41:58.544Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:42:07.416Z] ERROR:  cart updated error
+[2025-08-11T06:42:28.114Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:46:47.841Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:46:57.991Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:47:01.344Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:47:21.573Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:47:25.300Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:47:28.457Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:48:22.765Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:48:30.649Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:48:43.070Z] ERROR:  cart updated error
+[2025-08-11T06:49:05.409Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:49:09.264Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:49:39.729Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:50:03.179Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:50:59.559Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:51:10.574Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:51:12.871Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:51:40.090Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:51:54.699Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:52:23.137Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:52:30.383Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:52:33.161Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T06:52:38.419Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T07:58:16.457Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T07:58:27.934Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T07:58:31.360Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T07:58:48.348Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T07:58:49.988Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:00:36.519Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:01:10.907Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:01:20.846Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:03:30.979Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:03:36.605Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:03:39.028Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:03:43.613Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:03:50.434Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:03:58.843Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:04:03.835Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:04:07.700Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:04:16.119Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:04:18.881Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:04:38.137Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:04:54.252Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:05:00.696Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:05:02.277Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:05:13.507Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:06:04.485Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:06:10.395Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:06:44.717Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:07:25.660Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:07:27.736Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:07:33.842Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:07:37.978Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:07:43.544Z] ERROR:  cart updated error
+[2025-08-11T08:07:54.770Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:09:00.431Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:09:15.178Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:09:18.654Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:10:17.208Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:10:20.093Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:10:25.432Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:12:03.274Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:12:16.752Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:13:16.727Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:13:36.441Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:13:47.425Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:13:51.315Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:14:00.847Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:14:14.135Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:14:16.663Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:14:20.143Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:16:34.719Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:17:03.523Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:17:12.717Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:17:25.021Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:17:29.909Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:17:33.865Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:17:38.424Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:18:39.908Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:18:51.792Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:19:07.400Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:19:11.550Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:19:16.234Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:19:24.947Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:19:27.921Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:19:40.842Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:19:43.357Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:20:28.933Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:20:31.631Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:20:36.317Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:21:55.388Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:22:01.066Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T08:22:29.743Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:29:47.073Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:29:56.699Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:30:30.811Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:30:39.582Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:31:40.328Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:32:18.174Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:32:26.141Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:32:57.802Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:33:02.620Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:33:07.910Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:33:10.854Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:39:26.865Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T10:40:34.547Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:49:50.105Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:49:53.342Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:49:56.993Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:50:04.319Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:53:05.056Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:53:07.981Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:53:13.463Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:54:13.073Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:54:19.179Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:54:25.599Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T11:58:05.140Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T12:08:38.856Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T13:24:31.399Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:24:35.979Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:24:36.828Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:24:41.687Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-11T13:28:57.629Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T14:00:27.338Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T14:00:41.547Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T14:36:17.787Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T14:57:34.392Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T15:01:12.336Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T15:01:14.553Z] ERROR: Home page error:
+[2025-08-11T15:01:29.200Z] ERROR: Home page error:
+[2025-08-11T15:01:31.692Z] ERROR: Home page error:
+[2025-08-11T15:01:42.150Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T15:04:26.399Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T15:06:59.570Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T15:08:01.232Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T15:09:04.630Z] INFO: Server is running at http://localhost:3001
+[2025-08-11T16:01:01.645Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:11:21.972Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:11:30.331Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:12:19.152Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:12:21.326Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:13:28.147Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:13:35.572Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:13:48.699Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:18:41.648Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:19:08.329Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:19:11.131Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:19:14.570Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:20:50.278Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:21:41.317Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:23:17.260Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:23:48.762Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:23:56.182Z] ERROR: Razorpay Order Creation Failed:
+[2025-08-12T06:24:57.059Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:25:04.075Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:25:07.113Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:25:09.362Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:26:05.434Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:26:07.668Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T06:26:09.963Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T07:06:30.339Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T07:06:45.447Z] INFO: Server is running at http://localhost:3001
+[2025-08-12T07:26:25.874Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:41:43.802Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:43:47.421Z] INFO: 7894
+[2025-08-13T09:44:08.901Z] INFO: Session OTP:
+[2025-08-13T09:44:08.903Z] INFO: Submitted OTP:
+[2025-08-13T09:50:16.053Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:50:34.811Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:50:38.153Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:50:43.875Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:51:19.422Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:51:29.348Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:51:35.059Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:51:43.011Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:51:45.218Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:51:52.303Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T09:51:54.434Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:03:05.684Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:03:13.758Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:03:22.088Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:04:21.219Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:08:33.443Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:08:36.494Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:08:52.534Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T10:08:54.567Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:40:30.101Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:40:39.049Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:40:47.768Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:40:54.309Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:40:57.034Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:44:36.214Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:44:39.936Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:51:27.070Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:51:40.939Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:52:05.669Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:52:17.968Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:56:25.376Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T11:56:52.419Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:08:15.116Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:08:23.882Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:08:43.154Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:08:46.014Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:09:07.613Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:10:12.319Z] ERROR: Cancel order error:
+[2025-08-13T12:10:33.368Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:10:40.028Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:12:28.564Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:12:40.230Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:12:43.985Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:12:56.200Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:13:00.169Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:13:06.859Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:13:59.658Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:14:04.203Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:14:41.636Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:14:49.143Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:14:57.513Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:16:34.707Z] ERROR: Cancel order error:
+[2025-08-13T12:17:08.970Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:17:32.682Z] ERROR: Cancel order error:
+[2025-08-13T12:18:10.435Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:18:38.219Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:25:15.134Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:25:23.469Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:25:31.595Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:25:41.660Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:25:45.271Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:25:49.017Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:26:07.376Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:26:10.630Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:26:13.447Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:28:59.379Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:29:02.352Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:29:35.758Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:30:05.721Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:30:11.540Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:30:14.208Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:30:45.776Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:30:52.702Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:31:07.258Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:31:20.320Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:31:31.607Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:31:50.870Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:33:00.352Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:35:14.185Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:35:23.295Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:35:30.382Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:42:18.974Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:49:28.884Z] INFO: Server is running at http://localhost:3001
+[2025-08-13T12:49:42.112Z] INFO: Server is running at http://localhost:3001
+[2025-08-14T12:00:39.320Z] INFO: Server is running at http://localhost:3001
+<<<<<<< HEAD
+[2025-08-14T14:55:55.790Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:20:28.444Z] ERROR: Login error:
+[2025-08-15T06:21:43.570Z] ERROR: Product details error:
+[2025-08-15T06:22:02.871Z] ERROR: Product details error:
+[2025-08-16T03:41:24.200Z] INFO: Server is running at http://localhost:3001
+[2025-08-16T03:42:25.523Z] ERROR: Product details error:
+[2025-08-16T03:56:55.373Z] INFO: Server is running at http://localhost:3001
+[2025-08-16T03:57:20.318Z] ERROR: Product details error:
+=======
+[2025-08-15T06:23:32.197Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:23:56.046Z] ERROR: Product details error:
+[2025-08-15T06:26:54.033Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:27:05.005Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:27:28.940Z] ERROR: Product details error:
+[2025-08-15T06:28:10.302Z] ERROR: Product details error:
+[2025-08-15T06:29:19.836Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:29:24.921Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:29:33.437Z] ERROR: Product details error:
+[2025-08-15T06:30:23.933Z] ERROR: Product details error:
+[2025-08-15T06:30:32.204Z] ERROR: Product details error:
+[2025-08-15T06:31:43.668Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:31:50.348Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:31:55.297Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:32:30.060Z] ERROR: Product details error:
+[2025-08-15T06:48:43.457Z] ERROR: Product details error:
+[2025-08-15T06:50:10.156Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:54:09.847Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:54:15.581Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:54:29.365Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:54:54.773Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:54:57.986Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:55:13.488Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:55:27.261Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:56:01.796Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:56:25.759Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:56:48.131Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:56:58.171Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:57:04.607Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:57:14.431Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:57:27.952Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:57:37.116Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:57:40.725Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:57:54.502Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:57:59.143Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:58:20.245Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:58:30.120Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:58:34.946Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:58:39.428Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:59:13.328Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:59:20.073Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:59:26.188Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T06:59:31.857Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:29:44.524Z] ERROR: Product details error:
+[2025-08-15T07:30:08.319Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:30:15.523Z] ERROR: Product details error:
+[2025-08-15T07:30:25.917Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:30:28.397Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:30:40.137Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:30:54.574Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:31:01.507Z] ERROR: Product details error:
+[2025-08-15T07:32:01.747Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:32:06.254Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:32:18.722Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:32:25.151Z] ERROR: Product details error:
+[2025-08-15T07:32:27.633Z] ERROR: Product details error:
+[2025-08-15T07:33:35.745Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:33:40.231Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:33:59.103Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:34:03.912Z] ERROR: Product details error:
+[2025-08-15T07:34:58.421Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:36:16.959Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:37:24.539Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:37:41.642Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:37:57.568Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:38:01.147Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:38:18.890Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:39:39.037Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:39:42.717Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:39:58.085Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:40:35.869Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:40:39.991Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:40:41.943Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:40:43.938Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:40:48.724Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:40:51.080Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:40:56.347Z] ERROR: Product details error:
+[2025-08-15T07:41:19.676Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:41:30.768Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:41:36.088Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:42:02.951Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:42:08.053Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:42:11.708Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:42:15.614Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:42:29.703Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:43:59.404Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:44:03.043Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:44:28.447Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:44:41.063Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:44:50.610Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:44:57.589Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:45:51.152Z] INFO: Server is running at http://localhost:3001
+[2025-08-15T07:45:53.878Z] INFO: Server is running at http://localhost:3001
+[2025-08-16T03:42:51.794Z] INFO: Server is running at http://localhost:3001
+[2025-08-16T03:51:19.386Z] INFO: Server is running at http://localhost:3001
+[2025-08-16T03:54:00.795Z] INFO: Server is running at http://localhost:3001
+[2025-08-16T03:55:04.174Z] INFO: Server is running at http://localhost:3001
+[2025-08-16T05:11:53.168Z] INFO: Server is running at http://localhost:3001
+<<<<<<< HEAD
+[2025-08-18T20:20:40.831Z] INFO: Server is running at http://localhost:3001
+[2025-08-18T20:44:11.729Z] INFO: Server is running at http://localhost:3001
+[2025-08-18T20:46:17.063Z] INFO: Server is running at http://localhost:3001
+[2025-08-18T20:46:35.107Z] INFO: Server is running at http://localhost:3001
+[2025-08-18T20:49:19.941Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:00:45.482Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:06:34.563Z] ERROR: editCoupon error:
+[2025-08-19T08:06:54.806Z] ERROR: editCoupon error:
+[2025-08-19T08:07:08.374Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:07:28.563Z] ERROR: editCoupon error:
+[2025-08-19T08:11:46.826Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:11:51.542Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:11:58.394Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:12:23.897Z] ERROR: editCoupon error:
+[2025-08-19T08:13:00.376Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:13:08.455Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:13:13.445Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:13:38.588Z] ERROR: editCoupon error:
+[2025-08-19T08:14:02.168Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:14:42.463Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:15:30.973Z] ERROR: editCoupon error:
+[2025-08-19T08:15:50.814Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:15:55.057Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:16:15.433Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:16:17.777Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:16:45.145Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:17:00.305Z] ERROR: editCoupon error:
+[2025-08-19T08:20:26.307Z] ERROR: editCoupon error:
+[2025-08-19T08:21:44.012Z] ERROR: editCoupon error:
+[2025-08-19T08:22:37.194Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:23:11.113Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:23:34.306Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T08:23:52.714Z] ERROR: editCoupon error:
+[2025-08-19T09:05:12.401Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:05:36.780Z] ERROR: editCoupon error:
+[2025-08-19T09:06:11.987Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:06:36.650Z] ERROR: editCoupon error:
+[2025-08-19T09:09:40.744Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:10:04.517Z] ERROR: editCoupon error:
+[2025-08-19T09:11:56.369Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:21:05.647Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:21:07.979Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:22:53.073Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:22:59.000Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:23:03.660Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:25:47.424Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:25:52.642Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:25:54.058Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:25:57.351Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:26:07.298Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:26:13.201Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:26:17.465Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:26:42.529Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:26:47.305Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:27:03.549Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:27:07.974Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:27:19.514Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:27:22.214Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:27:24.581Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:27:41.828Z] ERROR: get edit category offer error
+[2025-08-19T09:27:52.397Z] ERROR: get edit category offer error
+[2025-08-19T09:27:56.364Z] ERROR: get edit category offer error
+[2025-08-19T09:28:10.418Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:28:12.294Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:28:14.276Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:28:17.383Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:28:23.905Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:28:33.375Z] ERROR: get edit category offer error
+[2025-08-19T09:28:42.771Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:30:11.121Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:31:13.276Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:31:22.816Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:31:25.594Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:31:44.730Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:32:09.869Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:32:24.975Z] ERROR: get edit category offer error
+[2025-08-19T09:33:53.355Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:33:58.121Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:34:08.550Z] ERROR: get edit category offer error
+[2025-08-19T09:35:03.897Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:35:21.978Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:35:32.336Z] ERROR: get edit category offer error
+[2025-08-19T09:38:09.848Z] ERROR: get edit category offer error
+[2025-08-19T09:38:12.708Z] ERROR: get edit category offer error
+[2025-08-19T09:38:23.331Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:38:36.436Z] ERROR: get edit category offer error
+[2025-08-19T09:39:41.342Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:39:50.493Z] ERROR: get edit category offer error
+[2025-08-19T09:40:21.118Z] ERROR: get edit category offer error
+[2025-08-19T09:40:27.523Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:40:38.218Z] ERROR: get edit category offer error
+[2025-08-19T09:41:28.043Z] ERROR: get edit category offer error
+[2025-08-19T09:41:41.335Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:45:26.909Z] INFO: Server is running at http://localhost:3001
+[2025-08-19T09:45:31.594Z] INFO: Server is running at http://localhost:3001[2025-08-19T09:58:07.767Z] INFO: Server is running at http://localhost:3001
