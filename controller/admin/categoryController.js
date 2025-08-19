@@ -328,6 +328,7 @@ const getEditCategoryOffer = async (req, res, next) => {
     }
 
     const offer = await categoryOfferSchema.findById(id).populate('category');
+    console.log(offer,'is offer')
     const categories = await categorySchema
       .find({ isListed: true, isDeleted: false })
       .sort({ name: 1 });
@@ -399,6 +400,7 @@ const editCategoryOffer = async (req, res, next) => {
     next(error);
   }
 };
+
 
 module.exports = {
   listCategories,
