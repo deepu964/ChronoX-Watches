@@ -24,12 +24,8 @@ router.get('/', adminController.getAdminLogin);
 router.post('/login', adminController.adminLogin);
 router.get('/logout', adminController.logout);
 
-router.get(
-  '/dashboard',
-  preventBackHistory,
-  authMiddleware,
-  adminController.getDashBoard
-);
+router.get('/dashboard',preventBackHistory,authMiddleware,adminController.getDashBoard);
+
 router.get(
   '/dashboard/chart-data',
   authMiddleware,
