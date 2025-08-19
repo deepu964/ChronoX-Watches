@@ -401,6 +401,7 @@ const editCategoryOffer = async (req, res, next) => {
   }
 };
 
+
 module.exports = {
   listCategories,
   addCategory,
