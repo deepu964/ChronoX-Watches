@@ -830,10 +830,7 @@ const cancelOrder = async (req, res, next) => {
     }
      refundAmount += order.totalAmount ;
     if (
-      (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&
-      order.isPaid &&
-      refundAmount > 0
-    ) {
+      (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&order.isPaid &&refundAmount > 0) {
       let wallet = order.user.wallet;
 
       if (!wallet) {
@@ -1085,6 +1082,7 @@ const createRazorpayOrder = async (req, res) => {
 
       for (let Items of cartItems) {
         variant.quantity -= Items.quantity;
+        
       }
       await prod.save();
     } else {

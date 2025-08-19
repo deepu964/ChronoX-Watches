@@ -831,7 +831,7 @@
                         </div>
                         <div class="card-content">
                             <form id="couponForm" novalidate>
-                                <input type="hidden" id="couponId" value="sample-coupon-id">
+                                <input type="hidden" id="couponId" value="<%= coupon._id %>">
                                 
                                 <div class="form-group">
                                     <label class="form-label" for="couponName">
@@ -1064,6 +1064,7 @@ form.addEventListener('submit', async (e) => {
   submitBtn.textContent = 'Updating...';
 
   try {
+    console.log('herer1')
     const res = await fetch(`/admin/coupon/edit/${document.getElementById('couponId').value}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1074,8 +1075,9 @@ form.addEventListener('submit', async (e) => {
         minPurchase: parseFloat(minPurchaseInput.value)
       })
     });
-
+    console.log('herer')
     const data = await res.json();
+    console.log(data,'is data')
     if (data.success) {
       showToast(data.message || 'Coupon updated!');
       setTimeout(() => window.location.href = '/admin/coupon', 1500);

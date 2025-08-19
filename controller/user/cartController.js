@@ -144,11 +144,13 @@ const addToCart = async (req, res, next) => {
       if (newQuantity > maxQuantityAllowed) {
         const availableToAdd = maxQuantityAllowed - existingItem.quantity;
         if (availableToAdd <= 0) {
+          
           return res.status(400).json({
             success: false,
             message: `Maximum ${maxQuantityAllowed} items allowed per product. You already have ${existingItem.quantity} in cart.`,
           });
         } else {
+          
           return res.status(400).json({
             success: false,
             message: `Cannot add ${requestedQty} more. You can only add ${availableToAdd} more items (Maximum ${maxQuantityAllowed} per product).`,

@@ -87,6 +87,7 @@ const getEditCoupon = async (req, res, next) => {
         .status(404)
         .render('admin/404', { message: 'Coupon not found' });
     }
+    
     res.render('admin/editCoupon', { coupon });
   } catch (error) {
     logger.error('get edit coupon error', error);
@@ -98,6 +99,7 @@ const editCoupon = async (req, res, next) => {
   try {
     let { name, discount, expiryDate, minPurchase } = req.body;
     const couponId = req.params.id;
+    console.log(couponId,'is id')
 
     const coupon = await couponSchema.findById(couponId);
     if (!coupon) {
@@ -105,7 +107,7 @@ const editCoupon = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: 'Coupon not found' });
     }
-
+console.log(coupon,'is coup')
     name = name.trim();
 
     if (!/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/.test(name)) {
@@ -165,6 +167,15 @@ const editCoupon = async (req, res, next) => {
         minPurchase,
       },
     });
+    console.log(await couponSchema.findByIdAndUpdate(couponId, {
+      $set: {
+        name,
+        discount,
+        expiryDate: expiry,
+        minPurchase,
+      },
+    }))
+
 
     return res.json({ success: true, message: 'Coupon updated successfully' });
   } catch (error) {
