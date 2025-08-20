@@ -100,6 +100,14 @@ const updateOrderStatus = async (req, res, next) => {
       'Cancelled',
     ];
 
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+    console.log(order,'is order');
+
+
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -107,11 +115,18 @@ const updateOrderStatus = async (req, res, next) => {
       });
     }
 
-    const order = await Order.findByIdAndUpdate(
-      orderId,
-      { status },
-      { new: true }
-    );
+    //  let refund =0;
+    // for(let item of order.items){
+    //   if(item.quantity > 3 && item.status === "Cancelled"){
+          
+    //     let wallet = await Wallet.findOneAndUpdate({
+    //          refund = (item.price *30)/100
+    //     })
+    //   }
+    // }
+
+    
+
 
     if (!order) {
       return res.status(404).json({
