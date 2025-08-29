@@ -76,7 +76,7 @@ const getOrderDetails = async (req, res, next) => {
         .status(404)
         .render('admin/404', { message: 'Order not found' });
     }
-
+ console.log(order,'is order');
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
     res.render('admin/orderDetails', { order, cloudName, returnRequest });
@@ -105,7 +105,7 @@ const updateOrderStatus = async (req, res, next) => {
       { status },
       { new: true }
     );
-    console.log(order,'is order');
+    // console.log(order,'is order');
 
 
     if (!validStatuses.includes(status)) {

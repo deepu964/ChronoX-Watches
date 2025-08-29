@@ -1083,7 +1083,12 @@
                     </div>
                     <div>
                         <span class="status-badge status-<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
-                            <%= order.status %>
+                            <% if (returnRequest) { %>
+                                 <%=returnRequest.status  %>
+                                 <% } else { %>
+                                  <%=order.status  %>
+                            <% } %>
+                                 
                         </span>
                     </div>
                 </div>

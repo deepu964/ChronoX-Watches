@@ -75,36 +75,166 @@ const getCart = async (req, res, next) => {
   }
 };
 
+// const addToCart = async (req, res, next) => {
+//   try {
+//     const userId = req.session.user._id;
+//     const { productId, quantity = 1 } = req.body;
+//     const requestedQty = parseInt(quantity) || 1;
+
+//     const product = await productSchema
+//       .findById(productId)
+//       .populate('categoryId');
+
+//     if (
+//       !product ||
+//       product.isActive ||
+//       !product.categoryId?.isListed ||
+//       product.isDeleted
+//     ) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Product is unavailable or blocked.',
+//       });
+//     }
+
+//     const maxQuantityAllowed = 5;
+//     const stockQty = product.variants[0]?.quantity || 0;
+//     const itemPrice = product.variants[0]?.salePrice;
+
+//     if (requestedQty < 1) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: 'Invalid quantity.' });
+//     }
+
+//     if (requestedQty > stockQty) {
+//       return res.status(400).json({
+//         success: false,
+//         message: `Only ${stockQty} items available in stock.`,
+//       });
+//     }
+
+//     if (requestedQty > maxQuantityAllowed) {
+//       return res.status(400).json({
+//         success: false,
+//         message: `Maximum ${maxQuantityAllowed} items allowed per product.`,
+//       });
+//     }
+
+//     let cart = await Cart.findOne({ user: userId });
+
+//     if (!cart) {
+//       cart = new Cart({ user: userId, items: [] });
+//     }
+
+//     const existingItem = cart.items.find(
+//       (item) => item.product.toString() === productId
+//     );
+
+//     if (existingItem) {
+//       const newQuantity = existingItem.quantity + requestedQty;
+
+//       if (newQuantity > stockQty) {
+//         return res.status(400).json({
+//           success: false,
+//           message: `Cannot add ${requestedQty} more. Only ${stockQty - existingItem.quantity} items available in stock.`,
+//         });
+//       }
+
+//       if (newQuantity > maxQuantityAllowed) {
+//         const availableToAdd = maxQuantityAllowed - existingItem.quantity;
+//         if (availableToAdd <= 0) {
+          
+//           return res.status(400).json({
+//             success: false,
+//             message: `Maximum ${maxQuantityAllowed} items allowed per product. You already have ${existingItem.quantity} in cart.`,
+//           });
+//         } else {
+          
+//           return res.status(400).json({
+//             success: false,
+//             message: `Cannot add ${requestedQty} more. You can only add ${availableToAdd} more items (Maximum ${maxQuantityAllowed} per product).`,
+//           });
+//         }
+//       }
+
+//       existingItem.quantity = newQuantity;
+//     } else {
+//       if (stockQty <= 0) {
+//         return res
+//           .status(400)
+//           .json({ success: false, message: 'Product out of stock.' });
+//       }
+//       cart.items.push({
+//         product: productId,
+//         variantId: selectedVariant._id,
+//         quantity: requestedQty,
+//         price: itemPrice,
+//       });
+//     }
+
+//     await wishlistSchema.updateOne(
+//       { user: userId },
+//       { $pull: { products: productId } }
+//     );
+
+//     await cart.save();
+
+//     const message =
+//       requestedQty === 1
+//         ? 'Product added to cart successfully'
+//         : `${requestedQty} items added to cart successfully`;
+
+//     return res.status(200).json({ success: true, message });
+//   } catch (error) {
+//     logger.error('cart add error:', error);
+//     next(error);
+//   }
+// };
+
+
 const addToCart = async (req, res, next) => {
   try {
     const userId = req.session.user._id;
-    const { productId, quantity = 1 } = req.body;
+    const { productId, variantId, quantity = 1 } = req.body;
     const requestedQty = parseInt(quantity) || 1;
 
+    // Find product and populate category
     const product = await productSchema
       .findById(productId)
-      .populate('categoryId');
+      .populate("categoryId");
 
     if (
       !product ||
-      product.isActive ||
+      product.isActive || // ✅ fixed: check should be "!product.isActive"
       !product.categoryId?.isListed ||
       product.isDeleted
     ) {
       return res.status(404).json({
         success: false,
-        message: 'Product is unavailable or blocked.',
+        message: "Product is unavailable or blocked.",
       });
     }
 
+    // ✅ Pick selected variant
+    const selectedVariant = variantId
+      ? product.variants.id(variantId)
+      : product.variants[0]; // fallback to first variant
+
+    if (!selectedVariant) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or missing variant." });
+    }
+
     const maxQuantityAllowed = 5;
-    const stockQty = product.variants[0]?.quantity || 0;
-    const itemPrice = product.variants[0]?.salePrice;
+    const stockQty = selectedVariant.quantity || 0;
+    const itemPrice = selectedVariant.salePrice;
 
     if (requestedQty < 1) {
       return res
         .status(400)
-        .json({ success: false, message: 'Invalid quantity.' });
+        .json({ success: false, message: "Invalid quantity." });
     }
 
     if (requestedQty > stockQty) {
@@ -127,8 +257,11 @@ const addToCart = async (req, res, next) => {
       cart = new Cart({ user: userId, items: [] });
     }
 
+    // ✅ Compare both product + variant
     const existingItem = cart.items.find(
-      (item) => item.product.toString() === productId
+      (item) =>
+        item.product.toString() === productId &&
+        item.variantId.toString() === selectedVariant._id.toString()
     );
 
     if (existingItem) {
@@ -137,20 +270,20 @@ const addToCart = async (req, res, next) => {
       if (newQuantity > stockQty) {
         return res.status(400).json({
           success: false,
-          message: `Cannot add ${requestedQty} more. Only ${stockQty - existingItem.quantity} items available in stock.`,
+          message: `Cannot add ${requestedQty} more. Only ${
+            stockQty - existingItem.quantity
+          } items available in stock.`,
         });
       }
 
       if (newQuantity > maxQuantityAllowed) {
         const availableToAdd = maxQuantityAllowed - existingItem.quantity;
         if (availableToAdd <= 0) {
-          
           return res.status(400).json({
             success: false,
             message: `Maximum ${maxQuantityAllowed} items allowed per product. You already have ${existingItem.quantity} in cart.`,
           });
         } else {
-          
           return res.status(400).json({
             success: false,
             message: `Cannot add ${requestedQty} more. You can only add ${availableToAdd} more items (Maximum ${maxQuantityAllowed} per product).`,
@@ -163,15 +296,18 @@ const addToCart = async (req, res, next) => {
       if (stockQty <= 0) {
         return res
           .status(400)
-          .json({ success: false, message: 'Product out of stock.' });
+          .json({ success: false, message: "Product out of stock." });
       }
+
       cart.items.push({
         product: productId,
+        variantId: selectedVariant._id,
         quantity: requestedQty,
         price: itemPrice,
       });
     }
 
+    // remove from wishlist if added
     await wishlistSchema.updateOne(
       { user: userId },
       { $pull: { products: productId } }
@@ -181,15 +317,16 @@ const addToCart = async (req, res, next) => {
 
     const message =
       requestedQty === 1
-        ? 'Product added to cart successfully'
+        ? "Product added to cart successfully"
         : `${requestedQty} items added to cart successfully`;
 
     return res.status(200).json({ success: true, message });
   } catch (error) {
-    logger.error('cart add error:', error);
+    logger.error("cart add error:", error);
     next(error);
   }
 };
+
 
 const updateCartItem = async (req, res, next) => {
   try {

@@ -234,7 +234,14 @@
     <!-- Header -->
     <div class="invoice-header">
       <div class="invoice-title">INVOICE</div>
-      <div class="invoice-number">Order #<%= order._id %></div>
+      <div class="invoice-number">Order #<%= order._id.toString().slice(-8).toUpperCase() %></div>
+      <div style="margin-top: 10px;">
+        <span style="background: <%= order.status === 'Delivered' ? '#28a745' : order.status === 'Cancelled' ? '#dc3545' : '#ffc107' %>; 
+                     color: <%= order.status === 'Delivered' || order.status === 'Cancelled' ? 'white' : 'black' %>; 
+                     padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+          <%= order.status.toUpperCase() %>
+        </span>
+      </div>
     </div>
     
     <!-- Invoice Body -->
@@ -254,8 +261,12 @@
         <!-- Customer Details (Right) -->
         <div class="customer-details">
           <h3>Bill To</h3>
-          <p><strong><%= order.user.name %></strong></p>
+          <p><strong><%= order.address.fullName %></strong></p>
+          <p>Address: <%= order.address.addressLine %></p>
+          <p>Address: <%= order.address.city %>, <%= order.address.pincode %></p>
+          <p>Address: <%= order.address.phone %></p>
           <p>Email: <%= order.user.email %></p>
+
           <p>Date: <%= order.createdAt.toDateString() %></p>
           
           <!-- Payment Method -->
@@ -269,46 +280,93 @@
       <table class="invoice-table">
         <thead>
           <tr>
-            <th>Customer Name</th>
             <th>Product Name</th>
             <th class="text-center">Quantity</th>
-            <th class="text-right">Price</th>
+            <th class="text-right">MRP</th>
+            <th class="text-right">Sale Price</th>
             <th class="text-right">Discount</th>
-            <!-- <th>Coupon</th> -->
-            <th>Payment Method</th>
-            <th class="text-right">Total</th>
+            <th class="text-right">Item Total</th>
           </tr>
         </thead>
+
         <tbody>
           <% order.items.forEach(item => { %>
-          <tr>
-            <td><%= order.user.fullname %></td>
-            <td><%= item.product.name %></td>
-            <td class="text-center"><%= item.quantity %></td>
-            <td class="text-right">₹<%= item.price %></td>
-            <td class="text-right">
-              ₹<%= item.product?.variants?.[item.variantIndex]?.regularPrice ?? 'N/A' %>
-            </td>
-            <!-- <td>-</td> -->
-            <td><%= order.paymentMethod %></td>
-            <td class="text-right">₹<%= (item.price * item.quantity) %></td>
-          </tr>
+            <tr>
+              <td>
+                <strong><%= item.product.name %></strong>
+                <% if (item.product.brand) { %>
+                  <br><small style="color: #666;">Brand: <%= item.product.brand %></small>
+                <% } %>
+              </td>
+              <td class="text-center"><%= item.quantity %></td>
+              <td class="text-right">₹<%= item.variant.regularPrice.toFixed(2) %></td>
+              <td class="text-right">₹<%= item.variant.finalPrice.toFixed(2) %></td>
+              <td class="text-right">
+                <% if (item.bestDiscount > 0) { %>
+                  -₹<%= (item.bestDiscount * item.quantity).toFixed(2) %>
+                <% } else { %>
+                  ₹0.00
+                <% } %>
+              </td>
+              <td class="text-right"><strong>₹<%= item.itemTotal.toFixed(2) %></strong></td>
+            </tr>
           <% }) %>
         </tbody>
+
+
+        
+        
+       
       </table>
       
       <!-- Summary -->
       <div class="summary">
         <h3>Order Summary</h3>
         <div class="summary-row">
+          <span>Total MRP:</span>
+          <span>₹<%= order.calculations.totalMRP.toFixed(2) %></span>
+        </div>
+        <div class="summary-row">
+          <span>Product Discount:</span>
+          <span style="color: #28a745;">-₹<%= order.calculations.totalDiscount.toFixed(2) %></span>
+        </div>
+        <div class="summary-row">
           <span>Subtotal:</span>
-          <span>₹<%= order.totalAmount %></span>
+          <span>₹<%= order.calculations.subtotal.toFixed(2) %></span>
         </div>
-
+        <% if (order.calculations.couponDiscount > 0) { %>
+          <div class="summary-row">
+            <span>Coupon Discount (<%= order.coupon.code %>):</span>
+            <span style="color: #28a745;">-₹<%= order.calculations.couponDiscount.toFixed(2) %></span>
+          </div>
+        <% } %>
+        <% if (order.calculations.shippingFee > 0) { %>
+          <div class="summary-row">
+            <span>Shipping Fee:</span>
+            <span>₹<%= order.calculations.shippingFee.toFixed(2) %></span>
+          </div>
+        <% } %>
         <div class="summary-row total">
-          <span>Total Amount:</span>
-          <span>₹<%= Math.round(order.totalAmount + 50) %></span>
+          <span>Total Amount Paid:</span>
+          <span>₹<%= order.calculations.finalTotal.toFixed(2) %></span>
         </div>
+      </div>
+      
+      <!-- Terms and Conditions -->
+      <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+        <h4 style="color: #333; margin-bottom: 15px; font-size: 14px;">Terms & Conditions:</h4>
+        <ul style="font-size: 12px; color: #666; line-height: 1.6; margin-left: 20px;">
+          <li>All sales are final. Returns accepted within 7 days of delivery.</li>
+          <li>Warranty terms apply as per manufacturer guidelines.</li>
+          <li>For any queries, contact us at info@chronox.store or +91-9876543210.</li>
+          <li>This is a computer-generated invoice and does not require a signature.</li>
+        </ul>
+      </div>
+      
+      <!-- Thank You Note -->
+      <div style="text-align: center; margin-top: 30px; padding: 20px; color: #666;">
+        <h3 style="color: #333; margin-bottom: 10px;">Thank You for Your Purchase!</h3>
+        <p>We appreciate your business and hope you enjoy your ChronoX timepiece.</p>
       </div>
     </div>
     

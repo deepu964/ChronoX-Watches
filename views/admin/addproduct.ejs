@@ -601,7 +601,8 @@ in.css">
 
             
             const category = document.getElementById('category').value;
-            if (!category) {
+            if (!category || category === "all") {
+                showToast(" Category is requied.Please select a category")
                 document.getElementById('categoryError').textContent = 'Please select a category';
                 document.getElementById('categoryError').style.display = 'block';
                 isValid = false;

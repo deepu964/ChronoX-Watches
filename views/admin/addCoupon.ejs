@@ -74,6 +74,10 @@
     </div>
 
     <script>
+
+        
+
+
         document.getElementById('menuToggle')?.addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('active');
         });
@@ -85,6 +89,9 @@
                 this.classList.add('active');
             });
         });
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('expiryDate').setAttribute('min', today);
 
         document.getElementById('couponForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -111,20 +118,25 @@
                 isValid = false;
             }
 
-            if (isNaN(discount) || discount <= 0 || discount > 100) {
-                document.getElementById('discountError').textContent = 'Discount must be between 1 and 100';
+            if (isNaN(discount) || discount <= 0 || discount > 80) {
+                document.getElementById('discountError').textContent = 'Discount must be between 1 and 80';
                 document.getElementById('discountError').style.display = 'block';
                 isValid = false;
             }
 
-            if (!expiryDate) {
+             if (!expiryDate) {
                 document.getElementById('expiryDateError').textContent = 'Expiry date is required';
                 document.getElementById('expiryDateError').style.display = 'block';
                 isValid = false;
-            } else if (new Date(expiryDate) < new Date()) {
-                document.getElementById('expiryDateError').textContent = 'Expiry date must be in the future';
-                document.getElementById('expiryDateError').style.display = 'block';
-                isValid = false;
+            } else {
+                const selected = new Date(expiryDate).setHours(0,0,0,0);
+                const todayDate = new Date().setHours(0,0,0,0);
+
+                if (selected < todayDate) {
+                    document.getElementById('expiryDateError').textContent = 'Expiry date must be today or in the future';
+                    document.getElementById('expiryDateError').style.display = 'block';
+                    isValid = false;
+                }
             }
 
             if (isNaN(minPurchase) || minPurchase < 0) {
@@ -146,7 +158,7 @@
                             minPurchase
                         })
                     });
-                    console.log(response,'this is response');
+                    
                     const data = await response.json();
 
                     if (data.success) {
