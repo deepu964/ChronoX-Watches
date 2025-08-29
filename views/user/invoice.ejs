@@ -284,7 +284,7 @@
             <th class="text-center">Quantity</th>
             <th class="text-right">MRP</th>
             <th class="text-right">Sale Price</th>
-            <th class="text-right">Discount</th>
+            <th class="text-right">Offer & Discount</th>
             <th class="text-right">Item Total</th>
           </tr>
         </thead>
@@ -303,9 +303,11 @@
               <td class="text-right">₹<%= item.variant.finalPrice.toFixed(2) %></td>
               <td class="text-right">
                 <% if (item.bestDiscount > 0) { %>
-                  -₹<%= (item.bestDiscount * item.quantity).toFixed(2) %>
+                  <% const offerPercentage = ((item.bestDiscount / item.variant.regularPrice) * 100).toFixed(0) %>
+                  <span style="color: #28a745; font-weight: bold;"><%= offerPercentage %>% OFF</span>
+                  <br><small>-₹<%= (item.bestDiscount * item.quantity).toFixed(2) %></small>
                 <% } else { %>
-                  ₹0.00
+                  <span style="color: #666;">No Offer</span>
                 <% } %>
               </td>
               <td class="text-right"><strong>₹<%= item.itemTotal.toFixed(2) %></strong></td>
@@ -330,10 +332,10 @@
           <span>Product Discount:</span>
           <span style="color: #28a745;">-₹<%= order.calculations.totalDiscount.toFixed(2) %></span>
         </div>
-        <div class="summary-row">
+        <!-- <div class="summary-row">
           <span>Subtotal:</span>
-          <span>₹<%= order.calculations.subtotal.toFixed(2) %></span>
-        </div>
+          <span></span>
+        </div> -->
         <% if (order.calculations.couponDiscount > 0) { %>
           <div class="summary-row">
             <span>Coupon Discount (<%= order.coupon.code %>):</span>
