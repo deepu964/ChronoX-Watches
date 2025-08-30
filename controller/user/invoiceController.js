@@ -1,6 +1,5 @@
 const Order = require('../../models/orderSchema');
 const logger = require('../../utils/logger');
-const Product = require('../../models/productSchema');
 const categoryOffer = require('../../models/categoryOfferSchema');
 
 const generateInvoice = async (req, res, next) => {

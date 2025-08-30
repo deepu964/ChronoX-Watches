@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const Return = require('../models/returnSchema');
 const Wallet = require('../models/walletSchema');
-const Order = require('../models/orderSchema');
-const logger = require('../utils/logger');
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/chronox', {

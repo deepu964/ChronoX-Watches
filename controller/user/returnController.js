@@ -1,6 +1,5 @@
 const Order = require('../../models/orderSchema');
 const Return = require('../../models/returnSchema');
-const Wallet = require('../../models/walletSchema');
 const logger = require('../../utils/logger');
 
 const getMyReturns = async (req, res, next) => {

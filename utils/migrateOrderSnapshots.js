@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+
 const Order = require('../models/orderSchema');
-const productSchema = require('../models/productSchema');
 const categoryOffer = require('../models/categoryOfferSchema');
 const couponSchema = require('../models/couponSchema');
 const logger = require('./logger');

@@ -1,50 +1,83 @@
 const orderSchema = require('../../models/orderSchema');
+const productSchema = require('../../models/productSchema');
+const categorySchema = require('../../models/categorySchema');
+const returnSchema = require('../../models/returnSchema');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const logger = require('../../utils/logger');
 
 const getSalesReport = async (req, res, next) => {
   try {
-    const limit = 10;
+    const limit = 15;
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * limit;
 
-    const { type, fromDate, toDate } = req.query;
+    const { 
+      type, 
+      fromDate, 
+      toDate, 
+      product, 
+      category, 
+      paymentMethod 
+    } = req.query;
 
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
+    // Build filter object
     const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' },
     };
 
-    const totalOrders = await orderSchema.countDocuments(filter);
-    const totalPages = Math.ceil(totalOrders / limit);
+    // Add payment method filter
+    if (paymentMethod && paymentMethod !== 'all') {
+      filter.paymentMethod = paymentMethod;
+    }
 
-    const orders = await orderSchema
+    // Get all orders for filtering and calculations
+    let allOrders = await orderSchema
       .find(filter)
       .populate('user', 'fullname email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .populate('items.product', 'productName brand model')
+      .sort({ createdAt: -1 });
 
-    const allOrders = await orderSchema.find(filter).sort({ createdAt: -1 });
+    // Apply product and category filters
+    if (product && product !== 'all') {
+      allOrders = allOrders.filter(order => 
+        order.items.some(item => 
+          item.product && item.product._id.toString() === product
+        )
+      );
+    }
 
-    const summary = {
-      totalOrders,
-      totalSales: 0,
-      totalDiscount: 0,
-      totalCouponDiscount: 0,
-      totalAmount: 0,
+    if (category && category !== 'all') {
+      allOrders = allOrders.filter(order => 
+        order.items.some(item => 
+          item.productSnapshot && item.productSnapshot.categoryId && 
+          item.productSnapshot.categoryId.toString() === category
+        )
+      );
+    }
+
+    const totalOrders = allOrders.length;
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    // Get paginated orders
+    const orders = allOrders.slice(skip, skip + limit);
+
+    // Get return data for refunds calculation
+    const returnFilter = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      status: { $in: ['Approved', 'Refunded'] }
     };
+    const returns = await returnSchema.find(returnFilter);
 
-    allOrders.forEach((order) => {
-      const originalAmount = order.totalAmount + (order.discount || 0);
-      summary.totalSales += originalAmount;
-      summary.totalDiscount += order.discount || 0;
-      summary.totalCouponDiscount += order.couponDiscount || 0;
-      summary.totalAmount += order.totalAmount;
-    });
+    // Calculate comprehensive summary
+    const summary = calculateSummary(allOrders, returns);
+
+    // Get filter options
+    const products = await productSchema.find({ isBlocked: false }, 'productName').sort({ productName: 1 });
+    const categories = await categorySchema.find({ isListed: true }, 'name').sort({ name: 1 });
 
     res.render('admin/salesReport', {
       orders,
@@ -52,6 +85,11 @@ const getSalesReport = async (req, res, next) => {
       type: type || 'weekly',
       fromDate: fromDate || '',
       toDate: toDate || '',
+      product: product || 'all',
+      category: category || 'all',
+      paymentMethod: paymentMethod || 'all',
+      products,
+      categories,
       currentPage: page,
       totalPages,
       totalOrders,
@@ -63,6 +101,63 @@ const getSalesReport = async (req, res, next) => {
     logger.error('Sales report error:', error);
     next(error);
   }
+};
+
+const calculateSummary = (orders, returns) => {
+  const summary = {
+    totalOrders: orders.length,
+    totalProductsSold: 0,
+    grossSales: 0,
+    totalDiscounts: 0,
+    couponDiscounts: 0,
+    refunds: 0,
+    netRevenue: 0,
+  };
+
+  // Calculate from orders
+  orders.forEach((order) => {
+    order.items.forEach((item) => {
+      if (item.status !== 'Cancelled') {
+        const quantity = item.quantity || 0;
+        const unitPrice = item.price || item.pricingSnapshot?.regularPrice || 0;
+        const itemDiscount = item.discount || 0;
+        const discountShare = item.discountShare || 0;
+        
+        // Calculate final price per unit - try multiple sources
+        let finalPrice = item.paidPrice || 0;
+        if (!finalPrice) {
+          finalPrice = item.pricingSnapshot?.finalPrice || 0;
+        }
+        if (!finalPrice && unitPrice > 0) {
+          // Calculate from unit price minus discounts
+          finalPrice = unitPrice - itemDiscount - discountShare;
+          finalPrice = Math.max(0, finalPrice); // Ensure non-negative
+        }
+
+        // Calculate totals
+        summary.totalProductsSold += quantity;
+        summary.grossSales += unitPrice * quantity;
+        summary.totalDiscounts += (itemDiscount + discountShare) * quantity;
+        summary.netRevenue += finalPrice * quantity;
+      }
+    });
+
+    // Add coupon discount (track separately to avoid double counting)
+    const couponDiscount = order.coupon?.discountAmount || 0;
+    summary.couponDiscounts += couponDiscount;
+  });
+
+  // Calculate refunds from return records
+  returns.forEach((returnRecord) => {
+    if (returnRecord.status === 'Approved' || returnRecord.status === 'Refunded') {
+      summary.refunds += returnRecord.totalRefundAmount || 0;
+    }
+  });
+
+  // Adjust net revenue for refunds
+  summary.netRevenue -= summary.refunds;
+
+  return summary;
 };
 
 const getDateRange = (type, fromDate, toDate) => {
@@ -131,63 +226,98 @@ const getDateRange = (type, fromDate, toDate) => {
 
 const exportSalesReportPDF = async (req, res, next) => {
   try {
-    const { type, fromDate, toDate } = req.query;
+    const { 
+      type, 
+      fromDate, 
+      toDate, 
+      product, 
+      category, 
+      paymentMethod 
+    } = req.query;
+    
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    const orders = await orderSchema
-      .find({
-        createdAt: { $gte: startDate, $lte: endDate },
-        status: { $ne: 'Cancelled' },
-      })
+    // Build filter object
+    const filter = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      status: { $ne: 'Cancelled' },
+    };
+
+    if (paymentMethod && paymentMethod !== 'all') {
+      filter.paymentMethod = paymentMethod;
+    }
+
+    let orders = await orderSchema
+      .find(filter)
       .populate('user', 'fullname email')
-      .populate('items.product', 'productName')
+      .populate('items.product', 'productName brand model')
       .sort({ createdAt: -1 });
 
-    const summary = {
-      totalOrders: orders.length,
-      totalSales: 0,
-      totalDiscount: 0,
-      totalCouponDiscount: 0,
-      totalAmount: 0,
-      totalProducts: 0,
+    // Apply product and category filters
+    if (product && product !== 'all') {
+      orders = orders.filter(order => 
+        order.items.some(item => 
+          item.product && item.product._id.toString() === product
+        )
+      );
+    }
+
+    if (category && category !== 'all') {
+      orders = orders.filter(order => 
+        order.items.some(item => 
+          item.productSnapshot && item.productSnapshot.categoryId && 
+          item.productSnapshot.categoryId.toString() === category
+        )
+      );
+    }
+
+    // Get return data for refunds calculation
+    const returnFilter = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      status: { $in: ['Approved', 'Refunded'] }
     };
+    const returns = await returnSchema.find(returnFilter);
+
+    // Calculate comprehensive summary
+    const summary = calculateSummary(orders, returns);
 
     const productDetails = [];
 
     orders.forEach((order) => {
-      const couponDiscount = order.coupon?.discountAmount || 0;
-
       order.items.forEach((item) => {
-        const itemDiscount = item.discount || 0;
-        const itemDiscountShare = item.discountShare || 0;
-        const originalPrice = item.price || 0;
-        const paidPrice = item.paidPrice || 0;
-        const quantity = item.quantity || 0;
+        if (item.status !== 'Cancelled') {
+          const itemDiscount = item.discount || 0;
+          const itemDiscountShare = item.discountShare || 0;
+          const unitPrice = item.price || item.pricingSnapshot?.regularPrice || 0;
+          const quantity = item.quantity || 0;
 
-        // Calculate total discount for this item (item discount + share of coupon discount)
-        const totalItemDiscount = itemDiscount + itemDiscountShare;
+          // Calculate final price - try multiple sources
+          let finalPrice = item.paidPrice || 0;
+          if (!finalPrice) {
+            finalPrice = item.pricingSnapshot?.finalPrice || 0;
+          }
+          if (!finalPrice && unitPrice > 0) {
+            finalPrice = unitPrice - itemDiscount - itemDiscountShare;
+            finalPrice = Math.max(0, finalPrice);
+          }
 
-        productDetails.push({
-          orderId: '#' + order._id.toString().slice(-6).toUpperCase(),
-          customerName: order.user?.fullname || 'N/A',
-          customerEmail: order.user?.email || 'N/A',
-          productName: item.product?.productName || 'N/A',
-          quantity: quantity,
-          originalPrice: originalPrice,
-          discountAmount: totalItemDiscount,
-          salePrice: paidPrice,
-          totalPrice: paidPrice * quantity,
-          paymentMethod: order.paymentMethod || 'N/A',
-          orderDate: order.createdAt,
-        });
+          const totalItemDiscount = itemDiscount + itemDiscountShare;
 
-        summary.totalProducts += quantity;
-        summary.totalSales += originalPrice * quantity;
-        summary.totalDiscount += totalItemDiscount * quantity;
-        summary.totalAmount += paidPrice * quantity;
+          productDetails.push({
+            orderId: '#' + order._id.toString().slice(-6).toUpperCase(),
+            customerName: order.user?.fullname || 'N/A',
+            customerEmail: order.user?.email || 'N/A',
+            productName: item.productSnapshot?.name || item.product?.productName || 'N/A',
+            quantity: quantity,
+            originalPrice: unitPrice,
+            discountAmount: totalItemDiscount,
+            salePrice: finalPrice,
+            totalPrice: finalPrice * quantity,
+            paymentMethod: order.paymentMethod || 'N/A',
+            orderDate: order.createdAt,
+          });
+        }
       });
-
-      summary.totalCouponDiscount += couponDiscount;
     });
 
     const doc = new PDFDocument({
@@ -242,35 +372,42 @@ const exportSalesReportPDF = async (req, res, next) => {
 
     doc.text(`Total Orders: ${summary.totalOrders}`, leftCol, summaryY);
     doc.text(
-      `Total Products Sold: ${summary.totalProducts}`,
+      `Total Products Sold: ${summary.totalProductsSold}`,
       rightCol,
       summaryY
     );
     summaryY += 20;
 
     doc.text(
-      `Total Sales Amount: ₹${summary.totalSales.toLocaleString('en-IN')}`,
+      `Gross Sales: Rs.${Math.round(summary.grossSales).toLocaleString('en-IN')}`,
       leftCol,
       summaryY
     );
     doc.text(
-      `Total Discount: ₹${summary.totalDiscount.toLocaleString('en-IN')}`,
+      `Total Discounts: Rs.${Math.round(summary.totalDiscounts).toLocaleString('en-IN')}`,
       rightCol,
       summaryY
     );
     summaryY += 20;
 
     doc.text(
-      `Total Coupon Discount: ₹${summary.totalCouponDiscount.toLocaleString('en-IN')}`,
+      `Coupon Discounts: Rs.${Math.round(summary.couponDiscounts).toLocaleString('en-IN')}`,
       leftCol,
       summaryY
     );
+    doc.text(
+      `Refunds: Rs.${Math.round(summary.refunds).toLocaleString('en-IN')}`,
+      rightCol,
+      summaryY
+    );
+    summaryY += 20;
+
     doc
       .fontSize(14)
       .fillColor('#111827')
       .text(
-        `Net Total Amount: ₹${summary.totalAmount.toLocaleString('en-IN')}`,
-        rightCol,
+        `Net Revenue: Rs.${Math.round(summary.netRevenue).toLocaleString('en-IN')}`,
+        leftCol,
         summaryY
       );
 
@@ -336,17 +473,17 @@ const exportSalesReportPDF = async (req, res, next) => {
         doc.text(item.productName.substring(0, 18), 165, currentY);
         doc.text(item.quantity.toString(), 285, currentY);
         doc.text(
-          `₹${item.originalPrice.toLocaleString('en-IN')}`,
+          `Rs.${Math.round(item.originalPrice).toLocaleString('en-IN')}`,
           310,
           currentY
         );
         doc.text(
-          `₹${item.discountAmount.toLocaleString('en-IN')}`,
+          `Rs.${Math.round(item.discountAmount).toLocaleString('en-IN')}`,
           380,
           currentY
         );
-        doc.text(`₹${item.salePrice.toLocaleString('en-IN')}`, 430, currentY);
-        doc.text(`₹${item.totalPrice.toLocaleString('en-IN')}`, 480, currentY);
+        doc.text(`Rs.${Math.round(item.salePrice).toLocaleString('en-IN')}`, 430, currentY);
+        doc.text(`Rs.${Math.round(item.totalPrice).toLocaleString('en-IN')}`, 480, currentY);
         doc.text(item.paymentMethod, 540, currentY);
 
         currentY += 25;
@@ -377,63 +514,98 @@ const exportSalesReportPDF = async (req, res, next) => {
 
 const exportSalesReportExcel = async (req, res, next) => {
   try {
-    const { type, fromDate, toDate } = req.query;
+    const { 
+      type, 
+      fromDate, 
+      toDate, 
+      product, 
+      category, 
+      paymentMethod 
+    } = req.query;
+    
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    const orders = await orderSchema
-      .find({
-        createdAt: { $gte: startDate, $lte: endDate },
-        status: { $ne: 'Cancelled' },
-      })
+    // Build filter object
+    const filter = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      status: { $ne: 'Cancelled' },
+    };
+
+    if (paymentMethod && paymentMethod !== 'all') {
+      filter.paymentMethod = paymentMethod;
+    }
+
+    let orders = await orderSchema
+      .find(filter)
       .populate('user', 'fullname email')
-      .populate('items.product', 'productName')
+      .populate('items.product', 'productName brand model')
       .sort({ createdAt: -1 });
 
-    const summary = {
-      totalOrders: orders.length,
-      totalSales: 0,
-      totalDiscount: 0,
-      totalCouponDiscount: 0,
-      totalAmount: 0,
-      totalProducts: 0,
+    // Apply product and category filters
+    if (product && product !== 'all') {
+      orders = orders.filter(order => 
+        order.items.some(item => 
+          item.product && item.product._id.toString() === product
+        )
+      );
+    }
+
+    if (category && category !== 'all') {
+      orders = orders.filter(order => 
+        order.items.some(item => 
+          item.productSnapshot && item.productSnapshot.categoryId && 
+          item.productSnapshot.categoryId.toString() === category
+        )
+      );
+    }
+
+    // Get return data for refunds calculation
+    const returnFilter = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      status: { $in: ['Approved', 'Refunded'] }
     };
+    const returns = await returnSchema.find(returnFilter);
+
+    // Calculate comprehensive summary
+    const summary = calculateSummary(orders, returns);
 
     const productDetails = [];
 
     orders.forEach((order) => {
-      const couponDiscount = order.coupon?.discountAmount || 0;
-
       order.items.forEach((item) => {
-        const itemDiscount = item.discount || 0;
-        const itemDiscountShare = item.discountShare || 0;
-        const originalPrice = item.price || 0;
-        const paidPrice = item.paidPrice || 0;
-        const quantity = item.quantity || 0;
+        if (item.status !== 'Cancelled') {
+          const itemDiscount = item.discount || 0;
+          const itemDiscountShare = item.discountShare || 0;
+          const unitPrice = item.price || item.pricingSnapshot?.regularPrice || 0;
+          const quantity = item.quantity || 0;
 
-        // Calculate total discount for this item (item discount + share of coupon discount)
-        const totalItemDiscount = itemDiscount + itemDiscountShare;
+          // Calculate final price - try multiple sources
+          let finalPrice = item.paidPrice || 0;
+          if (!finalPrice) {
+            finalPrice = item.pricingSnapshot?.finalPrice || 0;
+          }
+          if (!finalPrice && unitPrice > 0) {
+            finalPrice = unitPrice - itemDiscount - itemDiscountShare;
+            finalPrice = Math.max(0, finalPrice);
+          }
 
-        productDetails.push({
-          orderId: '#' + order._id.toString().slice(-6).toUpperCase(),
-          customerName: order.user?.fullname || 'N/A',
-          customerEmail: order.user?.email || 'N/A',
-          productName: item.product?.productName || 'N/A',
-          quantity: quantity,
-          originalPrice: originalPrice,
-          discountAmount: totalItemDiscount,
-          salePrice: paidPrice,
-          totalPrice: paidPrice * quantity,
-          paymentMethod: order.paymentMethod || 'N/A',
-          orderDate: order.createdAt.toLocaleDateString('en-IN'),
-        });
+          const totalItemDiscount = itemDiscount + itemDiscountShare;
 
-        summary.totalProducts += quantity;
-        summary.totalSales += originalPrice * quantity;
-        summary.totalDiscount += totalItemDiscount * quantity;
-        summary.totalAmount += paidPrice * quantity;
+          productDetails.push({
+            orderId: '#' + order._id.toString().slice(-6).toUpperCase(),
+            customerName: order.user?.fullname || 'N/A',
+            customerEmail: order.user?.email || 'N/A',
+            productName: item.productSnapshot?.name || item.product?.productName || 'N/A',
+            quantity: quantity,
+            originalPrice: unitPrice,
+            discountAmount: totalItemDiscount,
+            salePrice: finalPrice,
+            totalPrice: finalPrice * quantity,
+            paymentMethod: order.paymentMethod || 'N/A',
+            orderDate: order.createdAt.toLocaleDateString('en-IN'),
+          });
+        }
       });
-
-      summary.totalCouponDiscount += couponDiscount;
     });
 
     const workbook = new ExcelJS.Workbook();
@@ -468,22 +640,26 @@ const exportSalesReportExcel = async (req, res, next) => {
     worksheet.getCell('A4').font = { bold: true, size: 14 };
 
     worksheet.addRow(['Total Orders', summary.totalOrders]);
-    worksheet.addRow(['Total Products Sold', summary.totalProducts]);
+    worksheet.addRow(['Total Products Sold', summary.totalProductsSold]);
     worksheet.addRow([
-      'Total Sales Amount',
-      `₹${summary.totalSales.toLocaleString('en-IN')}`,
+      'Gross Sales',
+      `₹${summary.grossSales.toLocaleString('en-IN')}`,
     ]);
     worksheet.addRow([
-      'Total Discount',
-      `₹${summary.totalDiscount.toLocaleString('en-IN')}`,
+      'Total Discounts',
+      `₹${summary.totalDiscounts.toLocaleString('en-IN')}`,
     ]);
     worksheet.addRow([
-      'Total Coupon Discount',
-      `₹${summary.totalCouponDiscount.toLocaleString('en-IN')}`,
+      'Coupon Discounts',
+      `₹${summary.couponDiscounts.toLocaleString('en-IN')}`,
     ]);
     worksheet.addRow([
-      'Net Total Amount',
-      `₹${summary.totalAmount.toLocaleString('en-IN')}`,
+      'Refunds',
+      `₹${summary.refunds.toLocaleString('en-IN')}`,
+    ]);
+    worksheet.addRow([
+      'Net Revenue',
+      `₹${summary.netRevenue.toLocaleString('en-IN')}`,
     ]);
 
     worksheet.addRow([]);

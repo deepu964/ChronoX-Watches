@@ -5,7 +5,6 @@ const productSchema = require('../../models/productSchema');
 const Wallet = require('../../models/walletSchema');
 const User = require('../../models/userSchema');
 const Razorpay = require('razorpay');
-const cartSchema = require('../../models/cartSchema');
 const categoryOffer = require('../../models/categoryOfferSchema');
 const couponSchema = require('../../models/couponSchema');
 const Return = require('../../models/returnSchema');
