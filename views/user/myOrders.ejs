@@ -1584,7 +1584,7 @@
                             <% order.items.slice(0, 3).forEach(item => { %>
                                 <div class="order-item">
                                     <div class="item-image">
-                                        <% if (item.product.images && item.product.images.length > 0) { %>
+                                        <% if (item.product && item.product.images && item.product.images.length > 0) { %>
                                             <img src="https://res.cloudinary.com/<%= cloudName %>/image/upload/w_50,h_50,c_fill/<%= item.product.images[0].public_id %>" 
                                                  alt="<%= item.product.name %>" 
                                                  onerror="this.src='/images/placeholder.jpg'">
@@ -1593,7 +1593,9 @@
                                         <% } %>
                                     </div>
                                     <div class="item-details">
-                                        <div class="item-name"><%= item.product.name %></div>
+                                        <div class="item-name">
+                                            <%= item.product ? item.product.name : 'Product Unavailable' %>
+                                        </div>
                                         <div class="item-quantity">Qty: <%= item.quantity %></div>
                                     </div>
                                 </div>

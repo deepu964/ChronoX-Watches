@@ -10,8 +10,41 @@ const orderSchema = new mongoose.Schema({
       price: Number,
       discount: Number,
       paidPrice: Number,
-
       discountShare: Number,
+      
+      // Snapshot data at the time of order placement
+      productSnapshot: {
+        name: String,
+        description: String,
+        brand: String,
+        model: String,
+        images: [{
+          public_id: String,
+          url: String,
+          isMain: { type: Boolean, default: false }
+        }],
+        categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+        categoryName: String,
+        variant: {
+          regularPrice: Number,
+          salePrice: Number,
+          originalQuantity: Number // quantity available at time of order
+        }
+      },
+      
+      // Pricing snapshot at time of order
+      pricingSnapshot: {
+        regularPrice: Number,
+        salePrice: Number,
+        productOffer: Number,
+        categoryOffer: {
+          name: String,
+          discount: Number,
+          discountAmount: Number
+        },
+        bestOffer: Number,
+        finalPrice: Number
+      },
 
       status: {
         type: String,
@@ -47,6 +80,16 @@ const orderSchema = new mongoose.Schema({
     code: { type: String },
     discountAmount: { type: Number, default: 0 },
     maxDiscount: { type: Number, default: 0 },
+  },
+  
+  // Coupon snapshot at time of order
+  couponSnapshot: {
+    name: String,
+    couponcode: String,
+    discount: Number,
+    minPurchase: Number,
+    discountAmount: Number,
+    appliedAt: { type: Date, default: Date.now }
   },
   shippingFee: Number,
   isPaid: { type: Boolean, default: false },

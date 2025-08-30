@@ -468,7 +468,7 @@ const placeOrder = async (req, res, next) => {
           .json({ success: false, message: `${product.name} is out of stock` });
       }
 
-      // Create snapshot data for the order item
+      
       const productSnapshot = {
         name: product.name,
         description: product.description,
@@ -528,7 +528,7 @@ const placeOrder = async (req, res, next) => {
       }
     }
 
-    // Create coupon snapshot if coupon was applied
+  
     let couponSnapshot = null;
     if (coupon && couponAmount > 0) {
       couponSnapshot = {
@@ -722,7 +722,7 @@ const getOrderDetails = async (req, res, next) => {
       const quantity = item.quantity;
       
       if (item.pricingSnapshot) {
-        
+       
         regularPrice = item.pricingSnapshot.regularPrice;
         salePrice = item.pricingSnapshot.salePrice;
         bestOffer = item.pricingSnapshot.bestOffer;
@@ -743,7 +743,7 @@ const getOrderDetails = async (req, res, next) => {
 
         const productOffer = regularPrice - salePrice;
 
-        
+
         const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
         const catOffer = categoryOff.find(
           (cat) => cat.category._id.toString() === product.categoryId.toString()
@@ -763,7 +763,6 @@ const getOrderDetails = async (req, res, next) => {
       grandTotal += discountedPrice * quantity;
     }
 
-    
     if (order.couponSnapshot) {
       offerPer = order.couponSnapshot.discount || 0;
     } else {
@@ -862,6 +861,8 @@ const cancelOrder = async (req, res, next) => {
       ]
     );
 
+    
+
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (order.status !== 'Placed')
       return res.status(400).json({ message: 'Order cannot be cancelled' });
@@ -883,24 +884,24 @@ const cancelOrder = async (req, res, next) => {
 
         const itemTotal = item.price * item.quantity;
         let itemRefund = itemTotal;
+       
 
         if (order.coupon) {
           const totalOrderValue = order.items.reduce(
             (sum, i) => sum + i.price * i.quantity,
             0
           );
+          console.log(totalOrderValue,'iskkkkk')
           const itemShare = itemTotal / totalOrderValue;
           const couponShare = itemShare * order.coupon.discountAmount;
           itemRefund -= couponShare;
+    
         }
       }
     }
-    refundAmount += order.totalAmount;
+     refundAmount += order.totalAmount ;
     if (
-      (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&
-      order.isPaid &&
-      refundAmount > 0
-    ) {
+      (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&order.isPaid &&refundAmount > 0) {
       let wallet = order.user.wallet;
 
       if (!wallet) {
@@ -909,11 +910,14 @@ const cancelOrder = async (req, res, next) => {
         order.user.wallet = wallet;
       }
 
+      console.log(refundAmount,'is refund')
+
       await wallet.addMoney(
         refundAmount,
         `Refund for cancelled order: ${order._id.toString().slice(-8)}`,
         order._id
       );
+      // const updatedWallet = await Wallet.findOne({ user: userId });
     }
 
     order.status = 'Cancelled';
@@ -975,6 +979,7 @@ const cancelOrderItem = async (req, res, next) => {
 
     if (order.coupon) {
       const finalPrice = itemTotal * (1 - order.coupon.maxDiscount / 100);
+
       refundAmount += finalPrice;
     }
 
@@ -1057,6 +1062,7 @@ const createRazorpayOrder = async (req, res) => {
   try {
     const { amount, address, orderId } = req.body;
 
+    
     const selectedAddress = await addressSchema.findById(address);
     if (!selectedAddress) {
       return res.json({ success: false, message: "Invalid Address" });
@@ -1071,6 +1077,7 @@ const createRazorpayOrder = async (req, res) => {
     let cartItems = [];
     let localOrder;
 
+    
     if (orderId) {
       localOrder = await Order.findById(orderId);
       if (!localOrder) {
@@ -1086,6 +1093,7 @@ const createRazorpayOrder = async (req, res) => {
 
       cartItems = localOrder.items;
     } else {
+      
       const cart = await Cart.findOne({ user: req.session.user })
         .populate("items.product")
         .lean();
@@ -1095,9 +1103,12 @@ const createRazorpayOrder = async (req, res) => {
       }
 
       cartItems = cart.items;
+
+      
       await Cart.updateOne({ user: req.session.user }, { $set: { items: [] } });
     }
 
+    
     const options = {
       amount: amount * 100,
       currency: "INR",
@@ -1108,91 +1119,33 @@ const createRazorpayOrder = async (req, res) => {
     const razorpayOrder = await razorpayInstance.orders.create(options);
     const coupon = req.session.coupon ? req.session.coupon : { discountAmount: 0, couponcode: "" };
 
+    
     if (!orderId) {
       let totalBeforeDiscount = 0;
       let orderItems = [];
-      
-      
-      const categoryOff = await categoryOffer.find({ isDeleted: false }).lean();
 
       for (let item of cartItems) {
         const prod = await productSchema.findById(item.product._id);
+
+       
         const variant = prod.variants.id(item.variantId);
+
+        
         const chosenVariant = variant || prod.variants[0];
 
         totalBeforeDiscount += chosenVariant.regularPrice * item.quantity;
 
         
-        const regularPrice = chosenVariant.regularPrice;
-        const salePrice = chosenVariant.salePrice || regularPrice;
-        const productOffer = regularPrice - salePrice;
-
-        const catOffer = categoryOff.find(
-          (cat) => cat.category._id.toString() === prod.categoryId.toString()
-        );
-        let catDiscount = 0;
-        let catDiscountAmount = 0;
-        if (catOffer?.discount) {
-          catDiscount = catOffer.discount;
-          catDiscountAmount = (regularPrice * catOffer.discount) / 100;
-        }
-
-        const bestOffer = Math.max(productOffer, catDiscountAmount);
-        const finalPrice = regularPrice - bestOffer;
-
-        
-        const productSnapshot = {
-          name: prod.name,
-          description: prod.description,
-          brand: prod.brand,
-          model: prod.model,
-          images: prod.images,
-          categoryId: prod.categoryId,
-          categoryName: prod.categoryId?.name || 'Unknown Category',
-          variant: {
-            regularPrice: chosenVariant.regularPrice,
-            salePrice: chosenVariant.salePrice,
-            originalQuantity: chosenVariant.quantity
-          }
-        };
-
-        const pricingSnapshot = {
-          regularPrice: regularPrice,
-          salePrice: salePrice,
-          productOffer: productOffer,
-          categoryOffer: catOffer ? {
-            name: catOffer.offerName,
-            discount: catDiscount,
-            discountAmount: catDiscountAmount
-          } : null,
-          bestOffer: bestOffer,
-          finalPrice: finalPrice
-        };
-
         orderItems.push({
           product: prod._id,
           variantId: chosenVariant._id, 
           quantity: item.quantity,
           price: chosenVariant.salePrice,
-          productSnapshot: productSnapshot,
-          pricingSnapshot: pricingSnapshot
         });
 
+        
         chosenVariant.quantity -= item.quantity;
         await prod.save();
-      }
-
-      
-      let couponSnapshot = null;
-      if (coupon && coupon.discountAmount > 0) {
-        couponSnapshot = {
-          name: coupon.name || 'Unknown Coupon',
-          couponcode: coupon.couponcode || '',
-          discount: coupon.discount || 0,
-          minPurchase: coupon.minPurchase || 0,
-          discountAmount: coupon.discountAmount,
-          appliedAt: new Date()
-        };
       }
 
       localOrder = await Order.create({
@@ -1216,13 +1169,14 @@ const createRazorpayOrder = async (req, res) => {
         razorpayOrderId: razorpayOrder.id,
         coupon: coupon.discountAmount,
         couponcode: coupon.couponcode,
-        couponSnapshot: couponSnapshot
       });
     } else {
+     
       localOrder.razorpayOrderId = razorpayOrder.id;
       await localOrder.save();
     }
 
+    
     return res.status(200).json({
       success: true,
       orderId: razorpayOrder.id,
@@ -1241,6 +1195,11 @@ const createRazorpayOrder = async (req, res) => {
       .json({ success: false, message: "Failed to create payment order" });
   }
 };
+
+
+
+
+
 
 module.exports = {
   validateCartForCheckout,

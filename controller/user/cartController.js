@@ -261,7 +261,7 @@ const addToCart = async (req, res, next) => {
     const existingItem = cart.items.find(
       (item) =>
         item.product.toString() === productId &&
-        item.variantId.toString() === selectedVariant._id.toString()
+        (item.variantId ? item.variantId.toString() === selectedVariant._id.toString() : true)
     );
 
     if (existingItem) {
