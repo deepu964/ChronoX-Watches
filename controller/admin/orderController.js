@@ -182,27 +182,16 @@ const processReturn = async (req, res, next) => {
     }
 
     if (action === 'approve') {
+      // Update return request status first
       returnRequest.status = 'Approved';
       returnRequest.reviewedAt = new Date();
       returnRequest.adminNotes = adminNotes;
-      await returnRequest.save();
 
-      let totalItemsInOrder = returnRequest.order.items.length;
-      let couponAmount = returnRequest.order.coupon?.discountAmount || 0;
-      let perItemCoupon =
-        totalItemsInOrder > 0 ? couponAmount / totalItemsInOrder : 0;
+      // Use the pre-calculated refund amount from the return request
+      // This ensures we use the exact paid amount, not current product prices
+      const totalRefund = returnRequest.totalRefundAmount;
 
-      let totalRefund = 0;
-
-      for (const item of returnRequest.items) {
-        let itemPrice = Number(item.price) || 0;
-        let couponShare = Number(perItemCoupon) || 0;
-        let itemRefund = itemPrice - couponShare;
-        totalRefund += itemRefund;
-      }
-
-      totalRefund = Math.round(totalRefund * 100) / 100;
-
+      // Find or create wallet
       let wallet = await Wallet.findOne({ user: returnRequest.user._id });
       if (!wallet) {
         wallet = new Wallet({
@@ -210,8 +199,10 @@ const processReturn = async (req, res, next) => {
           balance: 0,
           transactions: [],
         });
+        await wallet.save();
       }
 
+      // Credit the wallet with the pre-calculated refund amount
       await wallet.addMoney(
         totalRefund,
         `Refund for return request #${returnRequest._id.toString().slice(-8)}`,
@@ -219,14 +210,16 @@ const processReturn = async (req, res, next) => {
         returnRequest._id
       );
 
+      // Ensure user has wallet reference
       await User.findByIdAndUpdate(
         returnRequest.user._id,
         {
           $setOnInsert: { wallet: wallet._id },
         },
-        { upsert: false }
+        { upsert: true }
       );
 
+      // Restore product stock for returned items
       for (const item of returnRequest.items) {
         if (item.product && item.product._id) {
           const product = await Product.findById(item.product._id);
@@ -237,7 +230,8 @@ const processReturn = async (req, res, next) => {
         }
       }
 
-      returnRequest.status = 'Approved';
+      // Mark as refunded
+      returnRequest.status = 'Refunded';
       returnRequest.refundedAt = new Date();
       await returnRequest.save();
 
@@ -252,6 +246,7 @@ const processReturn = async (req, res, next) => {
         },
       });
     } else if (action === 'reject') {
+      // Only update status and notes - no wallet credit for rejected returns
       returnRequest.status = 'Rejected';
       returnRequest.reviewedAt = new Date();
       returnRequest.adminNotes = adminNotes;
@@ -259,7 +254,7 @@ const processReturn = async (req, res, next) => {
 
       return res.json({
         success: true,
-        message: 'Return request rejected successfully',
+        message: 'Return request rejected successfully. No refund processed.',
       });
     } else {
       return res.status(400).json({

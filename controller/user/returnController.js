@@ -87,15 +87,24 @@ const requestReturn = async (req, res, next) => {
         });
       }
 
-      const itemTotal = orderItem.price * item.quantity;
+      // Calculate refund amount based on actual paid price (paidPrice or price after discounts)
+      let actualPaidPrice = orderItem.paidPrice || orderItem.price;
+      
+      // If paidPrice is not available, calculate from pricing snapshot
+      if (!orderItem.paidPrice && orderItem.pricingSnapshot) {
+        actualPaidPrice = orderItem.pricingSnapshot.finalPrice || orderItem.price;
+      }
+
+      const itemTotal = actualPaidPrice * item.quantity;
       let couponShare = 0;
 
+      // Calculate coupon share based on the actual paid amount
       if (
         order.coupon &&
         order.coupon.discountAmount > 0 &&
         order.totalBeforeDiscount > 0
       ) {
-        const fullItemValue = orderItem.price * orderItem.quantity;
+        const fullItemValue = actualPaidPrice * orderItem.quantity;
         const itemLevelCouponShare =
           (fullItemValue / order.totalBeforeDiscount) *
           order.coupon.discountAmount;
@@ -103,18 +112,21 @@ const requestReturn = async (req, res, next) => {
           (item.quantity / orderItem.quantity) * itemLevelCouponShare;
       }
 
-      const refundAmount = itemTotal - couponShare;
+      const refundAmount = Math.max(0, itemTotal - couponShare);
       totalRefundAmount += refundAmount;
 
       returnItems.push({
         product: item.productId,
         quantity: item.quantity,
-        price: orderItem.price,
+        price: actualPaidPrice, // Store the actual paid price
         reason: item.reason || reason,
         refundAmount,
         couponShare,
       });
     }
+
+    // Round to 2 decimal places
+    totalRefundAmount = Math.round(totalRefundAmount * 100) / 100;
 
     const returnRequest = new Return({
       user: userId,
@@ -123,34 +135,23 @@ const requestReturn = async (req, res, next) => {
       totalRefundAmount,
       reason,
       description,
+      status: 'Requested', // Explicitly set status to Requested
     });
 
     await returnRequest.save();
 
-    await Wallet.updateOne(
-      { user: userId },
-      {
-        $inc: { balance: totalRefundAmount },
-        $push: {
-          transactions: {
-            type: 'credit',
-            amount: totalRefundAmount,
-            description: `Refund for return - Order ${orderId}`,
-            date: new Date(),
-          },
-        },
-      },
-      { upsert: true }
-    );
+    // DO NOT credit wallet here - only create the return request
+    // Wallet will be credited only after admin approval
 
     res.json({
       success: true,
       message:
-        'Return request submitted successfully. We will review it within 24-48 hours.',
+        'Return request submitted successfully. We will review it within 24-48 hours. Refund will be processed after approval.',
       returnId: returnRequest._id,
+      estimatedRefund: totalRefundAmount,
     });
   } catch (error) {
-    logger.error(' Return request error:', error);
+    logger.error('Return request error:', error);
     next(error);
   }
 };

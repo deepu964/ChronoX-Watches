@@ -32,6 +32,16 @@ const returnSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        refundAmount: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        couponShare: {
+          type: Number,
+          default: 0,
+          min: 0,
+        },
       },
     ],
     totalRefundAmount: {
