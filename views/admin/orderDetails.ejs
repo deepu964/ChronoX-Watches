@@ -1118,8 +1118,18 @@
                 </div>
                 
                 <div class="status-update">
-                    <h3>Update Order Status</h3>
-                    <div class="status-controls">
+                <h3>Update Order Status</h3>
+                <div class="status-controls">
+                    <% if (returnRequest && returnRequest.status === 'Refunded') { %>
+                        <!-- If refunded, disable select and button -->
+                        <select class="status-select" id="statusSelect" disabled>
+                            <option value="<%= order.status %>" selected><%= order.status %></option>
+                        </select>
+                        <button class="update-btn" disabled>Update Status</button>
+                         <p style="color:red; font-size:14px; margin-top:5px;">
+                            This order has been refunded. Status change is disabled.</p>
+                    <% } else { %>
+                        <!-- Normal status change options -->
                         <select class="status-select" id="statusSelect">
                             <option value="Placed" <%= order.status === 'Placed' ? 'selected' : '' %>>Placed</option>
                             <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
@@ -1129,7 +1139,9 @@
                             <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
                         </select>
                         <button class="update-btn" onclick="updateStatus()">Update Status</button>
-                    </div>
+                       
+                    <% } %>
+                </div>
                 </div>
                 
                 <div class="order-items">

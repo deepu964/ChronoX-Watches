@@ -770,7 +770,7 @@ const getOrderDetails = async (req, res, next) => {
     }
 
     const finalTotal = grandTotal;
-
+    
     res.render('user/orderDetails', {
       user: req.session.user,
       items: order.items,

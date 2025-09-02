@@ -129,7 +129,7 @@ body {
   background-color: #f9fafb;
   min-height: 100vh;
   transition: var(--transition);
-  width: 110%;
+  width: 100%;
 }
 
 /* Page Title */

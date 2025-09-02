@@ -123,11 +123,7 @@ router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
 
 router.get('/referrals', isAuth, referralController.getReferralDashboard);
 router.get('/referrals/history', isAuth, referralController.getReferralHistory);
-router.get(
-  '/referrals/generate-link',
-  isAuth,
-  referralController.generateReferralLink
-);
+router.get('/referrals/generate-link',isAuth,referralController.generateReferralLink);
 router.get(
   '/referrals/earnings',
   isAuth,

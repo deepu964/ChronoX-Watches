@@ -23,25 +23,25 @@ const getSalesReport = async (req, res, next) => {
 
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    // Build filter object
+   
     const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' },
     };
 
-    // Add payment method filter
+    
     if (paymentMethod && paymentMethod !== 'all') {
       filter.paymentMethod = paymentMethod;
     }
 
-    // Get all orders for filtering and calculations
+   
     let allOrders = await orderSchema
       .find(filter)
       .populate('user', 'fullname email')
       .populate('items.product', 'productName brand model')
       .sort({ createdAt: -1 });
 
-    // Apply product and category filters
+
     if (product && product !== 'all') {
       allOrders = allOrders.filter(order => 
         order.items.some(item => 
@@ -62,17 +62,17 @@ const getSalesReport = async (req, res, next) => {
     const totalOrders = allOrders.length;
     const totalPages = Math.ceil(totalOrders / limit);
 
-    // Get paginated orders
+  
     const orders = allOrders.slice(skip, skip + limit);
 
-    // Get return data for refunds calculation
+ 
     const returnFilter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $in: ['Approved', 'Refunded'] }
     };
     const returns = await returnSchema.find(returnFilter);
 
-    // Calculate comprehensive summary
+  
     const summary = calculateSummary(allOrders, returns);
 
     // Get filter options
@@ -114,7 +114,7 @@ const calculateSummary = (orders, returns) => {
     netRevenue: 0,
   };
 
-  // Calculate from orders
+ 
   orders.forEach((order) => {
     order.items.forEach((item) => {
       if (item.status !== 'Cancelled') {
@@ -123,18 +123,18 @@ const calculateSummary = (orders, returns) => {
         const itemDiscount = item.discount || 0;
         const discountShare = item.discountShare || 0;
         
-        // Calculate final price per unit - try multiple sources
+       
         let finalPrice = item.paidPrice || 0;
         if (!finalPrice) {
           finalPrice = item.pricingSnapshot?.finalPrice || 0;
         }
         if (!finalPrice && unitPrice > 0) {
-          // Calculate from unit price minus discounts
+      
           finalPrice = unitPrice - itemDiscount - discountShare;
-          finalPrice = Math.max(0, finalPrice); // Ensure non-negative
+          finalPrice = Math.max(0, finalPrice); 
         }
 
-        // Calculate totals
+     
         summary.totalProductsSold += quantity;
         summary.grossSales += unitPrice * quantity;
         summary.totalDiscounts += (itemDiscount + discountShare) * quantity;
@@ -142,19 +142,19 @@ const calculateSummary = (orders, returns) => {
       }
     });
 
-    // Add coupon discount (track separately to avoid double counting)
+
     const couponDiscount = order.coupon?.discountAmount || 0;
     summary.couponDiscounts += couponDiscount;
   });
 
-  // Calculate refunds from return records
+
   returns.forEach((returnRecord) => {
     if (returnRecord.status === 'Approved' || returnRecord.status === 'Refunded') {
       summary.refunds += returnRecord.totalRefundAmount || 0;
     }
   });
 
-  // Adjust net revenue for refunds
+
   summary.netRevenue -= summary.refunds;
 
   return summary;
@@ -237,7 +237,7 @@ const exportSalesReportPDF = async (req, res, next) => {
     
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    // Build filter object
+    
     const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' },
@@ -253,7 +253,7 @@ const exportSalesReportPDF = async (req, res, next) => {
       .populate('items.product', 'productName brand model')
       .sort({ createdAt: -1 });
 
-    // Apply product and category filters
+    
     if (product && product !== 'all') {
       orders = orders.filter(order => 
         order.items.some(item => 
@@ -271,14 +271,14 @@ const exportSalesReportPDF = async (req, res, next) => {
       );
     }
 
-    // Get return data for refunds calculation
+    
     const returnFilter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $in: ['Approved', 'Refunded'] }
     };
     const returns = await returnSchema.find(returnFilter);
 
-    // Calculate comprehensive summary
+    
     const summary = calculateSummary(orders, returns);
 
     const productDetails = [];
@@ -291,7 +291,7 @@ const exportSalesReportPDF = async (req, res, next) => {
           const unitPrice = item.price || item.pricingSnapshot?.regularPrice || 0;
           const quantity = item.quantity || 0;
 
-          // Calculate final price - try multiple sources
+          
           let finalPrice = item.paidPrice || 0;
           if (!finalPrice) {
             finalPrice = item.pricingSnapshot?.finalPrice || 0;
@@ -525,7 +525,7 @@ const exportSalesReportExcel = async (req, res, next) => {
     
     const { startDate, endDate } = getDateRange(type, fromDate, toDate);
 
-    // Build filter object
+    
     const filter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $ne: 'Cancelled' },
@@ -541,7 +541,7 @@ const exportSalesReportExcel = async (req, res, next) => {
       .populate('items.product', 'productName brand model')
       .sort({ createdAt: -1 });
 
-    // Apply product and category filters
+   
     if (product && product !== 'all') {
       orders = orders.filter(order => 
         order.items.some(item => 
@@ -559,14 +559,14 @@ const exportSalesReportExcel = async (req, res, next) => {
       );
     }
 
-    // Get return data for refunds calculation
+    
     const returnFilter = {
       createdAt: { $gte: startDate, $lte: endDate },
       status: { $in: ['Approved', 'Refunded'] }
     };
     const returns = await returnSchema.find(returnFilter);
 
-    // Calculate comprehensive summary
+  
     const summary = calculateSummary(orders, returns);
 
     const productDetails = [];
@@ -579,7 +579,7 @@ const exportSalesReportExcel = async (req, res, next) => {
           const unitPrice = item.price || item.pricingSnapshot?.regularPrice || 0;
           const quantity = item.quantity || 0;
 
-          // Calculate final price - try multiple sources
+        
           let finalPrice = item.paidPrice || 0;
           if (!finalPrice) {
             finalPrice = item.pricingSnapshot?.finalPrice || 0;
