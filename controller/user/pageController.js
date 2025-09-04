@@ -219,6 +219,7 @@ const getProductDetails = async (req, res, next) => {
       }
     }
 
+
     res.render('user/details', {
       user: req.session.user,
       product,

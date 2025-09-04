@@ -107,11 +107,7 @@ router.get('/order-success', isAuth, orderController.getOrderSuccess);
 router.get('/order-details/:orderId', isAuth, orderController.getOrderDetails);
 router.get('/my-orders', isAuth, orderController.getMyOrders);
 router.put('/cancel-order/:orderId', isAuth, orderController.cancelOrder);
-router.put(
-  '/cancel-order-item/:orderId/:itemId',
-  isAuth,
-  orderController.cancelOrderItem
-);
+router.put('/cancel-order-item/:orderId/:itemId',isAuth,orderController.cancelOrderItem);
 router.get('/debug-order-ids', isAuth, orderController.debugOrderIds);
 router.post('/create-order', isAuth, orderController.createRazorpayOrder);
 
@@ -124,10 +120,6 @@ router.get('/download-invoice/:orderId', isAuth, invoice.generateInvoice);
 router.get('/referrals', isAuth, referralController.getReferralDashboard);
 router.get('/referrals/history', isAuth, referralController.getReferralHistory);
 router.get('/referrals/generate-link',isAuth,referralController.generateReferralLink);
-router.get(
-  '/referrals/earnings',
-  isAuth,
-  referralController.getReferralEarnings
-);
+router.get('/referrals/earnings',isAuth,referralController.getReferralEarnings);
 
 module.exports = router;
