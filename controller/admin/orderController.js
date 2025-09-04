@@ -4,6 +4,9 @@ const Product = require('../../models/productSchema');
 const Return = require('../../models/returnSchema');
 const Wallet = require('../../models/walletSchema');
 const logger = require('../../utils/logger');
+const productSchema = require('../../models/productSchema');
+const categoryOfferSchema = require('../../models/categoryOfferSchema');
+
 
 const getOrders = async (req, res, next) => {
   try {
@@ -76,7 +79,7 @@ const getOrderDetails = async (req, res, next) => {
         .status(404)
         .render('admin/404', { message: 'Order not found' });
     }
- console.log(order,'is order');
+ 
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
     res.render('admin/orderDetails', { order, cloudName, returnRequest });
@@ -105,7 +108,7 @@ const updateOrderStatus = async (req, res, next) => {
       { status },
       { new: true }
     );
-    // console.log(order,'is order');
+    
 
 
     if (!validStatuses.includes(status)) {
@@ -115,19 +118,33 @@ const updateOrderStatus = async (req, res, next) => {
       });
     }
 
-    //  let refund =0;
-    // for(let item of order.items){
-    //   if(item.quantity > 3 && item.status === "Cancelled"){
-          
-    //     let wallet = await Wallet.findOneAndUpdate({
-    //          refund = (item.price *30)/100
-    //     })
-    //   }
+    // console.log(order,'is order') 
+    // let prodId ;
+    // for(let item  of order.items){
+    //     prodId = item.product._id;
+    // }
+    // const product = await productSchema.findById(prodId).populate('categoryId');
+    // console.log(product,'is product')
+    // const catoff = await categoryOfferSchema.findById({categoryId:product.categoryId._id, isDeleted:false});
+    // console.log(catoff,'is catoff');
+    
+    // let wallet;
+    // for(let vari of product.variants){
+    //     if(vari.quantity > 3 &&  catoff.discount > 0){
+    //        wallet += order.totalAmount * 30 / 100;
+
+    //     }
     // }
 
+    // const user = await User.findById(order.user);
+    // console.log(user,'is user');
     
-
-
+    //  if(user){
+    //   user.wallet = (user.wallet || 0) + wallet;
+    //   await user.save();
+    //   console.log("wallet added", user.wallet);
+    //  }
+    
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -182,16 +199,15 @@ const processReturn = async (req, res, next) => {
     }
 
     if (action === 'approve') {
-      // Update return request status first
+      
       returnRequest.status = 'Approved';
       returnRequest.reviewedAt = new Date();
       returnRequest.adminNotes = adminNotes;
 
-      // Use the pre-calculated refund amount from the return request
-      // This ensures we use the exact paid amount, not current product prices
+      
       const totalRefund = returnRequest.totalRefundAmount;
 
-      // Find or create wallet
+      
       let wallet = await Wallet.findOne({ user: returnRequest.user._id });
       if (!wallet) {
         wallet = new Wallet({
@@ -202,7 +218,7 @@ const processReturn = async (req, res, next) => {
         await wallet.save();
       }
 
-      // Credit the wallet with the pre-calculated refund amount
+      
       await wallet.addMoney(
         totalRefund,
         `Refund for return request #${returnRequest._id.toString().slice(-8)}`,
@@ -210,7 +226,7 @@ const processReturn = async (req, res, next) => {
         returnRequest._id
       );
 
-      // Ensure user has wallet reference
+   
       await User.findByIdAndUpdate(
         returnRequest.user._id,
         {
@@ -219,7 +235,7 @@ const processReturn = async (req, res, next) => {
         { upsert: true }
       );
 
-      // Restore product stock for returned items
+     
       for (const item of returnRequest.items) {
         if (item.product && item.product._id) {
           const product = await Product.findById(item.product._id);
@@ -230,7 +246,7 @@ const processReturn = async (req, res, next) => {
         }
       }
 
-      // Mark as refunded
+   
       returnRequest.status = 'Refunded';
       returnRequest.refundedAt = new Date();
       await returnRequest.save();
@@ -246,7 +262,7 @@ const processReturn = async (req, res, next) => {
         },
       });
     } else if (action === 'reject') {
-      // Only update status and notes - no wallet credit for rejected returns
+      
       returnRequest.status = 'Rejected';
       returnRequest.reviewedAt = new Date();
       returnRequest.adminNotes = adminNotes;

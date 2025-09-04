@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronoX - Customer List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
     <style>
         /* Reset and Base Styles */
@@ -36,6 +36,7 @@
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
+            overflow-x: hidden;
         }
         
         /* Sidebar Styles */
@@ -47,7 +48,7 @@
             position: fixed;
             left: 0;
             top: 0;
-            z-index: 10;
+            z-index: 1000;
             transition: var(--transition);
             display: flex;
             flex-direction: column;
@@ -55,13 +56,13 @@
         }
         
         .sidebar-header {
-            padding: clamp(15px, 3vw, 20px);
+            padding: 20px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
         
         .logo {
-            font-size: clamp(20px, 3vw, 24px);
+            font-size: 24px;
             font-weight: 600;
             color: var(--text-color);
             text-align: center;
@@ -69,20 +70,20 @@
         
         .nav-items {
             flex: 1;
-            padding: clamp(15px, 3vw, 20px) 0;
+            padding: 20px 0;
             overflow-y: auto;
         }
         
         .nav-item {
             display: flex;
             align-items: center;
-            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
+            padding: 12px 20px;
             color: var(--text-secondary);
             text-decoration: none;
             transition: var(--transition);
             margin-bottom: 5px;
             cursor: pointer;
-            font-size: clamp(13px, 1.5vw, 14px);
+            font-size: 14px;
         }
         
         .nav-item:hover, .nav-item.active {
@@ -92,14 +93,14 @@
         }
         
         .nav-item i {
-            margin-right: clamp(8px, 2vw, 12px);
-            width: clamp(18px, 2.5vw, 20px);
+            margin-right: 12px;
+            width: 20px;
             text-align: center;
-            font-size: clamp(16px, 2vw, 18px);
+            font-size: 16px;
         }
         
         .sidebar-footer {
-            padding: clamp(15px, 3vw, 20px);
+            padding: 20px;
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
         }
@@ -107,14 +108,15 @@
         .account-btn, .logout-btn {
             display: block;
             width: 100%;
-            padding: clamp(8px, 1.5vw, 10px);
+            padding: 10px;
             margin-bottom: 10px;
             border-radius: 4px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
-            font-size: clamp(12px, 1.5vw, 14px);
+            font-size: 14px;
+            text-decoration: none;
         }
         
         .account-btn {
@@ -141,10 +143,10 @@
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            padding: clamp(15px, 3vw, 20px);
+            padding: 20px;
             transition: var(--transition);
-            /* min-width: 0; */
-            width:120%;
+            min-width: 0;
+            width: calc(100% - var(--sidebar-width));
         }
         
         /* Header */
@@ -152,19 +154,19 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: clamp(20px, 4vw, 30px);
+            margin-bottom: 30px;
             flex-wrap: wrap;
             gap: 15px;
         }
         
         .page-title {
-            font-size: clamp(18px, 3vw, 20px);
+            font-size: 24px;
             font-weight: 600;
             margin-bottom: 5px;
         }
         
         .breadcrumb {
-            font-size: clamp(12px, 1.5vw, 14px);
+            font-size: 14px;
             color: var(--text-secondary);
         }
         
@@ -177,7 +179,7 @@
             display: flex;
             align-items: center;
             background-color: white;
-            padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 15px);
+            padding: 8px 15px;
             border-radius: 50px;
             box-shadow: var(--shadow-sm);
             cursor: pointer;
@@ -190,11 +192,11 @@
         }
         
         .user-avatar {
-            width: clamp(30px, 4vw, 36px);
-            height: clamp(30px, 4vw, 36px);
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             overflow: hidden;
-            margin-right: clamp(8px, 1.5vw, 10px);
+            margin-right: 10px;
         }
         
         .user-avatar img {
@@ -210,11 +212,11 @@
         
         .user-name {
             font-weight: 500;
-            font-size: clamp(13px, 1.5vw, 14px);
+            font-size: 14px;
         }
         
         .user-role {
-            font-size: clamp(11px, 1.2vw, 12px);
+            font-size: 12px;
             color: var(--text-secondary);
         }
         
@@ -222,7 +224,7 @@
         .search-filter {
             display: flex;
             justify-content: space-between;
-            margin-bottom: clamp(15px, 3vw, 20px);
+            margin-bottom: 20px;
             gap: 15px;
             flex-wrap: wrap;
         }
@@ -236,10 +238,10 @@
         
         .search-box input {
             width: 100%;
-            padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 15px) clamp(8px, 1.5vw, 10px) clamp(35px, 5vw, 40px);
+            padding: 10px 15px 10px 40px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            font-size: clamp(13px, 1.5vw, 14px);
+            font-size: 14px;
             transition: var(--transition);
         }
         
@@ -251,43 +253,85 @@
         
         .search-box i {
             position: absolute;
-            left: clamp(12px, 2vw, 15px);
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-secondary);
-            font-size: clamp(12px, 1.5vw, 14px);
+            font-size: 14px;
         }
         
-        /* Customer Table */
+        /* Customer Table - Responsive Design */
         .customer-table {
             background-color: white;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: var(--shadow-sm);
-            margin-bottom: clamp(15px, 3vw, 20px);
+            margin-bottom: 20px;
             border: 1px solid var(--border-color);
+        }
+
+        .table-container {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .customer-table table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px;
+            table-layout: fixed;
+            min-width: 800px;
         }
 
         .customer-table th,
         .customer-table td {
-            padding: clamp(10px, 2vw, 15px);
-            font-size: clamp(12px, 1.5vw, 14px);
+            padding: 15px 12px;
+            font-size: 14px;
             text-align: left;
             vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* border-right: 1px solid var(--border-color); */
+        }
+
+        .customer-table th:last-child,
+        .customer-table td:last-child {
+            border-right: none;
+        }
+
+        /* Fixed column widths for consistent layout */
+        .customer-table th:nth-child(1),
+        .customer-table td:nth-child(1) {
+            width: 30%;
+        }
+
+        .customer-table th:nth-child(2),
+        .customer-table td:nth-child(2) {
+            width: 28%;
+        }
+
+        .customer-table th:nth-child(3),
+        .customer-table td:nth-child(3) {
+            width: 18%;
+        }
+
+        .customer-table th:nth-child(4),
+        .customer-table td:nth-child(4) {
+            width: 12%;
+        }
+
+        .customer-table th:nth-child(5),
+        .customer-table td:nth-child(5) {
+            width: 12%;
         }
 
         .customer-table th {
             background-color: #111827;
             color: white;
             font-weight: 500;
-            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .customer-table td {
@@ -307,13 +351,11 @@
         }
         
         .customer-avatar {
-            width: clamp(30px, 4vw, 36px);
-            height: clamp(30px, 4vw, 36px);
+            width: 36px;
+            height: 36px;
             border-radius: 4px;
             background-color: #f3f4f6;
-            display: inline-block;
-            margin-right: clamp(8px, 1.5vw, 10px);
-            vertical-align: middle;
+            margin-right: 10px;
             overflow: hidden;
             flex-shrink: 0;
         } 
@@ -324,28 +366,39 @@
             object-fit: cover;
         }
         
-        .customer-name {
-            display: inline-block;
-            vertical-align: middle;
-            font-weight: 500;
-            font-size: clamp(12px, 1.5vw, 14px);
+        .customer-info {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
         }
-        .email {
-            color: #010603;
-            font-size: clamp(12px, 1.5vw, 14px);
-            max-width: 120px;        /* Adjust as needed */
+        
+        .customer-name {
+            font-weight: 500;
+            font-size: 14px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: inline-block;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .email {
+            color: #010603;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            width: 100%;
         }
         
         /* Status Badge */
         .status-badge {
             display: inline-block;
-            padding: clamp(4px, 0.8vw, 5px) clamp(8px, 1.5vw, 10px);
+            padding: 5px 10px;
             border-radius: 4px;
-            font-size: clamp(10px, 1.2vw, 12px);
+            font-size: 12px;
             font-weight: 500;
             text-transform: uppercase;
             white-space: nowrap;
@@ -365,8 +418,8 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: clamp(40px, 6vw, 50px);
-            height: clamp(20px, 3vw, 24px);
+            width: 50px;
+            height: 24px;
         }
         
         .switch input {
@@ -390,10 +443,10 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: clamp(14px, 2.5vw, 16px);
-            width: clamp(14px, 2.5vw, 16px);
-            left: clamp(3px, 0.5vw, 4px);
-            bottom: clamp(3px, 0.5vw, 4px);
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
@@ -404,7 +457,7 @@
         }
         
         input:checked + .slider:before {
-            transform: translateX(clamp(18px, 3vw, 26px));
+            transform: translateX(26px);
         }
         
         /* Pagination */
@@ -417,7 +470,7 @@
         }
         
         .page-info {
-            font-size: clamp(12px, 1.5vw, 14px);
+            font-size: 14px;
             color: var(--text-secondary);
         }
         
@@ -429,8 +482,8 @@
         }
         
         .page-btn {
-            width: clamp(28px, 4vw, 32px);
-            height: clamp(28px, 4vw, 32px);
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -439,7 +492,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: var(--transition);
-            font-size: clamp(12px, 1.5vw, 14px);
+            font-size: 14px;
             text-decoration: none;
             color: var(--text-color);
         }
@@ -462,25 +515,78 @@
         /* Menu Toggle Button */
         .menu-toggle {
             position: fixed;
-            top: clamp(15px, 3vw, 20px);
-            left: clamp(15px, 3vw, 20px);
-            z-index: 20;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
             background-color: white;
             border: 1px solid var(--border-color);
             border-radius: 5px;
-            width: clamp(35px, 5vw, 40px);
-            height: clamp(35px, 5vw, 40px);
+            width: 40px;
+            height: 40px;
             display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             box-shadow: var(--shadow-sm);
-            font-size: clamp(14px, 2vw, 16px);
+            font-size: 16px;
+        }
+        
+        /* Mobile Card Layout */
+        .mobile-card {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .mobile-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mobile-card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .mobile-card-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .mobile-card-value {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .mobile-card-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
         }
         
         /* Responsive Design */
         
-        /* Large Desktop */
+        /* Large Desktop (1400px+) */
         @media (min-width: 1400px) {
             .main-content {
                 padding: 30px;
@@ -488,23 +594,25 @@
             
             .customer-table th,
             .customer-table td {
-                padding: 20px;
+                padding: 18px 15px;
+            }
+
+            .page-title {
+                font-size: 28px;
             }
         }
         
-        /* Desktop */
-        @media (max-width: 1200px) {
-            .customer-table {
-                overflow-x: auto;
-            }
-            
-            .search-box {
-                min-width: 200px;
+        /* Desktop (1200px - 1399px) */
+        @media (max-width: 1399px) {
+            .customer-table th,
+            .customer-table td {
+                padding: 12px 10px;
+                font-size: 13px;
             }
         }
         
-        /* Tablet Landscape */
-        @media (max-width: 1024px) {
+        /* Tablet Landscape (1024px - 1199px) */
+        @media (max-width: 1199px) {
             .sidebar {
                 width: var(--sidebar-collapsed);
             }
@@ -529,11 +637,12 @@
             
             .main-content {
                 margin-left: var(--sidebar-collapsed);
+                width: calc(100% - var(--sidebar-collapsed));
             }
             
             .account-btn, .logout-btn {
                 padding: 8px 5px;
-                font-size: 11px;
+                font-size: 12px;
             }
             
             .header {
@@ -544,10 +653,14 @@
             .user-profile {
                 align-self: flex-end;
             }
+
+            .customer-table table {
+                min-width: 700px;
+            }
         }
         
-        /* Tablet Portrait */
-        @media (max-width: 768px) {
+        /* Tablet Portrait (768px - 1023px) */
+        @media (max-width: 1023px) {
             .search-filter {
                 flex-direction: column;
             }
@@ -569,17 +682,41 @@
             }
             
             .customer-table table {
-                min-width: 500px;
+                min-width: 600px;
             }
-            
+
             .customer-table th:nth-child(3),
             .customer-table td:nth-child(3) {
-                display: none;
+                width: 0;
+                padding: 0;
+                border: none;
+                overflow: hidden;
+                max-width: 0;
+            }
+
+            .customer-table th:nth-child(1),
+            .customer-table td:nth-child(1) {
+                width: 40%;
+            }
+
+            .customer-table th:nth-child(2),
+            .customer-table td:nth-child(2) {
+                width: 35%;
+            }
+
+            .customer-table th:nth-child(4),
+            .customer-table td:nth-child(4) {
+                width: 12.5%;
+            }
+
+            .customer-table th:nth-child(5),
+            .customer-table td:nth-child(5) {
+                width: 12.5%;
             }
         }
         
-        /* Mobile Landscape */
-        @media (max-width: 640px) {
+        /* Mobile Landscape (640px - 767px) */
+        @media (max-width: 767px) {
             .sidebar {
                 width: 0;
                 overflow: hidden;
@@ -593,7 +730,9 @@
             
             .main-content {
                 margin-left: 0;
-                padding-top: 60px;
+                padding-top: 70px;
+                width: 100%;
+                padding: 70px 15px 15px 15px;
             }
             
             .menu-toggle {
@@ -609,31 +748,50 @@
             }
             
             .customer-table table {
-                min-width: 450px;
+                min-width: 500px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .breadcrumb {
+                font-size: 12px;
             }
         }
         
-        /* Mobile Portrait */
-        @media (max-width: 480px) {
+        /* Mobile Portrait (480px - 639px) */
+        @media (max-width: 639px) {
             .header {
                 margin-bottom: 20px;
             }
             
-            .page-title {
-                font-size: 16px;
-            }
-            
-            .breadcrumb {
-                font-size: 11px;
-            }
-            
             .customer-table th:nth-child(4),
             .customer-table td:nth-child(4) {
-                display: none;
+                width: 0;
+                padding: 0;
+                border: none;
+                overflow: hidden;
+                max-width: 0;
             }
             
             .customer-table table {
-                min-width: 350px;
+                min-width: 400px;
+            }
+
+            .customer-table th:nth-child(1),
+            .customer-table td:nth-child(1) {
+                width: 50%;
+            }
+
+            .customer-table th:nth-child(2),
+            .customer-table td:nth-child(2) {
+                width: 35%;
+            }
+
+            .customer-table th:nth-child(5),
+            .customer-table td:nth-child(5) {
+                width: 15%;
             }
             
             .page-controls {
@@ -651,19 +809,20 @@
             }
         }
         
-        /* Extra Small Mobile */
-        @media (max-width: 360px) {
+        /* Extra Small Mobile (360px - 479px) */
+        @media (max-width: 479px) {
             .main-content {
-                padding: 10px;
+                padding: 70px 10px 10px 10px;
             }
             
             .customer-table th,
             .customer-table td {
-                padding: 8px;
+                padding: 8px 6px;
+                font-size: 12px;
             }
             
             .customer-table table {
-                min-width: 300px;
+                min-width: 320px;
             }
             
             .page-btn {
@@ -673,8 +832,8 @@
             }
             
             .switch {
-                width: 35px;
-                height: 18px;
+                width: 40px;
+                height: 20px;
             }
             
             .slider:before {
@@ -683,14 +842,58 @@
             }
             
             input:checked + .slider:before {
-                transform: translateX(17px);
+                transform: translateX(20px);
+            }
+
+            .customer-avatar {
+                width: 28px;
+                height: 28px;
+                margin-right: 8px;
+            }
+
+            .customer-name {
+                font-size: 12px;
+            }
+
+            .email {
+                font-size: 12px;
+            }
+
+            .status-badge {
+                padding: 3px 6px;
+                font-size: 10px;
+            }
+        }
+
+        /* Ultra Small Mobile (320px and below) */
+        @media (max-width: 359px) {
+            .table-container {
+                display: none;
+            }
+
+            .mobile-card {
+                display: block;
+            }
+
+            .customer-table {
+                display: none;
+            }
+
+            .mobile-card-body {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .mobile-card-actions {
+                flex-direction: column;
+                gap: 10px;
             }
         }
         
         /* Landscape orientation for mobile */
         @media (max-height: 500px) and (orientation: landscape) {
             .main-content {
-                padding-top: 50px;
+                padding-top: 60px;
             }
             
             .menu-toggle {
@@ -721,13 +924,15 @@
         @media print {
             .sidebar,
             .menu-toggle,
-            .user-profile {
+            .user-profile,
+            .search-filter {
                 display: none;
             }
             
             .main-content {
                 margin-left: 0;
                 padding: 0;
+                width: 100%;
             }
             
             .customer-table {
@@ -737,6 +942,18 @@
             
             .page-controls {
                 display: none;
+            }
+
+            .mobile-card {
+                display: none;
+            }
+
+            .table-container {
+                display: block !important;
+            }
+
+            .customer-table {
+                display: block !important;
             }
         }
         
@@ -764,6 +981,33 @@
         .switch:focus-within {
             outline: 2px solid var(--primary-color);
             outline-offset: 2px;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading states */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Animation for mobile cards */
+        .mobile-card {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -862,48 +1106,92 @@
             </div>
         </form>
         
+        <!-- Desktop/Tablet Table View -->
         <div class="customer-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Customer Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% user.forEach(element => { %>
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="customer-avatar">
-                                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John">
-                                </div>
-                                <span class="customer-name"><%= element.fullname %></span>
-                            </td>
-                            <td><div class="email"><%= element.email %></div></td>
-                            <td><%= element.mobile %></td>
-                            <% if (element.isBlocked) { %>
-                                <td><span class="status-badge status-blocked">Blocked</span></td>
-                            <% } else { %>
-                                <td><span class="status-badge status-active">Active</span></td>
-                            <% } %>
-                            <td>
-                                <label class="switch">
-                                    <% if (element.isBlocked) { %>
-                                        <input type="checkbox" checked onclick="blockUnblock('<%=element._id %>')">
-                                    <% } else { %>
-                                        <input type="checkbox" onclick="blockUnblock('<%=element._id %>')">
-                                    <% } %>
-                                    <span class="slider" data-bs-toggle="tooltip" title="status change to block and unblock"></span>
-                                </label>
-                            </td>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <% user.forEach(element => { %>
+                            <tr>
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="customer-avatar">
+                                            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="<%= element.fullname %>">
+                                        </div>
+                                        <span class="customer-name"><%= element.fullname %></span>
+                                    </div>
+                                </td>
+                                <td><div class="email"><%= element.email %></div></td>
+                                <td><%= element.mobile %></td>
+                                <% if (element.isBlocked) { %>
+                                    <td><span class="status-badge status-blocked">Blocked</span></td>
+                                <% } else { %>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                <% } %>
+                                <td>
+                                    <label class="switch">
+                                        <% if (element.isBlocked) { %>
+                                            <input type="checkbox" checked onclick="blockUnblock('<%=element._id %>')">
+                                        <% } else { %>
+                                            <input type="checkbox" onclick="blockUnblock('<%=element._id %>')">
+                                        <% } %>
+                                        <span class="slider" data-bs-toggle="tooltip" title="Toggle user status"></span>
+                                    </label>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+        <!-- Mobile Card View -->
+        <% user.forEach(element => { %>
+            <div class="mobile-card">
+                <div class="mobile-card-header">
+                    <div class="customer-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="<%= element.fullname %>">
+                    </div>
+                    <div class="customer-name" style="font-weight: 600; font-size: 16px;"><%= element.fullname %></div>
+                </div>
+                <div class="mobile-card-body">
+                    <div class="mobile-card-field">
+                        <div class="mobile-card-label">Email</div>
+                        <div class="mobile-card-value email"><%= element.email %></div>
+                    </div>
+                    <div class="mobile-card-field">
+                        <div class="mobile-card-label">Phone</div>
+                        <div class="mobile-card-value"><%= element.mobile %></div>
+                    </div>
+                    <div class="mobile-card-actions">
+                        <div>
+                            <% if (element.isBlocked) { %>
+                                <span class="status-badge status-blocked">Blocked</span>
+                            <% } else { %>
+                                <span class="status-badge status-active">Active</span>
+                            <% } %>
+                        </div>
+                        <label class="switch">
+                            <% if (element.isBlocked) { %>
+                                <input type="checkbox" checked onclick="blockUnblock('<%=element._id %>')">
+                            <% } else { %>
+                                <input type="checkbox" onclick="blockUnblock('<%=element._id %>')">
+                            <% } %>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
         
         <div class="pagination">
             <div class="page-info">
@@ -923,14 +1211,12 @@
                     </button>
                 <% } %>
 
-                
                 <% for (let i = 1; i <= totalPage; i++) { %>
                     <a href="userlist?page=<%= i %>&search=<%= search %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
                         <%= i %>
                     </a>
                 <% } %>
 
-                
                 <% if (currentPage < totalPage) { %>
                     <a href="userlist?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">
                         <i class="fas fa-chevron-right"></i>
@@ -944,17 +1230,14 @@
         </div>
     </div>
     
-
-    <script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl);
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         });
-        });
-
 
         // Menu Toggle for Mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
@@ -966,7 +1249,7 @@
             const sidebar = document.getElementById('sidebar');
             const menuToggle = document.getElementById('menuToggle');
             
-            if (window.innerWidth <= 640 && 
+            if (window.innerWidth <= 767 && 
                 !sidebar.contains(e.target) && 
                 !menuToggle.contains(e.target) && 
                 sidebar.classList.contains('active')) {
@@ -978,7 +1261,7 @@
         const switches = document.querySelectorAll('.switch input');
         switches.forEach(switchEl => {
             switchEl.addEventListener('change', function() {
-                const row = this.closest('tr');
+                const row = this.closest('tr') || this.closest('.mobile-card');
                 const statusBadge = row.querySelector('.status-badge');
                 
                 if (this.checked) {
@@ -1028,9 +1311,18 @@
         // Handle window resize
         window.addEventListener('resize', function() {
             const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth > 640 && sidebar.classList.contains('active')) {
+            if (window.innerWidth > 767 && sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scroll for pagination
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!this.hasAttribute('disabled')) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
         });
     </script>
 </body>
