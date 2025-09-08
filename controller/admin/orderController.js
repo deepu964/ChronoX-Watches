@@ -44,6 +44,7 @@ const getOrders = async (req, res, next) => {
       .skip(skip)
       .limit(limit);
 
+
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
     res.render('admin/orders', {
@@ -54,6 +55,7 @@ const getOrders = async (req, res, next) => {
       total,
       limit,
       cloudName,
+     
     });
   } catch (error) {
     logger.error('Error fetching orders:', error);
