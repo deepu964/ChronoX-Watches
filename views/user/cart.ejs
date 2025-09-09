@@ -923,14 +923,57 @@
                                     <%= item.product.name %>
                                 </div>
                                 <div class="item-price">
-                                    <% const price=item.product.variants[0].salePrice ||
-                                        item.product.variants[0].regularPrice; const
-                                        originalPrice=item.product.variants[0].regularPrice; %>
-                                        <span class="current-price">₹<%= price.toLocaleString() %></span>
-                                        <% if (price !==originalPrice) { %>
-                                            <span class="original-price">₹<%= originalPrice.toLocaleString() %></span>
-                                            <% } %>
+                                    <% const regularPrice = item.product.variants[0].regularPrice; %>
+                                    <% const salePrice = item.product.variants[0].salePrice; %>
+                                    <% const productOffer = regularPrice - salePrice; %>
+                                    
+                                    <!-- Calculate category offer -->
+                                    <% let categoryDiscount = 0; %>
+                                    <% if (typeof categoryOffers !== 'undefined') { %>
+                                        <% const catOffer = categoryOffers.find(cat => cat.category._id.toString() === item.product.categoryId.toString()); %>
+                                        <% if (catOffer && catOffer.discount) { %>
+                                            <% categoryDiscount = (regularPrice * catOffer.discount) / 100; %>
+                                        <% } %>
+                                    <% } %>
+                                    
+                                    <% const bestOffer = Math.max(productOffer, categoryDiscount); %>
+                                    <% const finalPrice = regularPrice - bestOffer; %>
+                                    
+                                    <span class="current-price">₹<%= finalPrice.toLocaleString() %></span>
+                                    <% if (bestOffer > 0) { %>
+                                        <span class="original-price">₹<%= regularPrice.toLocaleString() %></span>
+                                    <% } %>
                                 </div>
+                                
+                                <!-- Offer Details for each item -->
+                                <% if (productOffer > 0 || categoryDiscount > 0) { %>
+                                <div class="item-offers" style="margin-top: 8px; font-size: 0.85rem;">
+                                    <% if (productOffer > 0) { %>
+                                    <div class="offer-badge" style="display: inline-block; margin-right: 8px; padding: 2px 6px; border-radius: 4px; <%= productOffer >= categoryDiscount ? 'background: #e8f5e8; color: #2e7d32; border: 1px solid #4caf50;' : 'background: #f5f5f5; color: #666; border: 1px solid #ddd;' %>">
+                                        <i class="fas fa-gift" style="font-size: 0.7rem; margin-right: 3px;"></i>
+                                        Product: <%= ((productOffer / regularPrice) * 100).toFixed(0) %>% OFF
+                                        <% if (productOffer >= categoryDiscount) { %>
+                                            <i class="fas fa-check" style="font-size: 0.6rem; margin-left: 3px;"></i>
+                                        <% } %>
+                                    </div>
+                                    <% } %>
+                                    
+                                    <% if (categoryDiscount > 0) { %>
+                                    <div class="offer-badge" style="display: inline-block; margin-right: 8px; padding: 2px 6px; border-radius: 4px; <%= categoryDiscount > productOffer ? 'background: #e3f2fd; color: #1976d2; border: 1px solid #2196f3;' : 'background: #f5f5f5; color: #666; border: 1px solid #ddd;' %>">
+                                        <i class="fas fa-layer-group" style="font-size: 0.7rem; margin-right: 3px;"></i>
+                                        Category: <%= ((categoryDiscount / regularPrice) * 100).toFixed(0) %>% OFF
+                                        <% if (categoryDiscount > productOffer) { %>
+                                            <i class="fas fa-check" style="font-size: 0.6rem; margin-left: 3px;"></i>
+                                        <% } %>
+                                    </div>
+                                    <% } %>
+                                    
+                                    <div style="margin-top: 4px; font-size: 0.75rem; color: #28a745; font-weight: 600;">
+                                        <i class="fas fa-tag" style="margin-right: 3px;"></i>
+                                        Best offer applied: ₹<%= bestOffer.toFixed(2) %> saved per item
+                                    </div>
+                                </div>
+                                <% } %>
                             </div>
                             <div class="quantity-controls">
                                 <button class="quantity-btn"
@@ -966,6 +1009,76 @@
                             <span class="green" id="discount">- ₹<%= discount.toLocaleString() %></span>
                         </div>
 
+                        <!-- Detailed Offer Breakdown -->
+                        <% if (discount > 0) { %>
+                        <div style="margin: 15px 0; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 0.9rem; display: flex; align-items: center;">
+                                <i class="fas fa-tags" style="color: #28a745; margin-right: 8px;"></i>
+                                Applied Offers Breakdown
+                            </h4>
+                            
+                            <% let totalProductDiscount = 0; %>
+                            <% let totalCategoryDiscount = 0; %>
+                            <% let productOfferCount = 0; %>
+                            <% let categoryOfferCount = 0; %>
+                            
+                            <% items.forEach(item => { %>
+                                <% const regularPrice = item.product.variants[0].regularPrice; %>
+                                <% const salePrice = item.product.variants[0].salePrice; %>
+                                <% const productOffer = regularPrice - salePrice; %>
+                                
+                                <% let categoryDiscount = 0; %>
+                                <% if (typeof categoryOffers !== 'undefined') { %>
+                                    <% const catOffer = categoryOffers.find(cat => cat.category._id.toString() === item.product.categoryId.toString()); %>
+                                    <% if (catOffer && catOffer.discount) { %>
+                                        <% categoryDiscount = (regularPrice * catOffer.discount) / 100; %>
+                                    <% } %>
+                                <% } %>
+                                
+                                <% const bestOffer = Math.max(productOffer, categoryDiscount); %>
+                                <% const itemTotalDiscount = bestOffer * item.quantity; %>
+                                
+                                <% if (productOffer >= categoryDiscount && productOffer > 0) { %>
+                                    <% totalProductDiscount += itemTotalDiscount; %>
+                                    <% productOfferCount++; %>
+                                <% } else if (categoryDiscount > 0) { %>
+                                    <% totalCategoryDiscount += itemTotalDiscount; %>
+                                    <% categoryOfferCount++; %>
+                                <% } %>
+                            <% }); %>
+                            
+                            <% if (totalProductDiscount > 0) { %>
+                            <div style="display: flex; justify-content: space-between; margin: 5px 0; font-size: 0.85rem;">
+                                <span style="color: #666;">
+                                    <i class="fas fa-gift" style="color: #28a745; margin-right: 5px; font-size: 0.7rem;"></i>
+                                    Product Offers (<%= productOfferCount %> items)
+                                </span>
+                                <span style="color: #28a745; font-weight: 600;">- ₹<%= totalProductDiscount.toFixed(2) %></span>
+                            </div>
+                            <% } %>
+                            
+                            <% if (totalCategoryDiscount > 0) { %>
+                            <div style="display: flex; justify-content: space-between; margin: 5px 0; font-size: 0.85rem;">
+                                <span style="color: #666;">
+                                    <i class="fas fa-layer-group" style="color: #007bff; margin-right: 5px; font-size: 0.7rem;"></i>
+                                    Category Offers (<%= categoryOfferCount %> items)
+                                </span>
+                                <span style="color: #28a745; font-weight: 600;">- ₹<%= totalCategoryDiscount.toFixed(2) %></span>
+                            </div>
+                            <% } %>
+                            
+                            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #ddd;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                                    <span style="color: #28a745; font-weight: 600;">
+                                        <i class="fas fa-calculator" style="margin-right: 5px;"></i>
+                                        Total Savings:
+                                    </span>
+                                    <span style="color: #28a745; font-weight: 700;">₹<%= discount.toFixed(2) %></span>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
                         <!-- <div class="price-row">
                             <span>Coupon Discount</span>
                             <span class="red">Apply Coupon</span>
@@ -976,6 +1089,15 @@
                             <strong>Total Amount</strong>
                             <strong id="grandTotal">₹<%= grandTotal  %></strong>
                         </div>
+                        
+                        <% if (discount > 0) { %>
+                        <div style="margin-top: 10px; padding: 8px; background: linear-gradient(135deg, #e8f5e8, #f1f8e9); border-radius: 6px; text-align: center;">
+                            <small style="color: #2e7d32; font-weight: 600;">
+                                <i class="fas fa-check-circle" style="margin-right: 5px;"></i>
+                                You're saving ₹<%= discount.toFixed(2) %> on this order!
+                            </small>
+                        </div>
+                        <% } %>
                     </div>
 
                     <div class="cart-actions">
@@ -997,38 +1119,45 @@
 
                 async function updateCart(productId, action) {
                     try {
-                            const res = await fetch(`/cart/update`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ productId, action })
-                            });
-                            const data = await res.json();
+                        const res = await fetch(`/cart/update`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId, action })
+                        });
+                        const data = await res.json();
 
-                            if (data.success) {
-                                // Update quantity
-                                document.getElementById(`qty-${productId}`).innerText = data.quantity;
+                        if (data.success) {
+                            // Update quantity display
+                            document.getElementById(`qty-${productId}`).innerText = data.quantity;
 
-                                if (data.cartTotal !== undefined) {
-                                    document.getElementById('cart-total').innerText = `₹${data.cartTotal.toLocaleString()}`;
-                                }
-
-                                if(data.discountOff !== undefined){
-                                    document.getElementById('discount').innerText = `-₹${data.discountOff.toLocaleString()}`
-                                }
-
-                                if(data.grandTotal !== undefined){
-                                    document.getElementById('grandTotal').innerText = `${data.grandTotal.toLocaleString()}`
-                                }
-
-                                showToast(data.message || 'Cart updated');
-                            } else {
-                                showToast(data.message || 'Failed to update cart', 'error');
+                            // Update cart totals
+                            if (data.cartTotal !== undefined) {
+                                document.getElementById('cart-total').innerText = `₹${data.cartTotal.toLocaleString()}`;
                             }
-                        } catch (err) {
-                            console.error(err);
-                            showToast('Something went wrong');
+
+                            if (data.discountOff !== undefined) {
+                                document.getElementById('discount').innerText = `-₹${data.discountOff.toLocaleString()}`;
+                            }
+
+                            if (data.grandTotal !== undefined) {
+                                document.getElementById('grandTotal').innerText = `₹${data.grandTotal.toLocaleString()}`;
+                            }
+
+                            showToast(data.message || 'Cart updated');
+                            
+                            // Reload page to update offer calculations and breakdown
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                            
+                        } else {
+                            showToast(data.message || 'Failed to update cart', 'error');
                         }
+                    } catch (err) {
+                        console.error(err);
+                        showToast('Something went wrong', 'error');
                     }
+                }
 
 
                 async function removeItem(productId) {
