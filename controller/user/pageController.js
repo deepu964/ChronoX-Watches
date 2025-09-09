@@ -8,19 +8,70 @@ const logger = require('../../utils/logger');
 const getLoadHomePage = async (req, res, next) => {
   try {
     const category = await categorySchema.find({ isListed: true });
-    const products = await productSchema.find({ isActive: false });
+    const products = await productSchema.find({ isActive: false }).populate('categoryId');
     const newProducts = await productSchema
       .find({ isActive: false })
+      .populate('categoryId')
       .sort({ createdAt: -1 })
       .limit(8);
     const user = req.session.user;
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+    // Get active category offers
+    const categoryOffers = await categoryOffer.find({
+      isDeleted: false,
+      status: "Active"
+    }).populate("category");
+
+    // Calculate offers for all products
+    const calculateProductOffers = (productList) => {
+      return productList.map(product => {
+        const basePrice = Math.min(
+          ...product.variants.map(v => v.salePrice || v.regularPrice)
+        );
+
+        // Calculate product-level discount percentage
+        let productDiscountPer = 0;
+        for (let vari of product.variants) {
+          const diff = vari.regularPrice - (vari.salePrice || vari.regularPrice);
+          const per = (diff / vari.regularPrice) * 100;
+          if (per > productDiscountPer) productDiscountPer = per;
+        }
+
+        // Calculate category-level discount percentage
+        let categoryDiscountPer = 0;
+        const catOffer = categoryOffers.find(
+          c => c.category._id.toString() === product.categoryId._id.toString()
+        );
+        if (catOffer) {
+          categoryDiscountPer = catOffer.discount;
+        }
+
+        // Determine which offer is greater and apply it
+        const finalDiscountPer = Math.max(productDiscountPer, categoryDiscountPer);
+        
+        // Store offer information on the product
+        product.productDiscountPer = productDiscountPer;
+        product.categoryDiscountPer = categoryDiscountPer;
+        product.finalDiscountPer = finalDiscountPer;
+        product.appliedOfferType = productDiscountPer >= categoryDiscountPer ? 'Product Offer' : 'Category Offer';
+        product.originalPrice = basePrice;
+        product.finalPrice = basePrice - (basePrice * finalDiscountPer) / 100;
+        product.savingsAmount = basePrice - product.finalPrice;
+
+        return product;
+      });
+    };
+
+    const productsWithOffers = calculateProductOffers(products);
+    const newProductsWithOffers = calculateProductOffers(newProducts);
+
     res.render('user/home', {
       user,
-      products,
+      products: productsWithOffers,
       cloudName,
       category,
-      newProducts,
+      newProducts: newProductsWithOffers,
     });
   } catch (error) {
     logger.error('Home page error:', error);
