@@ -258,13 +258,28 @@ const getProductDetails = async (req, res, next) => {
       categoryDiscountPer = catOffer.discount;
     }
 
-    // Final applied discount
+    // Final applied discount - choose the highest
     const finalDiscountPer = Math.max(productDiscountPer, categoryDiscountPer);
     const finalPrice = basePrice - (basePrice * finalDiscountPer) / 100;
 
-    // Attach values to product
+    // Determine which offer type is applied
+    let appliedOfferType = 'No Offer';
+    if (finalDiscountPer > 0) {
+      if (productDiscountPer >= categoryDiscountPer) {
+        appliedOfferType = 'Product Offer';
+      } else {
+        appliedOfferType = 'Category Offer';
+      }
+    }
+
+    // Attach comprehensive offer data to product
+    product.originalPrice = basePrice;
     product.finalPrice = finalPrice;
     product.appliedDiscount = finalDiscountPer;
+    product.productDiscountPer = productDiscountPer;
+    product.categoryDiscountPer = categoryDiscountPer;
+    product.appliedOfferType = appliedOfferType;
+    product.savingsAmount = basePrice - finalPrice;
 
     /** 🔹 Do the same for "related products" list */
     for (let p of products) {
