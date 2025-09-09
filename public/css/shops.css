@@ -260,7 +260,7 @@ a {
   animation: fadeLeft 1s forwards 0.5s;
 }
 
-.discount-badge {
+/* .discount-badge {
   position: absolute;
   right: 60px;
   top: 50%;
@@ -278,7 +278,7 @@ a {
   opacity: 0;
   animation: scaleIn 0.8s forwards 1s;
   box-shadow: var(--shadow-md);
-}
+} */
 
 .discount-text {
   font-size: 16px;

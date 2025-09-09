@@ -750,21 +750,22 @@
             <!-- Product Info -->
             <div class="product-info">
                 <h1 class="product-title"><%= product.name %></h1>
+
                 <div class="product-price">
-                        <span class="current-price" style="font-weight: bold; font-size: 1.1em; color: #000;">
-                        <% if (!discount) { %>
-                                ₹<%= product.variants[0]?.salePrice  %>
-                                <% } else { %>
-                                 ₹<%= lastAmount  %>
-                        <% } %>
-                        </span>
-                        <span style="text-decoration: line-through; color: rgb(221, 203, 203); font-size: 0.9em; margin-left: 8px;">
+                <span class="current-price" style="font-weight: bold; font-size: 1.2em; color: #000;">
+                    ₹<%= product.finalPrice.toFixed(2) %>
+                </span>
+
+                <% if (product.appliedDiscount > 0) { %>
+                    <span class="old-price" style="text-decoration: line-through; color: rgb(221, 203, 203); font-size: 0.9em; margin-left: 8px;">
                     ₹<%= product.variants[0]?.regularPrice %>
                     </span>
-                    </div>
-                <span style="color: rgb(251, 5, 5); font-weight: bold; font-size: 0.9em; margin-left: 8px;">
-                <%= lastOff.toFixed(2) %> % OFF
-                 </span>
+                    <span class="discount" style="color: rgb(251, 5, 5); font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                    -<%= product.appliedDiscount.toFixed(0) %>% OFF
+                    </span>
+                <% } %>
+                </div>
+
                 
                 <div class="rating">
                     <span class="stars">⭐⭐⭐⭐⭐</span>

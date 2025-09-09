@@ -111,21 +111,58 @@
                                 <h3 class="product-name">
                                     <%= product.name %>
                                 </h3>
+                                
+                                <!-- Offer Information -->
+                                <% if (product.finalDiscountPer > 0) { %>
+                                    <div class="offer-info">
+                                        <div class="discount-badge">
+                                            <span style="color: white; background-color: #e74c3c; padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold;">
+                                                <%= product.finalDiscountPer.toFixed(1) %>% OFF
+                                            </span>
+                                        </div>
+                                        <div class="offer-details" style="font-size: 11px; color: #666; margin-top: 2px;">
+                                            <% if (product.productDiscountPer > 0 && product.categoryDiscountPer > 0) { %>
+                                                <span>Product: <%= product.productDiscountPer.toFixed(1) %>% | Category: <%= product.categoryDiscountPer.toFixed(1) %>%</span><br>
+                                                <span style="color: #27ae60; font-weight: bold;">Applied: <%= product.appliedOfferType %></span>
+                                            <% } else if (product.productDiscountPer > 0) { %>
+                                                <span style="color: #27ae60;">Product Offer Applied</span>
+                                            <% } else if (product.categoryDiscountPer > 0) { %>
+                                                <span style="color: #27ae60;">Category Offer Applied</span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                <% } %>
 
-                                <div class="product-price">
-                                    <% if (product.variants && product.variants.length> 0 && product.variants[0]) { %>
+                                <!-- Price Information -->
+                                <div class="product-price" style="margin-top: 8px;">
+                                    <% if (product.finalPrice && product.finalDiscountPer > 0) { %>
+                                        <!-- Show discounted price -->
+                                        <span class="current-price" style="color: #e74c3c; font-weight: bold; font-size: 18px;">
+                                            ₹<%= product.finalPrice.toFixed(2) %>
+                                        </span>
+                                        <!-- Show original price -->
+                                        <span class="old-price" style="text-decoration: line-through; color: #999; margin-left: 8px;">
+                                            ₹<%= product.originalPrice.toFixed(2) %>
+                                        </span>
+                                        <!-- Show savings -->
+                                        <div style="font-size: 12px; color: #27ae60; margin-top: 2px;">
+                                            You save: ₹<%= (product.originalPrice - product.finalPrice).toFixed(2) %>
+                                        </div>
+                                    <% } else if (product.variants && product.variants.length > 0) { %>
+                                        <!-- fallback without finalPrice -->
                                         <span class="current-price">
                                             ₹<%= product.variants[0].salePrice || product.variants[0].regularPrice %>
                                         </span>
-                                        <% if (product.variants[0].salePrice && product.variants[0].regularPrice) { %>
-                                            <span class="old-price">
+                                        <% if (product.variants[0].salePrice && product.variants[0].regularPrice && product.variants[0].salePrice < product.variants[0].regularPrice) { %>
+                                            <span class="old-price" style="text-decoration: line-through; color: #999; margin-left: 8px;">
                                                 ₹<%= product.variants[0].regularPrice %>
                                             </span>
-                                            <% } %>
-                                                <% } else { %>
-                                                    <span class="current-price">Price not available</span>
-                                                    <% } %>
+                                        <% } %>
+                                    <% } else { %>
+                                        <span class="current-price">Price not available</span>
+                                    <% } %>
                                 </div>
+
 
                                 <div class="product-rating">
                                     <% for (let i=0; i < Math.floor(product.rating || 0); i++) { %>
