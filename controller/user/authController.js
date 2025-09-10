@@ -90,7 +90,7 @@ const signUp = async (req, res) => {
       return res.redirect('/signup?error2=User already exists with this email');
     }
 
-    // Validate referral code if provided
+   
     let validReferralCode = null;
     if (referredBy && referredBy.trim()) {
       const referrer = await User.findOne({ referralCode: referredBy.trim() });

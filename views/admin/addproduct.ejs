@@ -290,7 +290,7 @@ in.css">
                
                 <div class="form-group">
                     <label class="form-label" for="stock">Stock</label>
-                    <input type="number" class="form-control" id="stock" placeholder="Enter product Qauntity" name="stock">
+                    <input type="number" class="form-control" id="stock" placeholder="Enter product Quantity" name="stock">
                     <p id="quantityError" style="color: red;"></p>
                 </div>
                 <div class="form-group">
@@ -519,6 +519,7 @@ in.css">
             const productName = document.getElementById('productName').value.trim();
 
             if (!productName) {
+                showToast(" Category is requied.Please select a category",'error')
                 showError('productNameError', 'Product name is required');
                 isValid = false;
             } else if (productName.length < 3 || productName.length > 100) {
@@ -533,7 +534,9 @@ in.css">
             }else {
                 clearError('productNameError');
             }
+            
 
+            
             
             const description = document.getElementById('description').value.trim();
             if (description.length < 10) {
@@ -602,7 +605,7 @@ in.css">
             
             const category = document.getElementById('category').value;
             if (!category || category === "all") {
-                showToast(" Category is requied.Please select a category")
+                showToast(" Category is requied.Please select a category",'error')
                 document.getElementById('categoryError').textContent = 'Please select a category';
                 document.getElementById('categoryError').style.display = 'block';
                 isValid = false;
@@ -615,6 +618,7 @@ in.css">
                 document.getElementById('additionalInfoError').style.display = 'block';
                 isValid = false;
             }
+
 
             if (isValid) {
                 

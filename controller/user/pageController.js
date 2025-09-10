@@ -17,20 +17,20 @@ const getLoadHomePage = async (req, res, next) => {
     const user = req.session.user;
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
-    // Get active category offers
+   
     const categoryOffers = await categoryOffer.find({
       isDeleted: false,
       status: "Active"
     }).populate("category");
 
-    // Calculate offers for all products
+  
     const calculateProductOffers = (productList) => {
       return productList.map(product => {
         const basePrice = Math.min(
           ...product.variants.map(v => v.salePrice || v.regularPrice)
         );
 
-        // Calculate product-level discount percentage
+     
         let productDiscountPer = 0;
         for (let vari of product.variants) {
           const diff = vari.regularPrice - (vari.salePrice || vari.regularPrice);
@@ -38,7 +38,7 @@ const getLoadHomePage = async (req, res, next) => {
           if (per > productDiscountPer) productDiscountPer = per;
         }
 
-        // Calculate category-level discount percentage
+    
         let categoryDiscountPer = 0;
         const catOffer = categoryOffers.find(
           c => c.category._id.toString() === product.categoryId._id.toString()
@@ -47,10 +47,9 @@ const getLoadHomePage = async (req, res, next) => {
           categoryDiscountPer = catOffer.discount;
         }
 
-        // Determine which offer is greater and apply it
+
         const finalDiscountPer = Math.max(productDiscountPer, categoryDiscountPer);
-        
-        // Store offer information on the product
+   
         product.productDiscountPer = productDiscountPer;
         product.categoryDiscountPer = categoryDiscountPer;
         product.finalDiscountPer = finalDiscountPer;
@@ -201,7 +200,7 @@ const getShopPage = async (req, res, next) => {
       status: "Active"
     }).populate("category");
 
-    // Calculate offers for each product
+   
     for (let product of products) {
       const basePrice = Math.min(
         ...product.variants.map(
@@ -209,7 +208,7 @@ const getShopPage = async (req, res, next) => {
         )
       );
 
-      // Calculate product-level discount percentage
+     
       let productDiscountPer = 0;
       for (let vari of product.variants) {
         const diff = vari.regularPrice - (vari.salePrice || vari.regularPrice);
@@ -217,7 +216,7 @@ const getShopPage = async (req, res, next) => {
         if (per > productDiscountPer) productDiscountPer = per;
       }
 
-      // Calculate category-level discount percentage
+   
       let categoryDiscountPer = 0;
       const catOffer = categoryOffers.find(
         (c) => c.category._id.toString() === product.categoryId._id.toString()
@@ -226,10 +225,10 @@ const getShopPage = async (req, res, next) => {
         categoryDiscountPer = catOffer.discount;
       }
 
-      // Determine which offer is greater and apply it
+   
       const finalDiscountPer = Math.max(productDiscountPer, categoryDiscountPer);
       
-      // Store offer information on the product
+    
       product.productDiscountPer = productDiscountPer;
       product.categoryDiscountPer = categoryDiscountPer;
       product.finalDiscountPer = finalDiscountPer;
@@ -264,15 +263,14 @@ const getProductDetails = async (req, res, next) => {
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     const userId = req.session.user?._id;
 
-    // Main product
+ 
     const product = await productSchema.findById(id).populate("categoryId");
 
-    // Related products
+
     const products = await productSchema
       .find({ isActive: false, isDeleted: false })
       .limit(4);
 
-    // Wishlist
     let userWishlist = [];
     if (userId) {
       const wishlistSchema = require("../../models/wishlistSchema");
@@ -282,17 +280,17 @@ const getProductDetails = async (req, res, next) => {
       }
     }
 
-    // Active category offers
+   
     const categoryOffers = await categoryOffer
       .find({ isDeleted: false, status: "Active" })
       .populate("category");
 
-    /** 🔹 Calculate best discount for MAIN product */
+  
     const basePrice = Math.min(
       ...product.variants.map((v) => v.salePrice || v.regularPrice)
     );
 
-    // Product-level discount %
+ 
     let productDiscountPer = 0;
     for (let vari of product.variants) {
       const diff = vari.regularPrice - (vari.salePrice || vari.regularPrice);
@@ -300,7 +298,7 @@ const getProductDetails = async (req, res, next) => {
       if (per > productDiscountPer) productDiscountPer = per;
     }
 
-    // Category-level discount %
+    
     let categoryDiscountPer = 0;
     const catOffer = categoryOffers.find(
       (c) => c.category._id.toString() === product.categoryId._id.toString()
@@ -309,11 +307,11 @@ const getProductDetails = async (req, res, next) => {
       categoryDiscountPer = catOffer.discount;
     }
 
-    // Final applied discount - choose the highest
+
     const finalDiscountPer = Math.max(productDiscountPer, categoryDiscountPer);
     const finalPrice = basePrice - (basePrice * finalDiscountPer) / 100;
 
-    // Determine which offer type is applied
+   
     let appliedOfferType = 'No Offer';
     if (finalDiscountPer > 0) {
       if (productDiscountPer >= categoryDiscountPer) {
@@ -323,7 +321,7 @@ const getProductDetails = async (req, res, next) => {
       }
     }
 
-    // Attach comprehensive offer data to product
+   
     product.originalPrice = basePrice;
     product.finalPrice = finalPrice;
     product.appliedDiscount = finalDiscountPer;
@@ -332,7 +330,7 @@ const getProductDetails = async (req, res, next) => {
     product.appliedOfferType = appliedOfferType;
     product.savingsAmount = basePrice - finalPrice;
 
-    /** 🔹 Do the same for "related products" list */
+  
     for (let p of products) {
       const basePriceP = Math.min(
         ...p.variants.map((v) => v.salePrice || v.regularPrice)
@@ -361,7 +359,7 @@ const getProductDetails = async (req, res, next) => {
       p.appliedDiscount = finalDiscountPerP;
     }
 
-    // Render with proper data
+  
     res.render("user/details", {
       user: req.session.user,
       product,
