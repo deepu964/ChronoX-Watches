@@ -895,7 +895,7 @@ const cancelOrder = async (req, res, next) => {
       }
     }
     refundAmount += order.totalAmount;
-    console.log(refundAmount,'is amount')
+    
     if (
       (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&
       order.isPaid &&
@@ -930,7 +930,7 @@ const cancelOrder = async (req, res, next) => {
 
     order.status = 'Cancelled';
     await order.save();
-    console.log(order,'ia order')
+    
 
     res
       .status(200)
@@ -1029,7 +1029,7 @@ const cancelOrderItem = async (req, res, next) => {
 
     await wallet.save();
     await order.save();
-    console.log(order,'isorder')
+    
     const allCancelled = order.items.every((i) => i.status === 'Cancelled');
     if (allCancelled) {
       order.status = 'Cancelled';

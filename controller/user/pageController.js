@@ -263,14 +263,15 @@ const getProductDetails = async (req, res, next) => {
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     const userId = req.session.user?._id;
 
- 
+    // Fetch main product
     const product = await productSchema.findById(id).populate("categoryId");
 
-
+    // Fetch some products to show (suggestions)
     const products = await productSchema
       .find({ isActive: false, isDeleted: false })
       .limit(4);
 
+    // Get user wishlist
     let userWishlist = [];
     if (userId) {
       const wishlistSchema = require("../../models/wishlistSchema");
@@ -280,17 +281,17 @@ const getProductDetails = async (req, res, next) => {
       }
     }
 
-   
+    // Get active category offers
     const categoryOffers = await categoryOffer
       .find({ isDeleted: false, status: "Active" })
       .populate("category");
 
-  
+    // Calculate base price of the selected product
     const basePrice = Math.min(
       ...product.variants.map((v) => v.salePrice || v.regularPrice)
     );
 
- 
+    // Product-level discount
     let productDiscountPer = 0;
     for (let vari of product.variants) {
       const diff = vari.regularPrice - (vari.salePrice || vari.regularPrice);
@@ -298,7 +299,7 @@ const getProductDetails = async (req, res, next) => {
       if (per > productDiscountPer) productDiscountPer = per;
     }
 
-    
+    // Category-level discount
     let categoryDiscountPer = 0;
     const catOffer = categoryOffers.find(
       (c) => c.category._id.toString() === product.categoryId._id.toString()
@@ -307,33 +308,73 @@ const getProductDetails = async (req, res, next) => {
       categoryDiscountPer = catOffer.discount;
     }
 
-
+    // Choose final discount
     const finalDiscountPer = Math.max(productDiscountPer, categoryDiscountPer);
     const finalPrice = basePrice - (basePrice * finalDiscountPer) / 100;
 
-   
-    let appliedOfferType = 'No Offer';
+    // Determine which offer applied
+    let appliedOfferType = "No Offer";
     if (finalDiscountPer > 0) {
       if (productDiscountPer >= categoryDiscountPer) {
-        appliedOfferType = 'Product Offer';
+        appliedOfferType = "Product Offer";
       } else {
-        appliedOfferType = 'Category Offer';
+        appliedOfferType = "Category Offer";
       }
     }
 
+    // Attach extra info to product
+    product.originalPrice = basePrice;
+    product.finalPrice = finalPrice;
+    product.appliedDiscount = finalDiscountPer;
+    product.productDiscountPer = productDiscountPer;
+    product.categoryDiscountPer = categoryDiscountPer;
+    product.appliedOfferType = appliedOfferType;
+    product.savingsAmount = basePrice - finalPrice;
 
+    // Also update related products
+    for (let p of products) {
+      const basePriceP = Math.min(
+        ...p.variants.map((v) => v.salePrice || v.regularPrice)
+      );
+
+      let productDiscountPerP = 0;
+      for (let vari of p.variants) {
+        const diff = vari.regularPrice - (vari.salePrice || vari.regularPrice);
+        const per = (diff / vari.regularPrice) * 100;
+        if (per > productDiscountPerP) productDiscountPerP = per;
+      }
+
+      let categoryDiscountPerP = 0;
+      const catOfferP = categoryOffers.find(
+        (c) => c.category._id.toString() === p.categoryId._id.toString()
+      );
+      if (catOfferP) {
+        categoryDiscountPerP = catOfferP.discount;
+      }
+
+      const finalDiscountPerP = Math.max(
+        productDiscountPerP,
+        categoryDiscountPerP
+      );
+      p.finalPrice = basePriceP - (basePriceP * finalDiscountPerP) / 100;
+      p.appliedDiscount = finalDiscountPerP;
+    }
+
+    // Render the view
+    res.render("user/details", {
       user: req.session.user,
       product,
       cloudName,
       products,
       userWishlist,
       isInWishlist: userWishlist.includes(id),
-   
+    });
   } catch (error) {
     logger.error("Product details error:", error);
     next(error);
   }
 };
+
 
 
 module.exports = {
@@ -342,3 +383,7 @@ module.exports = {
   getShopPage,
   getProductDetails,
 };
+
+
+
+
