@@ -109,9 +109,39 @@ const updateOrderStatus = async (req, res, next) => {
       orderId,
       { status },
       { new: true }
-    );
-    
+    ).populate('items.product').populate('user')
 
+     const user = await User.findById(order.user._id).populate('wallet')
+
+
+    let refundAmount;
+
+
+    for(let item of order.items){
+       
+        console.log(item.product,'is product')
+
+        for(let vari of item.product.variants){
+           if(vari.quantity > 3){
+                refundAmount = (order.totalAmount * 30 )/ 100;
+                
+           }
+        }
+      }
+
+    if (refundAmount > 0 && user.wallet) {
+      await user.wallet.addMoney(refundAmount, 'Refund for product', order._id);
+      console.log(user.wallet.balance, 'Updated wallet');
+      console.log(refundAmount,'is refund')
+    } else {
+      console.log("Refund not valid");
+    }
+
+
+      await order.save()
+
+    console.log(order,'is user')
+    
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -120,32 +150,6 @@ const updateOrderStatus = async (req, res, next) => {
       });
     }
 
-    // console.log(order,'is order') 
-    // let prodId ;
-    // for(let item  of order.items){
-    //     prodId = item.product._id;
-    // }
-    // const product = await productSchema.findById(prodId).populate('categoryId');
-    // console.log(product,'is product')
-    // const catoff = await categoryOfferSchema.findById({categoryId:product.categoryId._id, isDeleted:false});
-    // console.log(catoff,'is catoff');
-    
-    // let wallet;
-    // for(let vari of product.variants){
-    //     if(vari.quantity > 3 &&  catoff.discount > 0){
-    //        wallet += order.totalAmount * 30 / 100;
-
-    //     }
-    // }
-
-    // const user = await User.findById(order.user);
-    // console.log(user,'is user');
-    
-    //  if(user){
-    //   user.wallet = (user.wallet || 0) + wallet;
-    //   await user.save();
-    //   console.log("wallet added", user.wallet);
-    //  }
     
     if (!order) {
       return res.status(404).json({

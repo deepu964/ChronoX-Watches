@@ -43,11 +43,17 @@
                                 </span>
                             </div>
                             <div class="product-price">
-                                <span class="current-price">₹<%= product.variants[0].salePrice %></span>
-                                <% if(product.originalPrice) { %>
-                                    <span class="original-price">$<%= product.variants[0].regularPrice %></span>
+                                <span class="current-price">₹<%= Math.round(product.finalPrice || product.variants[0].salePrice) %></span>
+                                <% if(product.originalPrice && product.finalDiscountPer > 0) { %>
+                                    <span class="original-price">₹<%= Math.round(product.originalPrice) %></span>
                                 <% } %>
                             </div>
+                            <% if(product.finalDiscountPer > 0) { %>
+                                <div class="offer-info">
+                                    <span class="discount-badge"><%= Math.round(product.finalDiscountPer) %>% OFF</span>
+                                    <span class="offer-type"><%= product.appliedOfferType %></span>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
                 <% }); %>
@@ -80,15 +86,24 @@
                     </div>
                     <div class="product-price">
                         <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
-                           ₹<%= element.variants[0]?.salePrice %>
+                           ₹<%= Math.round(element.finalPrice || element.variants[0]?.salePrice) %>
                         </span>
-                        <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
-                           ₹<%= element.variants[0]?.regularPrice %>
-                        </span>
-                        </div>  
-                        <!-- <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
-                           <%= element.offer %>% OFF
-                        </span> -->
+                        <% if(element.originalPrice && element.finalDiscountPer > 0) { %>
+                            <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
+                               ₹<%= Math.round(element.originalPrice) %>
+                            </span>
+                        <% } %>
+                    </div>
+                    <% if(element.finalDiscountPer > 0) { %>
+                        <div class="offer-info">
+                            <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                               <%= Math.round(element.finalDiscountPer) %>% OFF
+                            </span>
+                            <span style="color: #666; font-size: 0.8em; margin-left: 4px;">
+                               (<%= element.appliedOfferType %>)
+                            </span>
+                        </div>
+                    <% } %>
                 </div>
             </div>
         <% }) %>
@@ -134,16 +149,25 @@
                                     </span>
                                 </div>
                                 <div class="product-price">
-                                <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
-                                        ₹<%= element.variants[0]?.salePrice %>
+                                    <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
+                                        ₹<%= Math.round(element.finalPrice || element.variants[0]?.salePrice) %>
                                     </span>
-                                    <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
-                                        ₹<%= element.variants[0]?.regularPrice %>
-                                    </span>
+                                    <% if(element.originalPrice && element.finalDiscountPer > 0) { %>
+                                        <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
+                                            ₹<%= Math.round(element.originalPrice) %>
+                                        </span>
+                                    <% } %>
                                 </div>
-                                <!-- <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
-                                        <%= element.offer %>% OFF
-                                </span> -->
+                                <% if(element.finalDiscountPer > 0) { %>
+                                    <div class="offer-info">
+                                        <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                                            <%= Math.round(element.finalDiscountPer) %>% OFF
+                                        </span>
+                                        <span style="color: #666; font-size: 0.8em; margin-left: 4px;">
+                                            (<%= element.appliedOfferType %>)
+                                        </span>
+                                    </div>
+                                <% } %>
                             </div>
                         </div>
                     <% }) %>
@@ -186,15 +210,24 @@
                             </div>
                            <div class="product-price">
                                 <span class="current-price" style="font-weight: bold; font-size: 1.1em;">
-                                        ₹<%= element.variants[0]?.salePrice %>
-                                    </span>
+                                    ₹<%= Math.round(element.finalPrice || element.variants[0]?.salePrice) %>
+                                </span>
+                                <% if(element.originalPrice && element.finalDiscountPer > 0) { %>
                                     <span style="text-decoration: line-through; color: rgb(195, 161, 161); font-size: 0.9em; margin-left: 8px;">
-                                        ₹<%= element.variants[0]?.regularPrice %>
+                                        ₹<%= Math.round(element.originalPrice) %>
+                                    </span>
+                                <% } %>
+                            </div>
+                            <% if(element.finalDiscountPer > 0) { %>
+                                <div class="offer-info">
+                                    <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
+                                        <%= Math.round(element.finalDiscountPer) %>% OFF
+                                    </span>
+                                    <span style="color: #666; font-size: 0.8em; margin-left: 4px;">
+                                        (<%= element.appliedOfferType %>)
                                     </span>
                                 </div>
-                                <!-- <span style="color: green; font-weight: bold; font-size: 0.9em; margin-left: 8px;">
-                                        <%= element.offer %>% OFF
-                                </span> -->
+                            <% } %>
                         </div>
                     </div>
                 <% }) %>

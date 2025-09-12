@@ -68,6 +68,7 @@ const getCart = async (req, res, next) => {
       discount,
       grandTotal: grandTotal,
       cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      categoryOffers: categoryOff, // Pass category offers to template
     });
   } catch (error) {
     logger.error('cart get error:', error);
@@ -82,7 +83,7 @@ const addToCart = async (req, res, next) => {
     const { productId, variantId, quantity = 1 } = req.body;
     const requestedQty = parseInt(quantity) || 1;
 
-    
+
     const product = await productSchema
       .findById(productId)
       .populate("categoryId");
@@ -99,7 +100,6 @@ const addToCart = async (req, res, next) => {
       });
     }
 
-    
     const selectedVariant = variantId
       ? product.variants.id(variantId)
       : product.variants[0]; 
@@ -190,7 +190,7 @@ const addToCart = async (req, res, next) => {
       });
     }
 
-   
+
     await wishlistSchema.updateOne(
       { user: userId },
       { $pull: { products: productId } }
@@ -210,7 +210,6 @@ const addToCart = async (req, res, next) => {
   }
 };
 
-
 const updateCartItem = async (req, res, next) => {
   try {
     const userId = req.session.user._id;
@@ -221,6 +220,7 @@ const updateCartItem = async (req, res, next) => {
       return res
         .status(404)
         .json({ success: false, message: 'Cart not found' });
+    
     const item = cart.items.find(
       (item) => item.product._id.toString() === productId
     );
@@ -249,31 +249,7 @@ const updateCartItem = async (req, res, next) => {
     );
     const MAX_QTY = 5;
 
-    const categoryOff = await categoryOffer
-      .find({
-        isDeleted: false,
-        status: 'Active',
-      })
-      .lean();
-
-    const productOff =
-      item.product.variants[0].regularPrice -
-      item.product.variants[0].salePrice;
-    const catOffer = categoryOff.find(
-      (cat) => cat.category._id.toString() === product.categoryId.toString()
-    );
-    let catDiscount = 0;
-    if (catOffer && catOffer.discount) {
-      catDiscount =
-        (item.product.variants[0].regularPrice * catOffer.discount) / 100;
-    }
-
-    let grandTotal = 0;
-    const bestOffer = Math.max(productOff, catDiscount);
-    let discountOff = bestOffer * item.quantity;
-
-    grandTotal = item.product.variants[0].regularPrice - discountOff;
-
+   
     if (action === 'increase') {
       if (item.quantity >= MAX_QTY) {
         return res
@@ -286,51 +262,71 @@ const updateCartItem = async (req, res, next) => {
           .json({ success: false, message: 'Insufficient stock' });
       }
       item.quantity += 1;
-      await cart.save();
-      discountOff = bestOffer * item.quantity;
-      grandTotal =
-        item.product.variants[0].regularPrice * item.quantity - discountOff;
-      return res.json({
-        success: true,
-        message: 'Quantity increased',
-        quantity: item.quantity,
-        itemTotal: item.quantity * item.product.variants[0].regularPrice,
-        discountOff,
-        grandTotal,
-        cartTotal: cart.items.reduce(
-          (sum, i) => sum + i.quantity * i.product.variants[0].regularPrice,
-          0
-        ),
-      });
-    }
-
-    if (action === 'decrease') {
+    } else if (action === 'decrease') {
       if (item.quantity <= 1) {
         return res
           .status(400)
           .json({ success: false, message: 'Minimum 1 quantity required' });
-      } else {
-        item.quantity -= 1;
-        await cart.save();
-        discountOff = bestOffer * item.quantity;
-        grandTotal =
-          item.product.variants[0].regularPrice * item.quantity - discountOff;
-        return res.json({
-          success: true,
-          message: 'Quantity decreased',
-          quantity: item.quantity,
-          itemTotal: item.quantity * item.product.variants[0].regularPrice,
-          discountOff,
-          grandTotal,
-          cartTotal: cart.items.reduce(
-            (sum, i) => sum + i.quantity * i.product.variants[0].regularPrice,
-            0
-          ),
-        });
       }
+      item.quantity -= 1;
     }
+
+    await cart.save();
+
+ 
+    const categoryOff = await categoryOffer
+      .find({
+        isDeleted: false,
+        status: 'Active',
+      })
+      .lean();
+
+    let totalMRP = 0;
+    let totalDiscount = 0;
+    let grandTotal = 0;
+
+   
+    for (let cartItem of cart.items) {
+      const itemProduct = cartItem.product;
+      const quantity = cartItem.quantity;
+      const variant = itemProduct.variants[0];
+
+      const regularPrice = variant.regularPrice;
+      const salePrice = variant.salePrice;
+
+    
+      const productOffer = regularPrice - salePrice;
+
+    
+      const catOffer = categoryOff.find(
+        (cat) => cat.category._id.toString() === itemProduct.categoryId.toString()
+      );
+      let catDiscount = 0;
+      if (catOffer && catOffer.discount) {
+        catDiscount = (regularPrice * catOffer.discount) / 100;
+      }
+
+    
+      const bestOffer = Math.max(productOffer, catDiscount);
+      const discountedPrice = regularPrice - bestOffer;
+
+   
+      totalMRP += regularPrice * quantity;
+      totalDiscount += bestOffer * quantity;
+      grandTotal += discountedPrice * quantity;
+    }
+
+    return res.json({
+      success: true,
+      message: action === 'increase' ? 'Quantity increased' : 'Quantity decreased',
+      quantity: item.quantity,
+      cartTotal: totalMRP,
+      discountOff: totalDiscount,
+      grandTotal: grandTotal,
+    });
+
   } catch (err) {
-    logger.error(' cart updated error');
+    logger.error('cart updated error:', err);
     next(err);
   }
 };
