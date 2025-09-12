@@ -895,19 +895,32 @@ const cancelOrder = async (req, res, next) => {
       }
     }
     refundAmount += order.totalAmount;
+    console.log(refundAmount,'is amount')
     if (
       (order.paymentMethod === 'ONLINE' || order.paymentMethod === 'Wallet') &&
       order.isPaid &&
       refundAmount > 0
     ) {
       let wallet = order.user.wallet;
-
+      
       if (!wallet) {
         wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
         await wallet.save();
         order.user.wallet = wallet;
       }
-
+      await wallet.addMoney(
+        refundAmount,
+        `Refund for cancelled order: ${order._id.toString().slice(-8)}`,
+        order._id
+      );
+    }else{
+      let wallet = order.user.wallet;
+      
+      if (!wallet) {
+        wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
+        await wallet.save();
+        order.user.wallet = wallet;
+      }
       await wallet.addMoney(
         refundAmount,
         `Refund for cancelled order: ${order._id.toString().slice(-8)}`,
@@ -917,6 +930,7 @@ const cancelOrder = async (req, res, next) => {
 
     order.status = 'Cancelled';
     await order.save();
+    console.log(order,'ia order')
 
     res
       .status(200)
@@ -972,11 +986,14 @@ const cancelOrderItem = async (req, res, next) => {
 
     let refundAmount = 0;
 
-    if (order.coupon) {
+  
+    if (order.coupon.discountAmount > 0 ) {
       const finalPrice = itemTotal * (1 - order.coupon.maxDiscount / 100);
       refundAmount += finalPrice;
+    }else{
+      refundAmount += order.totalAmount;
     }
-
+  
     refundAmount = parseFloat(refundAmount.toFixed(2));
 
     if (isNaN(refundAmount) || refundAmount <= 0) {
@@ -1012,7 +1029,7 @@ const cancelOrderItem = async (req, res, next) => {
 
     await wallet.save();
     await order.save();
-
+    console.log(order,'isorder')
     const allCancelled = order.items.every((i) => i.status === 'Cancelled');
     if (allCancelled) {
       order.status = 'Cancelled';
